@@ -1,0 +1,120 @@
+package com.phoenix2k.priorityreminder;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.phoenix2k.priorityreminder.drive.DriveAPIType;
+import com.phoenix2k.priorityreminder.drive.task.CreateAppFolderTask;
+import com.phoenix2k.priorityreminder.drive.task.CreateDataFileTask;
+import com.phoenix2k.priorityreminder.drive.task.FindAppFolderTask;
+import com.phoenix2k.priorityreminder.drive.task.FindDataFileTask;
+import com.phoenix2k.priorityreminder.drive.task.GoogleDriveListener;
+import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
+import com.phoenix2k.priorityreminder.utils.LogUtils;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/**
+ * Created by Pushpan on 05/02/17.
+ */
+
+public class SignInActivity extends BasicDriveActivity implements GoogleDriveListener {
+
+    private static final String TAG = "SignInActivity";
+    @BindView(R.id.progress)
+    View mProgressView;
+    @BindView(R.id.text_log)
+    TextView mTextLog;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_signin);
+        ButterKnife.bind(this);
+    }
+
+    @Override
+    public void onGoogleServiceAvailibilityError(int statusCode) {
+        showGooglePlayServicesAvailabilityErrorDialog(statusCode);
+    }
+
+    @Override
+    public void onUserRecoverableAuthorizationError(UserRecoverableAuthIOException error) {
+        startActivityForResult(error.getIntent(), BasicDriveActivity.REQUEST_AUTHORIZATION);
+    }
+
+    @Override
+    public void onSignInComplete() {
+        new FindAppFolderTask(getString(R.string.app_name), mCredential, this).execute();
+    }
+
+    @Override
+    public void onError(String err) {
+        mTextLog.setText(err);
+    }
+
+    @Override
+    public void onDisplayInfo(String msg) {
+        mTextLog.setText(msg);
+    }
+
+    @Override
+    public void onProgress(boolean show) {
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onFinishQuery(DriveAPIType type, Object result) {
+        switch (type) {
+            case Folder_List:
+                if (result != null) {
+                    PreferenceHelper.setAppFolderId(this, result.toString());
+                    LogUtils.logI(TAG, "Folder Id =" + result.toString());
+                    onDisplayInfo("Folder Id =" + result.toString());
+                    new FindDataFileTask(getString(R.string.app_name), result.toString(), mCredential, this).execute();
+                } else {
+                    LogUtils.logI(TAG, "Folder Id not found");
+                    onDisplayInfo("Folder Id not found");
+                    new CreateAppFolderTask(getString(R.string.app_name), mCredential, this).execute();
+                }
+                break;
+            case Folder_Create:
+                if (result != null) {
+                    PreferenceHelper.setAppFolderId(this, result.toString());
+                    LogUtils.logI(TAG, "Folder Id created =" + result.toString());
+                    onDisplayInfo("Folder Id created =" + result.toString());
+                    String folderId = PreferenceHelper.getSavedAppFolderId(this);
+                    new FindDataFileTask(getString(R.string.app_name), folderId, mCredential, this).execute();
+                } else {
+                    LogUtils.logI(TAG, "Folder couldn't be created");
+                    onDisplayInfo("Folder couldn't be created");
+                }
+                break;
+            case File_List:
+                if (result != null) {
+                    PreferenceHelper.setDataFileId(this, result.toString());
+                    LogUtils.logI(TAG, "File Id =" + result.toString());
+                    onDisplayInfo("File Id =" + result.toString());
+                } else {
+                    LogUtils.logI(TAG, "File Id not found");
+                    onDisplayInfo("File Id not found");
+                    new CreateDataFileTask(getString(R.string.app_name), this, R.raw.sample, mCredential, this).execute();
+                }
+                break;
+            case File_Create:
+                if (result != null) {
+                    PreferenceHelper.setDataFileId(this, result.toString());
+                    LogUtils.logI(TAG, "File Id created =" + result.toString());
+                    onDisplayInfo("File Id created =" + result.toString());
+                } else {
+                    LogUtils.logI(TAG, "Data file couldn't be created");
+                    onDisplayInfo("Data file couldn't be created");
+                }
+                break;
+
+        }
+    }
+}
