@@ -126,6 +126,6 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
 
     private void onSetupValidationComplete() {
         Intent intent = new Intent(this, DashboardActivity.class);
-        startActivity(intent);
+//        startActivity(intent);
     }
 }
