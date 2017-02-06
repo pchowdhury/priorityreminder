@@ -1,4 +1,4 @@
-package com.phoenix2k.priorityreminder.drive.task;
+package com.phoenix2k.priorityreminder.task;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -11,9 +11,7 @@ import com.google.api.client.googleapis.services.json.AbstractGoogleJsonClient;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.drive.Drive;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.drive.DriveAPIType;
 
 import java.io.IOException;
 

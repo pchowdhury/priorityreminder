@@ -1,4 +1,4 @@
-package com.phoenix2k.priorityreminder.drive.task;
+package com.phoenix2k.priorityreminder.task;
 
 /**
  * Created by Pushpan on 05/02/17.

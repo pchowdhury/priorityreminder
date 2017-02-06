@@ -17,7 +17,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.DriveScopes;
-import com.phoenix2k.priorityreminder.drive.task.ErrorCallback;
+import com.phoenix2k.priorityreminder.task.ErrorCallback;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.phoenix2k.priorityreminder.drive.task;
+package com.phoenix2k.priorityreminder.task;
 
 import android.content.Context;
 
@@ -7,7 +7,6 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
-import com.phoenix2k.priorityreminder.drive.DriveAPIType;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.List;

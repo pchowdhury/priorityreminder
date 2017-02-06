@@ -1,15 +1,11 @@
-package com.phoenix2k.priorityreminder.drive.task;
+package com.phoenix2k.priorityreminder.task;
 
 import android.content.Context;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
-import com.phoenix2k.priorityreminder.drive.DriveAPIType;
-
-import java.util.List;
 
 /**
  * Created by Pushpan on 05/02/17.

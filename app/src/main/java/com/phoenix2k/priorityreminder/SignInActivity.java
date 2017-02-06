@@ -6,12 +6,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.phoenix2k.priorityreminder.drive.DriveAPIType;
-import com.phoenix2k.priorityreminder.drive.task.CreateAppFolderTask;
-import com.phoenix2k.priorityreminder.drive.task.CreateDataFileTask;
-import com.phoenix2k.priorityreminder.drive.task.FindAppFolderTask;
-import com.phoenix2k.priorityreminder.drive.task.FindDataFileTask;
-import com.phoenix2k.priorityreminder.drive.task.GoogleDriveListener;
+import com.phoenix2k.priorityreminder.task.DriveAPIType;
+import com.phoenix2k.priorityreminder.task.CreateAppFolderTask;
+import com.phoenix2k.priorityreminder.task.CreateDataFileTask;
+import com.phoenix2k.priorityreminder.task.FindAppFolderTask;
+import com.phoenix2k.priorityreminder.task.FindDataFileTask;
+import com.phoenix2k.priorityreminder.task.GoogleDriveListener;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
