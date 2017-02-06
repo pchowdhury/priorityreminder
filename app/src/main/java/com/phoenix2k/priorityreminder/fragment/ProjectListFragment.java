@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
+import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
 
@@ -78,7 +79,7 @@ public class ProjectListFragment extends BasicFragment {
     public void onFinishQuery(APIType type, Object result) {
         switch (type) {
             case Sheet_Load_Projects_Metadata:
-                List<String> list = (List<String>) result;
+                List<Project> list = (List<Project>) result;
                 DataStore.getInstance().setProjects(new ArrayList<>(list));
                 break;
         }
@@ -114,8 +115,8 @@ public class ProjectListFragment extends BasicFragment {
 
         @Override
         public void onBindViewHolder(ProjectViewHolder projectViewHolder, int i) {
-            String project = DataStore.getInstance().getProjects().get(i);
-            projectViewHolder.mNameTxt.setText(project);
+            Project project = DataStore.getInstance().getProjects().get(i);
+            projectViewHolder.mNameTxt.setText(project.mTitle);
         }
 
         @Override

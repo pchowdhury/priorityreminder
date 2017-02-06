@@ -1,18 +1,19 @@
 package com.phoenix2k.priorityreminder;
 
+import com.phoenix2k.priorityreminder.model.Project;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Pushpan on 08/01/17.
  */
 
 public class DataStore {
+    private final String TAG = "DataStore";
     public static final String APP_FOLDER_NAME = "Priority Reminder";
     public static final String APP_DATA_FILE_NAME = "AppData";
-    private final String TAG = "DataStore";
     private static DataStore mInstance;
-    private ArrayList<String> mProjects = new ArrayList<>() ;
+    private ArrayList<Project> mProjects = new ArrayList<>() ;
 
     public static DataStore getInstance(){
         if(mInstance==null){
@@ -21,11 +22,11 @@ public class DataStore {
         return mInstance;
     }
 
-    public void setProjects(ArrayList<String> projects) {
+    public void setProjects(ArrayList<Project> projects) {
         this.mProjects = projects;
     }
 
-    public ArrayList<String> getProjects(){
+    public ArrayList<Project> getProjects(){
         return mProjects;
     }
 }
