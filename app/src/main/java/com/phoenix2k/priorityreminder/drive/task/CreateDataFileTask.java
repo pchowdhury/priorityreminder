@@ -4,8 +4,10 @@ import android.content.Context;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.FileContent;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.phoenix2k.priorityreminder.DataStore;
+import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.drive.DriveAPIType;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
@@ -20,13 +22,14 @@ import java.util.Collections;
 
 public class CreateDataFileTask extends BasicTask {
     private static final String TAG = "CreateDataFileTask";
-    private Context mContext;
-    private int mResId;
 
-    public CreateDataFileTask(String appName, Context context, int resId, GoogleAccountCredential credential, GoogleDriveListener listener) {
-        super(appName, credential, listener);
-        this.mContext = context;
-        this.mResId = resId;
+    public CreateDataFileTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+        super(context, credential, listener);
+    }
+
+    @Override
+    public ServiceType getServiceType() {
+        return ServiceType.Drive;
     }
 
     @Override
@@ -37,11 +40,11 @@ public class CreateDataFileTask extends BasicTask {
             File fileMetadata = new File();
             fileMetadata.setName(DataStore.APP_DATA_FILE_NAME);
             fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
-            fileMetadata.setParents(Collections.singletonList(PreferenceHelper.getSavedAppFolderId(mContext)));
+            fileMetadata.setParents(Collections.singletonList(PreferenceHelper.getSavedAppFolderId(getContext())));
 
-            java.io.File filePath = new java.io.File(mContext.getCacheDir().getAbsolutePath() + "/sample.csv");
+            java.io.File filePath = new java.io.File(getContext().getCacheDir().getAbsolutePath() + "/sample.csv");
             FileContent mediaContent = new FileContent("text/csv", filePath);
-            File file = getService().files().create(fileMetadata, mediaContent)
+            File file = ((Drive)getService()).files().create(fileMetadata, mediaContent)
                     .setFields("id")
                     .execute();
             if(filePath.delete()){
@@ -56,12 +59,12 @@ public class CreateDataFileTask extends BasicTask {
     }
 
     private void copyCsvToTemporaryPath() {
-        InputStream input = mContext.getResources().openRawResource(mResId);
+        InputStream input = getContext().getResources().openRawResource(R.raw.sample);
         java.io.File file;
         java.io.FileOutputStream output = null;
 
         try {
-            file = new java.io.File(mContext.getCacheDir(), "sample.csv");
+            file = new java.io.File(getContext().getCacheDir(), "sample.csv");
             output = new java.io.FileOutputStream(file);
             byte[] buffer = new byte[4 * 1024]; // or other buffer size
             int read;

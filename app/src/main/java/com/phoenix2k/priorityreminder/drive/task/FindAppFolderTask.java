@@ -1,6 +1,9 @@
 package com.phoenix2k.priorityreminder.drive.task;
 
+import android.content.Context;
+
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
@@ -14,8 +17,13 @@ import java.util.List;
  */
 
 public class FindAppFolderTask extends BasicTask {
-    public FindAppFolderTask(String appName, GoogleAccountCredential credential, GoogleDriveListener listener) {
-        super(appName, credential, listener);
+    public FindAppFolderTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+        super(context, credential, listener);
+    }
+
+    @Override
+    public ServiceType getServiceType() {
+        return ServiceType.Drive;
     }
 
     @Override
@@ -23,15 +31,15 @@ public class FindAppFolderTask extends BasicTask {
         // Get a list of up to 10 files.
         FileList result;
         try {
-            result = getService().files().list().setQ("mimeType = 'application/vnd.google-apps.folder' and 'root' in parents and trashed=false and name = '" + DataStore.APP_FOLDER_NAME + "'")
-                    .setFields("files(id, name)")//nextPageToken,
+            result = ((Drive) getService()).files().list().setQ("mimeType = 'application/vnd.google-apps.folder' and 'root' in parents and trashed=false and name = '" + DataStore.APP_FOLDER_NAME + "'")
+                    .setFields("files(id, name)")
                     .execute();
 
             List<File> files = result.getFiles();
             LogUtils.printList(files);
             if (files != null) {
                 for (File file : files) {
-                    if ( file.getName().equals(DataStore.APP_FOLDER_NAME)){
+                    if (file.getName().equals(DataStore.APP_FOLDER_NAME)) {
                         return file.getId();
                     }
                 }
@@ -46,9 +54,9 @@ public class FindAppFolderTask extends BasicTask {
 
     @Override
     public void handleResult(Object result) {
-        if(getLastError()!=null){
+        if (getLastError() != null) {
             onError(getLastError().getMessage());
-        }else{
+        } else {
             onFinishQuery(DriveAPIType.Folder_List, result);
         }
     }

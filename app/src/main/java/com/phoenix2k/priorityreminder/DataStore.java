@@ -7,7 +7,7 @@ package com.phoenix2k.priorityreminder;
 public class DataStore {
     public static final String APP_FOLDER_NAME = "Priority Reminder";
     public static final String APP_DATA_FILE_NAME = "AppData";
-    private final String TAG = "SyncStore";
+    private final String TAG = "DataStore";
     private static DataStore mInstance;
 
     public static DataStore getInstance(){

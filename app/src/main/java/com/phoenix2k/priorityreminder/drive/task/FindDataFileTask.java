@@ -1,12 +1,14 @@
 package com.phoenix2k.priorityreminder.drive.task;
 
-import android.text.TextUtils;
+import android.content.Context;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.drive.DriveAPIType;
+import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.List;
@@ -16,19 +18,22 @@ import java.util.List;
  */
 
 public class FindDataFileTask extends BasicTask {
-    private String mAppFolderId;
+    public FindDataFileTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+        super(context, credential, listener);
+    }
 
-    public FindDataFileTask(String appName, String appFolderId, GoogleAccountCredential credential, GoogleDriveListener listener) {
-        super(appName, credential, listener);
-        this.mAppFolderId = appFolderId;
+    @Override
+    public ServiceType getServiceType() {
+        return ServiceType.Drive;
     }
 
     @Override
     public Object getDataFromApi() {
         // Get a list of up to 10 files.
         FileList result;
+        String appFolderId = PreferenceHelper.getSavedAppFolderId(getContext());
         try {
-            result = getService().files().list().setQ("mimeType = 'application/vnd.google-apps.spreadsheet' and trashed=false and '" + mAppFolderId + "' in parents and name = '" + DataStore.APP_DATA_FILE_NAME + "'")
+            result = ((Drive)getService()).files().list().setQ("mimeType = 'application/vnd.google-apps.spreadsheet' and trashed=false and '" + appFolderId + "' in parents and name = '" + DataStore.APP_DATA_FILE_NAME + "'")
                     .setFields("files(id, name)")
                     .execute();
             List<File> files = result.getFiles();

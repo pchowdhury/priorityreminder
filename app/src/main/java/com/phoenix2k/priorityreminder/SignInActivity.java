@@ -1,5 +1,6 @@
 package com.phoenix2k.priorityreminder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -48,7 +49,11 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
 
     @Override
     public void onSignInComplete() {
-        new FindAppFolderTask(getString(R.string.app_name), mCredential, this).execute();
+        if (PreferenceHelper.getSavedDataFileId(this) == null) {
+            new FindAppFolderTask(this, mCredential, this).execute();
+        } else {
+            onSetupValidationComplete();
+        }
     }
 
     @Override
@@ -74,11 +79,11 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
                     PreferenceHelper.setAppFolderId(this, result.toString());
                     LogUtils.logI(TAG, "Folder Id =" + result.toString());
                     onDisplayInfo("Folder Id =" + result.toString());
-                    new FindDataFileTask(getString(R.string.app_name), result.toString(), mCredential, this).execute();
+                    new FindDataFileTask(this, mCredential, this).execute();
                 } else {
                     LogUtils.logI(TAG, "Folder Id not found");
                     onDisplayInfo("Folder Id not found");
-                    new CreateAppFolderTask(getString(R.string.app_name), mCredential, this).execute();
+                    new CreateAppFolderTask(this, mCredential, this).execute();
                 }
                 break;
             case Folder_Create:
@@ -86,8 +91,7 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
                     PreferenceHelper.setAppFolderId(this, result.toString());
                     LogUtils.logI(TAG, "Folder Id created =" + result.toString());
                     onDisplayInfo("Folder Id created =" + result.toString());
-                    String folderId = PreferenceHelper.getSavedAppFolderId(this);
-                    new FindDataFileTask(getString(R.string.app_name), folderId, mCredential, this).execute();
+                    new FindDataFileTask(this, mCredential, this).execute();
                 } else {
                     LogUtils.logI(TAG, "Folder couldn't be created");
                     onDisplayInfo("Folder couldn't be created");
@@ -98,10 +102,11 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
                     PreferenceHelper.setDataFileId(this, result.toString());
                     LogUtils.logI(TAG, "File Id =" + result.toString());
                     onDisplayInfo("File Id =" + result.toString());
+                    onSetupValidationComplete();
                 } else {
                     LogUtils.logI(TAG, "File Id not found");
                     onDisplayInfo("File Id not found");
-//                    new CreateDataFileTask(getString(R.string.app_name), this, R.raw.sample, mCredential, this).execute();
+                    new CreateDataFileTask(this, mCredential, this).execute();
                 }
                 break;
             case File_Create:
@@ -109,6 +114,7 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
                     PreferenceHelper.setDataFileId(this, result.toString());
                     LogUtils.logI(TAG, "File Id created =" + result.toString());
                     onDisplayInfo("File Id created =" + result.toString());
+                    onSetupValidationComplete();
                 } else {
                     LogUtils.logI(TAG, "Data file couldn't be created");
                     onDisplayInfo("Data file couldn't be created");
@@ -116,5 +122,10 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
                 break;
 
         }
+    }
+
+    private void onSetupValidationComplete() {
+        Intent intent = new Intent(this, DashboardActivity.class);
+        startActivity(intent);
     }
 }

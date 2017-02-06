@@ -1,6 +1,9 @@
 package com.phoenix2k.priorityreminder.drive.task;
 
+import android.content.Context;
+
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
@@ -13,8 +16,13 @@ import java.util.List;
  */
 
 public class CreateAppFolderTask extends BasicTask {
-    public CreateAppFolderTask(String appName, GoogleAccountCredential credential, GoogleDriveListener listener) {
-        super(appName, credential, listener);
+    public CreateAppFolderTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+        super(context, credential, listener);
+    }
+
+    @Override
+    public ServiceType getServiceType() {
+        return ServiceType.Drive;
     }
 
     @Override
@@ -25,7 +33,7 @@ public class CreateAppFolderTask extends BasicTask {
             fileMetadata.setName(DataStore.APP_FOLDER_NAME);
             fileMetadata.setMimeType("application/vnd.google-apps.folder");
 
-            File file = getService().files().create(fileMetadata)
+            File file = ((Drive)getService()).files().create(fileMetadata)
                     .setFields("id")
                     .execute();
         return file.getId();

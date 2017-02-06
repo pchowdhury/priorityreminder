@@ -1,15 +1,18 @@
 package com.phoenix2k.priorityreminder.drive.task;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.googleapis.services.json.AbstractGoogleJsonClient;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
+import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.drive.DriveAPIType;
 
 import java.io.IOException;
@@ -19,21 +22,46 @@ import java.io.IOException;
  */
 
 public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
-    private com.google.api.services.drive.Drive mService = null;
+    private AbstractGoogleJsonClient mService = null;
     private Exception mLastError = null;
     private GoogleDriveListener mGoogleDriveListener;
+    private Context mContext;
 
-    public BasicTask(String appName, GoogleAccountCredential credential, GoogleDriveListener listener) {
+    public enum ServiceType {
+        Drive, Spreadsheet
+    }
+
+    ;
+
+    public BasicTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+        this.mContext = context;
         this.mGoogleDriveListener = listener;
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        mService = new com.google.api.services.drive.Drive.Builder(
-                transport, jsonFactory, credential)
-                .setApplicationName(appName)
-                .build();
+        switch (getServiceType()){
+            case Drive:
+                mService = new com.google.api.services.drive.Drive.Builder(
+                        transport, jsonFactory, credential)
+                        .setApplicationName(mContext.getString(R.string.app_name))
+                        .build();
+                break;
+            case Spreadsheet:
+                mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                        transport, jsonFactory, credential)
+                        .setApplicationName(mContext.getString(R.string.app_name))
+                        .build();
+                break;
+
+        }
+
     }
 
-    public Drive getService() {
+    public Context getContext(){
+        return mContext;
+    }
+    public abstract ServiceType getServiceType();
+
+    public AbstractGoogleJsonClient getService() {
         return mService;
     }
 
