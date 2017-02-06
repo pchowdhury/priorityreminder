@@ -5,6 +5,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.drive.DriveAPIType;
+import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class FindAppFolderTask extends BasicTask {
                     .execute();
 
             List<File> files = result.getFiles();
+            LogUtils.printList(files);
             if (files != null) {
                 for (File file : files) {
                     if ( file.getName().equals(DataStore.APP_FOLDER_NAME)){

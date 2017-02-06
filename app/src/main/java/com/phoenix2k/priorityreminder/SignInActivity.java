@@ -101,7 +101,7 @@ public class SignInActivity extends BasicDriveActivity implements GoogleDriveLis
                 } else {
                     LogUtils.logI(TAG, "File Id not found");
                     onDisplayInfo("File Id not found");
-                    new CreateDataFileTask(getString(R.string.app_name), this, R.raw.sample, mCredential, this).execute();
+//                    new CreateDataFileTask(getString(R.string.app_name), this, R.raw.sample, mCredential, this).execute();
                 }
                 break;
             case File_Create:
