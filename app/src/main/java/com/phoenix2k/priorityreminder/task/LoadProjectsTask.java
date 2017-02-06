@@ -42,9 +42,9 @@ public class LoadProjectsTask extends BasicTask {
     @Override
     public Object getDataFromApi() {
         String spreadsheetId = PreferenceHelper.getSavedDataFileId(getContext());
-        String range = "Class Data!A2:E";
+        String range = "AppData!A2:E";
         try {
-            List<String> results = new ArrayList<String>();
+            List<String> results = new ArrayList<>();
             ValueRange response;
             response = ((Sheets) getService()).spreadsheets().values()
                     .get(spreadsheetId, range)
@@ -52,15 +52,24 @@ public class LoadProjectsTask extends BasicTask {
 
             List<List<Object>> values = response.getValues();
             if (values != null) {
-                results.add("Name, Major");
                 for (List row : values) {
-                    results.add(row.get(0) + ", " + row.get(4));
+                    String rowStr = "";
+                    for (int i = 0; i < row.size(); i++) {
+                        Object obj = row.get(i);
+                        if (i != 0) {
+                            rowStr += ", ";
+                        }
+                        rowStr += obj.toString();
+                    }
+                    results.add(rowStr);
                 }
             }
             return results;
-        } catch (IOException e) {
+        } catch (Exception e) {
+            setLastError(e);
             LogUtils.printException(e);
         }
         return null;
     }
+
 }

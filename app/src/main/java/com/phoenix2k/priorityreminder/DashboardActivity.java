@@ -26,6 +26,7 @@ public class DashboardActivity extends BasicCommunicationActivity
     @BindView(R.id.progress)
     View mProgressView;
 
+    private ProjectListFragment mProjectListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +49,9 @@ public class DashboardActivity extends BasicCommunicationActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+        mProjectListFragment = new ProjectListFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.navigation_view, new ProjectListFragment(), ProjectListFragment.TAG).commit();
+        ft.add(R.id.navigation_view, mProjectListFragment, ProjectListFragment.TAG).commit();
     }
 
     @Override

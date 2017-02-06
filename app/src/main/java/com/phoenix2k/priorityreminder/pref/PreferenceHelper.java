@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 public class PreferenceHelper {
     private static final String KEY_APP_FOLDER_ID = "priorityreminder.KEY_APP_FOLDER_ID";
     private static final String KEY_DATA_FILE_ID = "priorityreminder.KEY_DATA_FILE_ID";
+    private static final String KEY_SIGNIN_USER_ID = "priorityreminder.KEY_SIGNIN_USER_ID";
 
 
     /**
@@ -56,6 +57,28 @@ public class PreferenceHelper {
         return name;
     }
 
+
+    /**
+     * Set the data file id in the preferences.
+     * @param c  The current {@link Context}
+     * @param userId The user id to save in the preferences
+     */
+    public static void setSignInUserId(Context c, String userId) {
+        PreferenceManager.getDefaultSharedPreferences(c).edit()
+                .putString(KEY_SIGNIN_USER_ID, String.valueOf(userId)).apply();
+    }
+
+    /**
+     * The data file id
+     *
+     * @param c The current Context
+     * @return The user id
+     */
+    public static String getSavedSignInUserId(Context c) {
+        String userId = PreferenceManager.getDefaultSharedPreferences(c)
+                .getString(KEY_SIGNIN_USER_ID, null);
+        return userId;
+    }
 
 }
 

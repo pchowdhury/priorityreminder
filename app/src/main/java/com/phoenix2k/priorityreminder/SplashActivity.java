@@ -22,9 +22,10 @@ public class SplashActivity extends Activity {
             public void run() {
                 timerObj.cancel();
                 proceedToSignIn();
+                finish();
             }
         };
-        timerObj.schedule(timerTaskObj, 3000, 1000);
+        timerObj.schedule(timerTaskObj, 1000, 1000);
     }
 
     private void proceedToSignIn() {

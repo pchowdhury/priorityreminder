@@ -5,7 +5,6 @@ import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -18,6 +17,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.sheets.v4.SheetsScopes;
+import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.task.TaskListener;
 
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {DriveScopes.DRIVE_METADATA_READONLY};
+    private static final String[] SCOPES = {DriveScopes.DRIVE_METADATA_READONLY, SheetsScopes.SPREADSHEETS_READONLY};
 
     /**
      * Create the main activity.
@@ -50,6 +51,10 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+        String userId = PreferenceHelper.getSavedSignInUserId(this);
+        if(userId!=null){
+            mCredential.setSelectedAccountName(userId);
+        }
     }
 
 
@@ -98,8 +103,7 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
-            String accountName = getPreferences(Context.MODE_PRIVATE)
-                    .getString(PREF_ACCOUNT_NAME, null);
+            String accountName =PreferenceHelper.getSavedSignInUserId(this);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
                 attemptSignIn();
@@ -137,7 +141,7 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
         switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                   onError(
+                    onError(
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
@@ -150,11 +154,7 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
                     String accountName =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
-                        SharedPreferences settings =
-                                getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(PREF_ACCOUNT_NAME, accountName);
-                        editor.apply();
+                        PreferenceHelper.setSignInUserId(this, accountName);
                         mCredential.setSelectedAccountName(accountName);
                         attemptSignIn();
                     }
@@ -197,6 +197,7 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
         // Do nothing.
+        attemptSignIn();
     }
 
     /**
@@ -262,7 +263,6 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
     public void onUserRecoverableAuthorizationError(UserRecoverableAuthIOException error) {
         startActivityForResult(error.getIntent(), BasicCommunicationActivity.REQUEST_AUTHORIZATION);
     }
-
 
 
     /**

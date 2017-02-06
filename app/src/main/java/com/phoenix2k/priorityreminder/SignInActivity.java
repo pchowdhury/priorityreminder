@@ -115,5 +115,6 @@ public class SignInActivity extends BasicCommunicationActivity {
     private void onSetupValidationComplete() {
         Intent intent = new Intent(this, DashboardActivity.class);
         startActivity(intent);
+        finish();
     }
 }
