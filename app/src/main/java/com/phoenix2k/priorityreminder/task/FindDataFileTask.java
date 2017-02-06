@@ -7,6 +7,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.phoenix2k.priorityreminder.DataStore;
+import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
@@ -17,13 +18,23 @@ import java.util.List;
  */
 
 public class FindDataFileTask extends BasicTask {
-    public FindDataFileTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+    public FindDataFileTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
         super(context, credential, listener);
     }
 
     @Override
     public ServiceType getServiceType() {
         return ServiceType.Drive;
+    }
+
+    @Override
+    public APIType getAPITypeForTask() {
+        return APIType.Drive_File_List;
+    }
+
+    @Override
+    public String getProgressMessage() {
+        return getContext().getString(R.string.progress_validating_setup);
     }
 
     @Override
@@ -50,14 +61,5 @@ public class FindDataFileTask extends BasicTask {
             return null;
         }
         return null;
-    }
-
-    @Override
-    public void handleResult(Object result) {
-        if (getLastError() != null) {
-            onError(getLastError().getMessage());
-        } else {
-            onFinishQuery(DriveAPIType.File_List, result);
-        }
     }
 }

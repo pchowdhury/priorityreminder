@@ -6,19 +6,30 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.phoenix2k.priorityreminder.DataStore;
+import com.phoenix2k.priorityreminder.R;
 
 /**
  * Created by Pushpan on 05/02/17.
  */
 
 public class CreateAppFolderTask extends BasicTask {
-    public CreateAppFolderTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+    public CreateAppFolderTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
         super(context, credential, listener);
     }
 
     @Override
     public ServiceType getServiceType() {
         return ServiceType.Drive;
+    }
+
+    @Override
+    public APIType getAPITypeForTask() {
+        return APIType.Drive_Folder_Create;
+    }
+
+    @Override
+    public String getProgressMessage() {
+        return getContext().getString(R.string.progress_validating_setup);
     }
 
     @Override
@@ -38,14 +49,5 @@ public class CreateAppFolderTask extends BasicTask {
             cancel(true);
         }
         return null;
-    }
-
-    @Override
-    public void handleResult(Object result) {
-        if(getLastError()!=null){
-            onError(getLastError().getMessage());
-        }else{
-            onFinishQuery(DriveAPIType.Folder_Create, result);
-        }
     }
 }

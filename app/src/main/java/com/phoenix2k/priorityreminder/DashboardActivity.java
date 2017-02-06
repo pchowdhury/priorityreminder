@@ -2,28 +2,30 @@ package com.phoenix2k.priorityreminder;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.view.View;
+
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
+import com.phoenix2k.priorityreminder.task.APIType;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DashboardActivity extends SpreadsheetCommunicationActivity
-        implements NavigationView.OnNavigationItemSelectedListener, CommunicationListener {
+public class DashboardActivity extends BasicCommunicationActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.progress)
     View mProgressView;
-    @BindView(R.id.txt_error)
-    TextView mTxtError;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,21 +48,13 @@ public class DashboardActivity extends SpreadsheetCommunicationActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        setCommunicationListener(this);
-        fetchAllProjects();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.navigation_view, new ProjectListFragment(), ProjectListFragment.TAG).commit();
     }
 
     @Override
-    public void onDisplayError(String error, boolean force) {
-        mTxtError.setText(error + (force ? ("\nPlease login again.") : ""));
-    }
+    public void onAccountValidationComplete() {
 
-    @Override
-    public void showProgress(boolean show) {
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -118,5 +112,30 @@ public class DashboardActivity extends SpreadsheetCommunicationActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onGoogleServiceAvailibilityError(int statusCode) {
+
+    }
+
+    @Override
+    public void onUserRecoverableAuthorizationError(UserRecoverableAuthIOException error) {
+
+    }
+
+    @Override
+    public void onDisplayInfo(String msg) {
+
+    }
+
+    @Override
+    public void onProgress(boolean show, String msg) {
+
+    }
+
+    @Override
+    public void onFinishQuery(APIType type, Object result) {
+
     }
 }

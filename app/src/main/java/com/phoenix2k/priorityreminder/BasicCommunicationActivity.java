@@ -2,7 +2,6 @@ package com.phoenix2k.priorityreminder;
 
 import android.Manifest;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -11,13 +10,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.DriveScopes;
-import com.phoenix2k.priorityreminder.task.ErrorCallback;
+import com.phoenix2k.priorityreminder.task.TaskListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,9 +26,9 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public abstract class BasicDriveActivity extends Activity
-        implements EasyPermissions.PermissionCallbacks, ErrorCallback{
-    GoogleAccountCredential mCredential;
+public abstract class BasicCommunicationActivity extends AppCompatActivity
+        implements EasyPermissions.PermissionCallbacks, TaskListener {
+    private GoogleAccountCredential mCredential;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -55,7 +56,11 @@ public abstract class BasicDriveActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-        attemptSignIn();
+    }
+
+    @Override
+    public GoogleAccountCredential getUserCredentials() {
+        return mCredential;
     }
 
     /**
@@ -65,7 +70,7 @@ public abstract class BasicDriveActivity extends Activity
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void attemptSignIn() {
+    public void attemptSignIn() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -73,11 +78,11 @@ public abstract class BasicDriveActivity extends Activity
         } else if (!isDeviceOnline()) {
             onError("No network connection available.");
         } else {
-           onSignInComplete();
+            onAccountValidationComplete();
         }
     }
 
-    public abstract void onSignInComplete();
+    public abstract void onAccountValidationComplete();
 
     /**
      * Attempts to set the account used with the API credentials. If an account
@@ -248,6 +253,18 @@ public abstract class BasicDriveActivity extends Activity
     }
 
 
+    @Override
+    public void onGoogleServiceAvailibilityError(int statusCode) {
+        showGooglePlayServicesAvailabilityErrorDialog(statusCode);
+    }
+
+    @Override
+    public void onUserRecoverableAuthorizationError(UserRecoverableAuthIOException error) {
+        startActivityForResult(error.getIntent(), BasicCommunicationActivity.REQUEST_AUTHORIZATION);
+    }
+
+
+
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
@@ -259,7 +276,7 @@ public abstract class BasicDriveActivity extends Activity
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
-                BasicDriveActivity.this,
+                BasicCommunicationActivity.this,
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();

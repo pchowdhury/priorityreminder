@@ -6,4 +6,5 @@ package com.phoenix2k.priorityreminder;
 public interface CommunicationListener {
      void onDisplayError(String error, boolean force);
      void showProgress(boolean show);
+
 }

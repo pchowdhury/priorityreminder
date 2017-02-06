@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
@@ -17,7 +18,7 @@ import java.util.List;
  */
 
 public class LoadProjectsTask extends BasicTask {
-    public LoadProjectsTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+    public LoadProjectsTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
         super(context, credential, listener);
 
     }
@@ -26,6 +27,17 @@ public class LoadProjectsTask extends BasicTask {
     public ServiceType getServiceType() {
         return ServiceType.Spreadsheet;
     }
+
+    @Override
+    public APIType getAPITypeForTask() {
+        return APIType.Sheet_Load_Projects_Metadata;
+    }
+
+    @Override
+    public String getProgressMessage() {
+        return getContext().getString(R.string.progress_loading_projects);
+    }
+
 
     @Override
     public Object getDataFromApi() {
@@ -50,10 +62,5 @@ public class LoadProjectsTask extends BasicTask {
             LogUtils.printException(e);
         }
         return null;
-    }
-
-    @Override
-    public void handleResult(Object result) {
-
     }
 }

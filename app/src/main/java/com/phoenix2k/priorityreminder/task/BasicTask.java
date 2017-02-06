@@ -22,7 +22,7 @@ import java.io.IOException;
 public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
     private AbstractGoogleJsonClient mService = null;
     private Exception mLastError = null;
-    private GoogleDriveListener mGoogleDriveListener;
+    private TaskListener mTaskListener;
     private Context mContext;
 
     public enum ServiceType {
@@ -31,12 +31,12 @@ public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
 
     ;
 
-    public BasicTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+    public BasicTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
         this.mContext = context;
-        this.mGoogleDriveListener = listener;
+        this.mTaskListener = listener;
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        switch (getServiceType()){
+        switch (getServiceType()) {
             case Drive:
                 mService = new com.google.api.services.drive.Drive.Builder(
                         transport, jsonFactory, credential)
@@ -54,10 +54,13 @@ public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
 
     }
 
-    public Context getContext(){
+    public Context getContext() {
         return mContext;
     }
+
     public abstract ServiceType getServiceType();
+
+    public abstract APIType getAPITypeForTask();
 
     public AbstractGoogleJsonClient getService() {
         return mService;
@@ -70,6 +73,8 @@ public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
     public Exception getLastError() {
         return this.mLastError;
     }
+
+    public abstract String getProgressMessage();
 
     /**
      * Background task to call Drive API.
@@ -99,56 +104,52 @@ public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
 
     @Override
     protected void onPreExecute() {
-        if (mGoogleDriveListener != null) {
-            mGoogleDriveListener.onDisplayInfo("");
-            mGoogleDriveListener.onProgress(true);
+        if (mTaskListener != null) {
+            mTaskListener.onDisplayInfo("");
+            mTaskListener.onProgress(true, getProgressMessage());
         }
     }
 
     @Override
     protected void onPostExecute(Object result) {
-        if (mGoogleDriveListener != null) {
-            mGoogleDriveListener.onProgress(false);
+        if (mTaskListener != null) {
+            mTaskListener.onProgress(false, getProgressMessage());
         }
         handleResult(result);
     }
 
-    public abstract void handleResult(Object result);
+    public void handleResult(Object result) {
+        if (mTaskListener != null) {
+            if (getLastError() != null) {
+                mTaskListener.onError(getLastError().getMessage());
+            } else {
+                mTaskListener.onFinishQuery(getAPITypeForTask(), result);
+            }
+        }
+    }
 
     @Override
     protected void onCancelled() {
-        if (mGoogleDriveListener != null) {
-            mGoogleDriveListener.onProgress(false);
+        if (mTaskListener != null) {
+            mTaskListener.onProgress(false, getProgressMessage());
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    mGoogleDriveListener.onGoogleServiceAvailibilityError(((GooglePlayServicesAvailabilityIOException) mLastError).getConnectionStatusCode());
+                    mTaskListener.onGoogleServiceAvailibilityError(((GooglePlayServicesAvailabilityIOException) mLastError).getConnectionStatusCode());
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    mGoogleDriveListener.onUserRecoverableAuthorizationError((UserRecoverableAuthIOException) mLastError);
+                    mTaskListener.onUserRecoverableAuthorizationError((UserRecoverableAuthIOException) mLastError);
                 } else {
-                    mGoogleDriveListener.onError("The following error occurred:\n"
+                    mTaskListener.onError("The following error occurred:\n"
                             + mLastError.getMessage());
                 }
             } else {
-                mGoogleDriveListener.onDisplayInfo("Request cancelled.");
+                mTaskListener.onDisplayInfo("Request cancelled.");
             }
         }
     }
 
     public void onDisplayInfo(String info) {
-        if (mGoogleDriveListener != null) {
-            mGoogleDriveListener.onDisplayInfo(info);
-        }
-    }
-
-    public void onFinishQuery(DriveAPIType type, Object result) {
-        if (mGoogleDriveListener != null) {
-            mGoogleDriveListener.onFinishQuery(type, result);
-        }
-    }
-
-    public void onError(String error) {
-        if (mGoogleDriveListener != null) {
-            mGoogleDriveListener.onError(error);
+        if (mTaskListener != null) {
+            mTaskListener.onDisplayInfo(info);
         }
     }
 }

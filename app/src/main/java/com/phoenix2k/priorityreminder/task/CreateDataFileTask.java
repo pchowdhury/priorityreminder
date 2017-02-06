@@ -22,13 +22,23 @@ import java.util.Collections;
 public class CreateDataFileTask extends BasicTask {
     private static final String TAG = "CreateDataFileTask";
 
-    public CreateDataFileTask(Context context, GoogleAccountCredential credential, GoogleDriveListener listener) {
+    public CreateDataFileTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
         super(context, credential, listener);
     }
 
     @Override
     public ServiceType getServiceType() {
         return ServiceType.Drive;
+    }
+
+    @Override
+    public APIType getAPITypeForTask() {
+        return APIType.Drive_File_Create;
+    }
+
+    @Override
+    public String getProgressMessage() {
+        return getContext().getString(R.string.progress_validating_setup);
     }
 
     @Override
@@ -88,16 +98,6 @@ public class CreateDataFileTask extends BasicTask {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-    }
-
-    @Override
-    public void handleResult(Object result) {
-        if (getLastError() != null) {
-            onError(getLastError().getMessage());
-        } else {
-            onFinishQuery(DriveAPIType.File_Create, result);
         }
     }
 }
