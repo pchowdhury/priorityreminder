@@ -8,6 +8,7 @@ public enum DataColumns {
     ID,
     PROJECT_ID,
     TITLE,
+    INDEX,
     TYPE,
     REPEAT,
     CREATED_ON,

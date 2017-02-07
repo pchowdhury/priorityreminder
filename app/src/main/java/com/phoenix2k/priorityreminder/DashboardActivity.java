@@ -2,7 +2,6 @@ package com.phoenix2k.priorityreminder;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -14,17 +13,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.task.APIType;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
-    @BindView(R.id.progress)
-    View mProgressView;
+        implements OnNavigationListener {
 
     private ProjectListFragment mProjectListFragment;
 
@@ -51,7 +47,9 @@ public class DashboardActivity extends BasicCommunicationActivity
         toggle.syncState();
         mProjectListFragment = new ProjectListFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.navigation_view, mProjectListFragment, ProjectListFragment.TAG).commit();
+        ft.add(R.id.project_list_container, mProjectListFragment, ProjectListFragment.TAG).commit();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
     }
 
     @Override
@@ -91,29 +89,19 @@ public class DashboardActivity extends BasicCommunicationActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(Object item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onAddNewProject() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
     }
 
     @Override

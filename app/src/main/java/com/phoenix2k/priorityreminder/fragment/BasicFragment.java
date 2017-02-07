@@ -8,16 +8,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.task.APIType;
-import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
 import com.phoenix2k.priorityreminder.task.TaskListener;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -31,7 +26,7 @@ public abstract class BasicFragment extends Fragment implements TaskListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(getViewResource(), null);
-        ButterKnife.bind(this, v);
+        ButterKnife.bind(getMainFragment(), v);
         loadData();
         return v;
     }

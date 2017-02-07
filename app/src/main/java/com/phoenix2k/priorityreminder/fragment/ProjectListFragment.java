@@ -1,8 +1,7 @@
 package com.phoenix2k.priorityreminder.fragment;
 
+import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
+import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
 import com.phoenix2k.priorityreminder.model.Project;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * Created by Pushpan on 06/02/17.
@@ -35,15 +34,7 @@ public class ProjectListFragment extends BasicFragment {
     View mProgressView;
     @BindView(R.id.progress_text)
     TextView mProgressTextView;
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.layout_project_list, null);
-        ButterKnife.bind(this, v);
-        loadData();
-        return v;
-    }
+    private OnNavigationListener mOnNavigationListener;
 
     @Override
     public BasicFragment getMainFragment() {
@@ -91,11 +82,28 @@ public class ProjectListFragment extends BasicFragment {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
                 int position = holder.getAdapterPosition();
+
             }
         });
         ProjectsAdapter adapter = new ProjectsAdapter(getActivity());
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mListView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(activity instanceof OnNavigationListener){
+            mOnNavigationListener = (OnNavigationListener) activity;
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof OnNavigationListener){
+            mOnNavigationListener = (OnNavigationListener) context;
+        }
     }
 
     private static class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {
