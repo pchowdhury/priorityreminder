@@ -13,11 +13,12 @@ public class DataStore {
     public static final String APP_FOLDER_NAME = "Priority Reminder";
     public static final String APP_DATA_FILE_NAME = "AppData";
     private static DataStore mInstance;
-    private ArrayList<Project> mProjects = new ArrayList<>() ;
+    private ArrayList<Project> mProjects = new ArrayList<>();
+    private Project mNewProject;
 
-    public static DataStore getInstance(){
-        if(mInstance==null){
-            mInstance= new DataStore();
+    public static DataStore getInstance() {
+        if (mInstance == null) {
+            mInstance = new DataStore();
         }
         return mInstance;
     }
@@ -26,7 +27,35 @@ public class DataStore {
         this.mProjects = projects;
     }
 
-    public ArrayList<Project> getProjects(){
+    public ArrayList<Project> getProjects() {
         return mProjects;
+    }
+
+    public void setNewProject(Project project) {
+        mNewProject = project;
+        if (mNewProject != null) {
+            mNewProject.mIndex = getLastProjectIndex() + 1;
+        }
+    }
+
+    public Project getNewProject() {
+        return mNewProject;
+    }
+
+    public void confirmSaveNewProject() {
+        getProjects().add(getNewProject());
+        setNewProject(null);
+    }
+
+    public int getLastProjectPosition() {
+        return mProjects.size() + 1;
+    }
+
+    public int getLastProjectIndex() {
+        if (mProjects.size() > 0) {
+            return mProjects.get(mProjects.size() - 1).mIndex;
+        } else {
+            return -1;
+        }
     }
 }

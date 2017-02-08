@@ -15,12 +15,14 @@ import android.view.View;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
+import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.task.APIType;
+import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
-        implements OnNavigationListener {
+        implements OnNavigationListener, UpdateListener {
 
     private ProjectListFragment mProjectListFragment;
 
@@ -127,5 +129,16 @@ public class DashboardActivity extends BasicCommunicationActivity
     @Override
     public void onFinishQuery(APIType type, Object result) {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        IDGenerator.deInit();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onNewProjectAdded() {
+//        mProjectListFragment.loadView();
     }
 }

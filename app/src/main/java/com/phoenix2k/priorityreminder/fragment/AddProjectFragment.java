@@ -1,32 +1,19 @@
 package com.phoenix2k.priorityreminder.fragment;
 
+import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
+import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.task.APIType;
-import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
-
-import java.text.BreakIterator;
-import java.util.ArrayList;
-import java.util.List;
+import com.phoenix2k.priorityreminder.task.AddProjectTask;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 /**
@@ -47,6 +34,7 @@ public class AddProjectFragment extends BasicFragment {
     TextView mProgressTextView;
     @BindView(R.id.lyt_button)
     View mLytButton;
+    private UpdateListener mUpdateListener;
 
     @Override
     public BasicFragment getMainFragment() {
@@ -60,18 +48,16 @@ public class AddProjectFragment extends BasicFragment {
 
     @Override
     public void loadData() {
-//        if (getUserCredentials() != null) {
-//            new LoadProjectsTask(getActivity(), getUserCredentials(), this).execute();
-//        }
     }
-
 
     @Override
     public void onProgress(boolean show, String msg) {
         if (show) {
+            mLytButton.setVisibility(View.INVISIBLE);
             mProgressView.setVisibility(View.VISIBLE);
             mProgressTextView.setText(msg);
         } else {
+            mLytButton.setVisibility(View.VISIBLE);
             mProgressView.setVisibility(View.GONE);
             mProgressTextView.setText("");
         }
@@ -81,9 +67,13 @@ public class AddProjectFragment extends BasicFragment {
     @Override
     public void onFinishQuery(APIType type, Object result) {
         switch (type) {
-            case Sheet_Load_Projects_Metadata:
-                List<Project> list = (List<Project>) result;
-                DataStore.getInstance().setProjects(new ArrayList<>(list));
+            case Sheet_Add_Project_Metadata:
+                Boolean isUpdated = (Boolean) result;
+                if (isUpdated) {
+                    DataStore.getInstance().confirmSaveNewProject();
+                    mUpdateListener.onNewProjectAdded();
+                }
+                collapse();
                 break;
         }
         loadView();
@@ -94,23 +84,54 @@ public class AddProjectFragment extends BasicFragment {
     }
 
     @OnClick(R.id.btn_cancel)
-    public void onClickCancel(View v){
-        mLytAddDetails.setVisibility(View.GONE);
-        mLytAddProject.setVisibility(View.VISIBLE);
+    public void onClickCancel(View v) {
+        collapse();
     }
 
     @OnClick(R.id.btn_add)
-    public void onClickAdd(View v){
-
+    public void onClickAdd(View v) {
+        DataStore.getInstance().getNewProject().mTitle = mEditTitle.getText().toString();
+        if (getUserCredentials() != null) {
+            new AddProjectTask(getActivity(), getUserCredentials(), this).execute();
+        }
     }
 
     @OnClick(R.id.btn_add_project)
-    public void onClickLayoutAdd(View v){
+    public void onClickLayoutAdd(View v) {
+        expand();
+    }
+
+    public void expand() {
+        DataStore.getInstance().setNewProject(Project.newProject(getContext()));
+        mEditTitle.setText(DataStore.getInstance().getNewProject().mTitle);
         mLytAddDetails.setVisibility(View.VISIBLE);
         mLytAddProject.setVisibility(View.GONE);
+    }
+
+    public void collapse() {
+        mEditTitle.setText("");
+        mLytAddDetails.setVisibility(View.GONE);
+        mLytAddProject.setVisibility(View.VISIBLE);
     }
 //    @OnCheckedChanged(R.id.type_switch)
 //    public void onSwitchCheckedChanged(View view, boolean checked){
 //
 //    }
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof UpdateListener) {
+            mUpdateListener = (UpdateListener) activity;
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof UpdateListener) {
+            mUpdateListener = (UpdateListener) context;
+        }
+    }
 }

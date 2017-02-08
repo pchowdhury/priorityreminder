@@ -47,7 +47,7 @@ public class FindDataFileTask extends BasicTask {
                     .setFields("files(id, name)")
                     .execute();
             List<File> files = result.getFiles();
-            LogUtils.printList(files);
+            LogUtils.printFileList(files);
             if (files != null) {
                 for (File file : files) {
                     if (file.getName().equals(DataStore.APP_DATA_FILE_NAME)) {

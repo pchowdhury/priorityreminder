@@ -70,14 +70,16 @@ public class ProjectListFragment extends BasicFragment {
     public void onFinishQuery(APIType type, Object result) {
         switch (type) {
             case Sheet_Load_Projects_Metadata:
-                List<Project> list = (List<Project>) result;
-                DataStore.getInstance().setProjects(new ArrayList<>(list));
+                if (result != null) {
+                    List<Project> list = (List<Project>) result;
+                    DataStore.getInstance().setProjects(new ArrayList<>(list));
+                }
                 break;
         }
         loadView();
     }
 
-    private void loadView() {
+    public void loadView() {
         RecyclerItemClickHelper.attach(mListView).withListener(new RecyclerItemClickHelper.OnItemClickListener() {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
@@ -93,7 +95,7 @@ public class ProjectListFragment extends BasicFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if(activity instanceof OnNavigationListener){
+        if (activity instanceof OnNavigationListener) {
             mOnNavigationListener = (OnNavigationListener) activity;
         }
     }
@@ -101,7 +103,7 @@ public class ProjectListFragment extends BasicFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof OnNavigationListener){
+        if (context instanceof OnNavigationListener) {
             mOnNavigationListener = (OnNavigationListener) context;
         }
     }
@@ -109,7 +111,7 @@ public class ProjectListFragment extends BasicFragment {
     private static class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {
         Context mContext;
 
-        public ProjectsAdapter(Context context){
+        public ProjectsAdapter(Context context) {
             mContext = context;
         }
 

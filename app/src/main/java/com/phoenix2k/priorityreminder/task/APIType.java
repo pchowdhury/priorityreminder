@@ -9,5 +9,6 @@ public enum APIType {
     Drive_Folder_Create,
     Drive_File_List,
     Drive_File_Create,
-    Sheet_Load_Projects_Metadata
+    Sheet_Load_Projects_Metadata,
+    Sheet_Add_Project_Metadata
 }

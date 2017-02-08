@@ -46,7 +46,7 @@ public class FindAppFolderTask extends BasicTask {
                     .execute();
 
             List<File> files = result.getFiles();
-            LogUtils.printList(files);
+            LogUtils.printFileList(files);
             if (files != null) {
                 for (File file : files) {
                     if (file.getName().equals(DataStore.APP_FOLDER_NAME)) {

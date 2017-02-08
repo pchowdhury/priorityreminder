@@ -11,6 +11,7 @@ import com.phoenix2k.priorityreminder.task.CreateAppFolderTask;
 import com.phoenix2k.priorityreminder.task.CreateDataFileTask;
 import com.phoenix2k.priorityreminder.task.FindAppFolderTask;
 import com.phoenix2k.priorityreminder.task.FindDataFileTask;
+import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import butterknife.BindView;
@@ -113,6 +114,7 @@ public class SignInActivity extends BasicCommunicationActivity {
     }
 
     private void onSetupValidationComplete() {
+        IDGenerator.init();
         Intent intent = new Intent(this, DashboardActivity.class);
         startActivity(intent);
         finish();
