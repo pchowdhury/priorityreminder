@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lytQuad"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.phoenix2k.priorityreminder.view.DraggableListView
+        android:id="@+id/listQuad1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top" />
+
+    <com.phoenix2k.priorityreminder.view.DraggableListView
+        android:id="@+id/listQuad2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top" />
+
+    <com.phoenix2k.priorityreminder.view.DraggableListView
+        android:id="@+id/listQuad3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top" />
+
+    <com.phoenix2k.priorityreminder.view.DraggableListView
+        android:id="@+id/listQuad4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top" />
+
+
+    <ImageView
+        android:id="@+id/imgAnchor"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="top"
+        android:src="@drawable/anchor" />
+
+    <LinearLayout
+        android:id="@+id/lyt_slider_left"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:id="@+id/lyt_slider_right"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:orientation="horizontal" />
+
+</FrameLayout>

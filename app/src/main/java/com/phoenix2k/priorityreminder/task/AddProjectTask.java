@@ -6,6 +6,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.Project;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class AddProjectTask extends SpreadsheetTask {
     @Override
     public Object getDataFromApi() {
         int currentLastPosition = DataStore.getInstance().getLastProjectPosition();
-        String range =  "A" + (currentLastPosition + 1) + ":J";
+        String range = "A" + (currentLastPosition + 1) + ":N";
         Boolean isUpdated = updateSheet(range, getData());
         if (!isUpdated) {
             onDisplayInfo("Could not add project");
@@ -53,10 +54,15 @@ public class AddProjectTask extends SpreadsheetTask {
             add(project.mTitle + "");
             add(project.mIndex + "");
             add(project.mProjectType.ordinal() + "");
-            add(project.mColorQ1 + "");
-            add(project.mColorQ2 + "");
-            add(project.mColorQ3 + "");
-            add(project.mColorQ4 + "");
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q1) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q2) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q3) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q4) + "");
+            add(project.mCenterInPercent.x + "," + project.mCenterInPercent.y);
             add(project.mCreatedOn + "");
             add(project.mUpdatedOn + "");
         }};

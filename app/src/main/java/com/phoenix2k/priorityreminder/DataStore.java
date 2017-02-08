@@ -16,6 +16,7 @@ public class DataStore {
     private static DataStore mInstance;
     private ArrayList<Project> mProjects = new ArrayList<>();
     private Project mNewProject;
+    private Project mCurrentProject;
 
     public static DataStore getInstance() {
         if (mInstance == null) {
@@ -45,6 +46,7 @@ public class DataStore {
 
     public void confirmSaveNewProject() {
         getProjects().add(getNewProject());
+        setCurrentProject(getNewProject());
         setNewProject(null);
     }
 
@@ -58,5 +60,16 @@ public class DataStore {
         } else {
             return -1;
         }
+    }
+
+    public void setCurrentProject(Project project){
+        this.mCurrentProject = project;
+    }
+    public Project getCurrentProject() {
+        return mCurrentProject;
+    }
+
+    public void applyChanges() {
+
     }
 }

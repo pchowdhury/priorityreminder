@@ -14,17 +14,17 @@ import android.view.View;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
+import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
+import com.phoenix2k.priorityreminder.view.FourQuadrantView;
 
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
         implements OnNavigationListener, UpdateListener {
-
-    private ProjectListFragment mProjectListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +47,12 @@ public class DashboardActivity extends BasicCommunicationActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        mProjectListFragment = new ProjectListFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.project_list_container, mProjectListFragment, ProjectListFragment.TAG).commit();
+        ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
         ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
     }
 
     @Override
@@ -92,10 +93,12 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(Object item) {
+    public boolean onProjectSelected(Project project) {
         // Handle navigation view item clicks here.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        DataStore.getInstance().setCurrentProject(project);
+        reloadDashboard();
         return true;
     }
 
@@ -103,7 +106,6 @@ public class DashboardActivity extends BasicCommunicationActivity
     public void onAddNewProject() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-
     }
 
     @Override
@@ -139,6 +141,13 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public void onNewProjectAdded() {
-//        mProjectListFragment.loadView();
+        reloadDashboard();
+    }
+
+    private void reloadDashboard(){
+        FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
+        if (fragment != null) {
+            fragment.loadData();
+        }
     }
 }

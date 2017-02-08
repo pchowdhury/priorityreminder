@@ -9,10 +9,15 @@ public enum ProjectsColumns {
     NAME,
     INDEX,
     TYPE,
+    Q1_TITLE,
+    Q2_TITLE,
+    Q3_TITLE,
+    Q4_TITLE,
     Q1_COLOR,
     Q2_COLOR,
     Q3_COLOR,
     Q4_COLOR,
+    CENTER_IN_PERCENT,
     CREATED_ON,
     UPDATED_ON
 }

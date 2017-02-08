@@ -6,6 +6,8 @@ package com.phoenix2k.priorityreminder;
 
 import android.support.annotation.NonNull;
 
+import com.phoenix2k.priorityreminder.model.Project;
+
 /**
  * Listener for handling events on navigation items.
  */
@@ -18,6 +20,6 @@ public interface OnNavigationListener {
      *
      * @return true to display the item as the selected item
      */
-     boolean onNavigationItemSelected(@NonNull Object item);
+     boolean onProjectSelected(@NonNull Project item);
      void onAddNewProject();
 }

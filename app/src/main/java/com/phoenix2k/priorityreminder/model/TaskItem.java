@@ -6,6 +6,10 @@ package com.phoenix2k.priorityreminder.model;
 
 public class TaskItem {
 
+    public enum QuadrantType {
+        Q1, Q2, Q3, Q4
+    }
+
     public enum RepeatType {
         None,
         Once,
@@ -25,7 +29,7 @@ public class TaskItem {
     String mId;
     String mProjectId;
     public String mTitle;
-
+    public QuadrantType mQuadrantType;
 
     public Status mStatus = Status.NotStarted;
     public RepeatType mRepeatType = RepeatType.None;

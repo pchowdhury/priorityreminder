@@ -84,6 +84,9 @@ public class ProjectListFragment extends BasicFragment {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
                 int position = holder.getAdapterPosition();
+                if (mOnNavigationListener != null) {
+                    mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position));
+                }
 
             }
         });

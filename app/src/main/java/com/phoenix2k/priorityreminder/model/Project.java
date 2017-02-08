@@ -1,6 +1,7 @@
 package com.phoenix2k.priorityreminder.model;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
 
 import com.phoenix2k.priorityreminder.ProjectsColumns;
@@ -8,6 +9,8 @@ import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,14 +27,14 @@ public class Project {
     public String mId;
     public String mTitle;
     public int mIndex;
-    public int mColorQ1;
-    public int mColorQ2;
-    public int mColorQ3;
-    public int mColorQ4;
-
+    public HashMap<TaskItem.QuadrantType, String> mTitleQuadrants = new HashMap<>();
+    public HashMap<TaskItem.QuadrantType, Integer> mColorQuadrants = new HashMap<>();
     public ProjectType mProjectType = ProjectType.Simple;
+    public Point mCenterInPercent = new Point();
     public long mCreatedOn;
     public long mUpdatedOn;
+
+    private HashMap<TaskItem.QuadrantType, ArrayList<TaskItem>> mQuadrants = new HashMap<>();
 
     public static Project newProject(Context context) {
         Project project = new Project();
@@ -41,23 +44,15 @@ public class Project {
         project.mProjectType = ProjectType.Simple;
         project.mCreatedOn = IDGenerator.generateUniqueId();
         project.mUpdatedOn = project.mCreatedOn;
-        project.mColorQ1 = ContextCompat.getColor(context, R.color.color_default_q1);
-        project.mColorQ2 = ContextCompat.getColor(context, R.color.color_default_q2);
-        project.mColorQ3 = ContextCompat.getColor(context, R.color.color_default_q3);
-        project.mColorQ4 = ContextCompat.getColor(context, R.color.color_default_q4);
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, context.getString(R.string.lbl_title_quadrant1));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, context.getString(R.string.lbl_title_quadrant2));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, context.getString(R.string.lbl_title_quadrant3));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, context.getString(R.string.lbl_title_quadrant4));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, ContextCompat.getColor(context, R.color.color_default_q1));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, ContextCompat.getColor(context, R.color.color_default_q2));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, ContextCompat.getColor(context, R.color.color_default_q3));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, ContextCompat.getColor(context, R.color.color_default_q4));
         return project;
-    }
-
-    public String getColorCode(int color) {
-        return String.format("#%06X", (0xFFFFFF & color));
-    }
-
-    public int getColorCode(String color) {
-        try {
-            return Integer.parseInt(color.replaceFirst("#", ""), 16);
-        } catch (Exception e) {
-            return 0;
-        }
     }
 
     public static Project getProjectFrom(Context context, List<Object> values) {
@@ -73,22 +68,39 @@ public class Project {
                         project.mTitle = value;
                         break;
                     case INDEX:
-                        project.mIndex =  DataUtils.parseIntValue(value);
+                        project.mIndex = DataUtils.parseIntValue(value);
                         break;
                     case TYPE:
                         project.mProjectType = Project.ProjectType.values()[Integer.valueOf(value)];
                         break;
+                    case Q1_TITLE:
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, value);
+                        break;
+                    case Q2_TITLE:
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, value);
+                        break;
+                    case Q3_TITLE:
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, value);
+                        break;
+                    case Q4_TITLE:
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, value);
+                        break;
                     case Q1_COLOR:
-                        project.mColorQ1 = DataUtils.parseIntValue(value);
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, DataUtils.parseIntValue(value));
                         break;
                     case Q2_COLOR:
-                        project.mColorQ2 = DataUtils.parseIntValue(value);
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, DataUtils.parseIntValue(value));
                         break;
                     case Q3_COLOR:
-                        project.mColorQ3 = DataUtils.parseIntValue(value);
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, DataUtils.parseIntValue(value));
                         break;
                     case Q4_COLOR:
-                        project.mColorQ4 = DataUtils.parseIntValue(value);
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, DataUtils.parseIntValue(value));
+                        break;
+                    case CENTER_IN_PERCENT:
+                        String[] points = value.split(",");
+                        project.mCenterInPercent.x = DataUtils.parseIntValue(points[0]);
+                        project.mCenterInPercent.y = DataUtils.parseIntValue(points[1]);
                         break;
                     case CREATED_ON:
                         project.mCreatedOn = DataUtils.parseLongValue(value);
@@ -103,6 +115,22 @@ public class Project {
         return null;
     }
 
+    public void clearAllQuadrants() {
+        mQuadrants.clear();
+    }
+
+    public void addfromTaskList(ArrayList<TaskItem> list) {
+        for (TaskItem item : list) {
+            if (item.mProjectId == mId) {
+                mQuadrants.get(item.mQuadrantType).add(item);
+            }
+        }
+    }
+
+    public ArrayList<TaskItem> getTaskListForQuadrant(TaskItem.QuadrantType type) {
+        return mQuadrants.get(type);
+    }
+
     @Override
     public String toString() {
         return
@@ -110,10 +138,10 @@ public class Project {
                         "\nmTitle:" + mTitle +
                         "\nmIndex:" + mIndex +
                         "\nmProjectType:" + mProjectType.name() +
-                        "\nmColorQ1:" + mColorQ1 +
-                        "\nmColorQ2:" + mColorQ2 +
-                        "\nmColorQ3:" + mColorQ3 +
-                        "\nmColorQ4:" + mColorQ4 +
+                        "\nmColorQ1:" + mColorQuadrants.get(TaskItem.QuadrantType.Q1) +
+                        "\nmColorQ2:" + mColorQuadrants.get(TaskItem.QuadrantType.Q2) +
+                        "\nmColorQ3:" + mColorQuadrants.get(TaskItem.QuadrantType.Q3) +
+                        "\nmColorQ4:" + mColorQuadrants.get(TaskItem.QuadrantType.Q4) +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
                         "\n}";
