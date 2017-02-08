@@ -11,7 +11,8 @@ import java.util.ArrayList;
 public class DataStore {
     private final String TAG = "DataStore";
     public static final String APP_FOLDER_NAME = "Priority Reminder";
-    public static final String APP_DATA_FILE_NAME = "AppData";
+    public static final String PROJECT_FILE_NAME = "Project";
+    public static final String DATA_FILE_NAME = "Data";
     private static DataStore mInstance;
     private ArrayList<Project> mProjects = new ArrayList<>();
     private Project mNewProject;
@@ -48,7 +49,7 @@ public class DataStore {
     }
 
     public int getLastProjectPosition() {
-        return mProjects.size() + 1;
+        return mProjects.size();
     }
 
     public int getLastProjectIndex() {

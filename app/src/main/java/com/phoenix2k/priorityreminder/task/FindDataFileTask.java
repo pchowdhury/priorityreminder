@@ -43,14 +43,14 @@ public class FindDataFileTask extends BasicTask {
         FileList result;
         String appFolderId = PreferenceHelper.getSavedAppFolderId(getContext());
         try {
-            result = ((Drive)getService()).files().list().setQ("mimeType = 'application/vnd.google-apps.spreadsheet' and trashed=false and '" + appFolderId + "' in parents and name = '" + DataStore.APP_DATA_FILE_NAME + "'")
+            result = ((Drive)getService()).files().list().setQ("mimeType = 'application/vnd.google-apps.spreadsheet' and trashed=false and '" + appFolderId + "' in parents and name = '" + DataStore.DATA_FILE_NAME + "'")
                     .setFields("files(id, name)")
                     .execute();
             List<File> files = result.getFiles();
             LogUtils.printFileList(files);
             if (files != null) {
                 for (File file : files) {
-                    if (file.getName().equals(DataStore.APP_DATA_FILE_NAME)) {
+                    if (file.getName().equals(DataStore.DATA_FILE_NAME)) {
                         return file.getId();
                     }
                 }

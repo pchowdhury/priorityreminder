@@ -3,18 +3,9 @@ package com.phoenix2k.priorityreminder.task;
 import android.content.Context;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
-import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
 import com.phoenix2k.priorityreminder.DataStore;
-import com.phoenix2k.priorityreminder.ProjectsColumns;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.Project;
-import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
-import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +26,7 @@ public class AddProjectTask extends SpreadsheetTask {
 
     @Override
     public APIType getAPITypeForTask() {
-        return APIType.Sheet_Add_Project_Metadata;
+        return APIType.Sheet_Add_Project;
     }
 
     @Override
@@ -46,7 +37,7 @@ public class AddProjectTask extends SpreadsheetTask {
     @Override
     public Object getDataFromApi() {
         int currentLastPosition = DataStore.getInstance().getLastProjectPosition();
-        String range = "Project!A" + (currentLastPosition + 1) + ":J";
+        String range =  "A" + (currentLastPosition + 1) + ":J";
         Boolean isUpdated = updateSheet(range, getData());
         if (!isUpdated) {
             onDisplayInfo("Could not add project");
@@ -61,11 +52,11 @@ public class AddProjectTask extends SpreadsheetTask {
             add(project.mId + "");
             add(project.mTitle + "");
             add(project.mIndex + "");
+            add(project.mProjectType.ordinal() + "");
             add(project.mColorQ1 + "");
             add(project.mColorQ2 + "");
             add(project.mColorQ3 + "");
             add(project.mColorQ4 + "");
-            add(project.mProjectType.ordinal() + "");
             add(project.mCreatedOn + "");
             add(project.mUpdatedOn + "");
         }};

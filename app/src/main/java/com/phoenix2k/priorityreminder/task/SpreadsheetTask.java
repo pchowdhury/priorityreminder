@@ -43,7 +43,7 @@ public abstract class SpreadsheetTask extends BasicTask {
         try {
             ValueRange response;
             response = ((Sheets) getService()).spreadsheets().values()
-                    .get(getSpreadsheetId(), range)
+                    .get(getProjectSpreadsheetId(), range)
                     .execute();
             List<List<Object>> values = response.getValues();
             return values;
@@ -66,7 +66,7 @@ public abstract class SpreadsheetTask extends BasicTask {
             oRequest.setValueInputOption("RAW");
             oRequest.setData(oList);
 
-            BatchUpdateValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchUpdate(getSpreadsheetId(), oRequest).execute();
+            BatchUpdateValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchUpdate(getProjectSpreadsheetId(), oRequest).execute();
             return response.getTotalUpdatedRows() >= 0;
         } catch (Exception e) {
             setLastError(e);
@@ -114,8 +114,10 @@ public abstract class SpreadsheetTask extends BasicTask {
 //        }
 //    }
 
-    public String getSpreadsheetId(){
+    public String getDataSpreadsheetId(){
         return PreferenceHelper.getSavedDataFileId(getContext());
     }
-
+    public String getProjectSpreadsheetId(){
+        return PreferenceHelper.getSavedProjectFileId(getContext());
+    }
 }

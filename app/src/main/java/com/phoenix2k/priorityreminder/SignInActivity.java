@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.task.CreateAppFolderTask;
-import com.phoenix2k.priorityreminder.task.CreateDataFileTask;
+import com.phoenix2k.priorityreminder.task.CreateFileTask;
 import com.phoenix2k.priorityreminder.task.FindAppFolderTask;
 import com.phoenix2k.priorityreminder.task.FindDataFileTask;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
@@ -38,7 +38,7 @@ public class SignInActivity extends BasicCommunicationActivity {
     }
     @Override
     public void onAccountValidationComplete() {
-        if (PreferenceHelper.getSavedDataFileId(this) == null) {
+        if (PreferenceHelper.getSavedDataFileId(this) == null || PreferenceHelper.getSavedProjectFileId(this) == null) {
             new FindAppFolderTask(this, getUserCredentials(), this).execute();
         } else {
             onSetupValidationComplete();
@@ -95,10 +95,21 @@ public class SignInActivity extends BasicCommunicationActivity {
                 } else {
                     LogUtils.logI(TAG, "File Id not found");
                     onDisplayInfo("File Id not found");
-                    new CreateDataFileTask(this, getUserCredentials(), this).execute();
+                    new CreateFileTask(APIType.Drive_Project_File_Create, this, getUserCredentials(), this).execute();
                 }
                 break;
-            case Drive_File_Create:
+            case Drive_Project_File_Create:
+                if (result != null) {
+                    PreferenceHelper.setProjectFileId(this, result.toString());
+                    LogUtils.logI(TAG, "Project File Id created =" + result.toString());
+                    onDisplayInfo("Project File Id created =" + result.toString());
+                    new CreateFileTask(APIType.Drive_Data_File_Create, this, getUserCredentials(), this).execute();
+                } else {
+                    LogUtils.logI(TAG, "Project file couldn't be created");
+                    onDisplayInfo("Project file couldn't be created");
+                }
+                break;
+            case Drive_Data_File_Create:
                 if (result != null) {
                     PreferenceHelper.setDataFileId(this, result.toString());
                     LogUtils.logI(TAG, "File Id created =" + result.toString());

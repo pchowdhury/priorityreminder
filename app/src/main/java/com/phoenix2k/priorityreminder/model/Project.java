@@ -8,7 +8,6 @@ import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +15,7 @@ import java.util.List;
  */
 
 public class Project {
+
     public enum ProjectType {
         Simple,
         State
@@ -38,9 +38,9 @@ public class Project {
         project.mId = IDGenerator.generateUniqueId() + "";
         project.mTitle = "";
         project.mIndex = 0;
+        project.mProjectType = ProjectType.Simple;
         project.mCreatedOn = IDGenerator.generateUniqueId();
         project.mUpdatedOn = project.mCreatedOn;
-        project.mProjectType = ProjectType.Simple;
         project.mColorQ1 = ContextCompat.getColor(context, R.color.color_default_q1);
         project.mColorQ2 = ContextCompat.getColor(context, R.color.color_default_q2);
         project.mColorQ3 = ContextCompat.getColor(context, R.color.color_default_q3);
@@ -72,6 +72,12 @@ public class Project {
                     case NAME:
                         project.mTitle = value;
                         break;
+                    case INDEX:
+                        project.mIndex =  DataUtils.parseIntValue(value);
+                        break;
+                    case TYPE:
+                        project.mProjectType = Project.ProjectType.values()[Integer.valueOf(value)];
+                        break;
                     case Q1_COLOR:
                         project.mColorQ1 = DataUtils.parseIntValue(value);
                         break;
@@ -83,9 +89,6 @@ public class Project {
                         break;
                     case Q4_COLOR:
                         project.mColorQ4 = DataUtils.parseIntValue(value);
-                        break;
-                    case TYPE:
-                        project.mProjectType = Project.ProjectType.values()[Integer.valueOf(value)];
                         break;
                     case CREATED_ON:
                         project.mCreatedOn = DataUtils.parseLongValue(value);
@@ -105,11 +108,12 @@ public class Project {
         return
                 "{\nId:" + mId +
                         "\nmTitle:" + mTitle +
+                        "\nmIndex:" + mIndex +
+                        "\nmProjectType:" + mProjectType.name() +
                         "\nmColorQ1:" + mColorQ1 +
                         "\nmColorQ2:" + mColorQ2 +
                         "\nmColorQ3:" + mColorQ3 +
                         "\nmColorQ4:" + mColorQ4 +
-                        "\nmProjectType:" + mProjectType.name() +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
                         "\n}";

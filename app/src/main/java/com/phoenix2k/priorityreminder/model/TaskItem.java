@@ -5,6 +5,7 @@ package com.phoenix2k.priorityreminder.model;
  */
 
 public class TaskItem {
+
     public enum RepeatType {
         None,
         Once,

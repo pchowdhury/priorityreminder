@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 
 public class PreferenceHelper {
     private static final String KEY_APP_FOLDER_ID = "priorityreminder.KEY_APP_FOLDER_ID";
+    private static final String KEY_PROJECT_FILE_ID = "priorityreminder.KEY_PROJECT_FILE_ID";
     private static final String KEY_DATA_FILE_ID = "priorityreminder.KEY_DATA_FILE_ID";
     private static final String KEY_SIGNIN_USER_ID = "priorityreminder.KEY_SIGNIN_USER_ID";
 
@@ -38,7 +39,7 @@ public class PreferenceHelper {
     /**
      * Set the data file id in the preferences.
      * @param c  The current {@link Context}
-     * @param id The drive id to save in the preferences
+     * @param id The data file id to save in the preferences
      */
     public static void setDataFileId(Context c, String id) {
         PreferenceManager.getDefaultSharedPreferences(c).edit()
@@ -54,6 +55,28 @@ public class PreferenceHelper {
     public static String getSavedDataFileId(Context c) {
         String name = PreferenceManager.getDefaultSharedPreferences(c)
                 .getString(KEY_DATA_FILE_ID, null);
+        return name;
+    }
+
+    /**
+     * Set the data file id in the preferences.
+     * @param c  The current {@link Context}
+     * @param id The project file id to save in the preferences
+     */
+    public static void setProjectFileId(Context c, String id) {
+        PreferenceManager.getDefaultSharedPreferences(c).edit()
+                .putString(KEY_PROJECT_FILE_ID, String.valueOf(id)).apply();
+    }
+
+    /**
+     * The data file id
+     *
+     * @param c The current Context
+     * @return The project file id
+     */
+    public static String getSavedProjectFileId(Context c) {
+        String name = PreferenceManager.getDefaultSharedPreferences(c)
+                .getString(KEY_PROJECT_FILE_ID, null);
         return name;
     }
 

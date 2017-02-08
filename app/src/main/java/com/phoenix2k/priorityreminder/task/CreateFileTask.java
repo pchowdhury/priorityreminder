@@ -19,11 +19,13 @@ import java.util.Collections;
  * Created by Pushpan on 05/02/17.
  */
 
-public class CreateDataFileTask extends BasicTask {
+public class CreateFileTask extends BasicTask {
     private static final String TAG = "CreateDataFileTask";
+    private APIType mApiType;
 
-    public CreateDataFileTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
+    public CreateFileTask(APIType apiType, Context context, GoogleAccountCredential credential, TaskListener listener) {
         super(context, credential, listener);
+        this.mApiType = apiType;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class CreateDataFileTask extends BasicTask {
 
     @Override
     public APIType getAPITypeForTask() {
-        return APIType.Drive_File_Create;
+        return mApiType;
     }
 
     @Override
@@ -47,16 +49,16 @@ public class CreateDataFileTask extends BasicTask {
         copyCsvToTemporaryPath();
         try {
             File fileMetadata = new File();
-            fileMetadata.setName(DataStore.APP_DATA_FILE_NAME);
+            fileMetadata.setName(getAPITypeForTask() == APIType.Drive_Project_File_Create ? DataStore.PROJECT_FILE_NAME : DataStore.DATA_FILE_NAME);
             fileMetadata.setMimeType("application/vnd.google-apps.spreadsheet");
             fileMetadata.setParents(Collections.singletonList(PreferenceHelper.getSavedAppFolderId(getContext())));
 
             java.io.File filePath = new java.io.File(getContext().getCacheDir().getAbsolutePath() + "/sample.csv");
             FileContent mediaContent = new FileContent("text/csv", filePath);
-            File file = ((Drive)getService()).files().create(fileMetadata, mediaContent)
+            File file = ((Drive) getService()).files().create(fileMetadata, mediaContent)
                     .setFields("id")
                     .execute();
-            if(filePath.delete()){
+            if (filePath.delete()) {
                 LogUtils.logI(TAG, "temp file deleted");
             }
             return file.getId();
@@ -92,9 +94,10 @@ public class CreateDataFileTask extends BasicTask {
                 e.printStackTrace();
             }
             try {
-                if(output!=null){
+                if (output != null) {
 
-                output.close();}
+                    output.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

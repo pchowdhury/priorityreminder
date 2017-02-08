@@ -67,7 +67,7 @@ public class AddProjectFragment extends BasicFragment {
     @Override
     public void onFinishQuery(APIType type, Object result) {
         switch (type) {
-            case Sheet_Add_Project_Metadata:
+            case Sheet_Add_Project:
                 Boolean isUpdated = (Boolean) result;
                 if (isUpdated) {
                     DataStore.getInstance().confirmSaveNewProject();

@@ -8,11 +8,11 @@ public enum ProjectsColumns {
     ID,
     NAME,
     INDEX,
+    TYPE,
     Q1_COLOR,
     Q2_COLOR,
     Q3_COLOR,
     Q4_COLOR,
-    TYPE,
     CREATED_ON,
     UPDATED_ON
 }

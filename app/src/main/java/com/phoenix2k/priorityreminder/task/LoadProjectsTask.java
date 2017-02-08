@@ -3,6 +3,7 @@ package com.phoenix2k.priorityreminder.task;
 import android.content.Context;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.Project;
 
@@ -31,7 +32,7 @@ public class LoadProjectsTask extends SpreadsheetTask {
     @Override
     public Object getDataFromApi() {
         ArrayList<Project> results = null;
-        String range = "Project!A2:J";
+        String range = "A1:J";
         List<List<Object>> values = readSheet(range);
         if (values != null) {
             results = new ArrayList<>();
