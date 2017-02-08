@@ -25,4 +25,14 @@
     <string name="lbl_title_quadrant2">Quadrant 2</string>
     <string name="lbl_title_quadrant3">Quadrant 3</string>
     <string name="lbl_title_quadrant4">Quadrant 4</string>
+
+    <string name="lbl_title_state_quadrant1">Not started</string>
+    <string name="lbl_title_state_quadrant2">Started</string>
+    <string name="lbl_title_state_quadrant3">Postpone</string>
+    <string name="lbl_title_state_quadrant4">Completed</string>
+
+    <string name="hint_q1">Add quadrant 1 title</string>
+    <string name="hint_q2">Add quadrant 2 title</string>
+    <string name="hint_q3">Add quadrant 3 title</string>
+    <string name="hint_q4">Add quadrant 4 title</string>
 </resources>

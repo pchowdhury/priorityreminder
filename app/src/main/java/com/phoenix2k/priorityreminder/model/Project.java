@@ -44,6 +44,7 @@ public class Project {
         project.mProjectType = ProjectType.Simple;
         project.mCreatedOn = IDGenerator.generateUniqueId();
         project.mUpdatedOn = project.mCreatedOn;
+        project.mCenterInPercent.x = project.mCenterInPercent.y = 50;
         project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, context.getString(R.string.lbl_title_quadrant1));
         project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, context.getString(R.string.lbl_title_quadrant2));
         project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, context.getString(R.string.lbl_title_quadrant3));

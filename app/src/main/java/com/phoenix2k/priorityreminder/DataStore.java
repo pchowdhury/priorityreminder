@@ -1,6 +1,9 @@
 package com.phoenix2k.priorityreminder;
 
+import android.content.Context;
+
 import com.phoenix2k.priorityreminder.model.Project;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 
 import java.util.ArrayList;
 
@@ -62,14 +65,40 @@ public class DataStore {
         }
     }
 
-    public void setCurrentProject(Project project){
+    public void setCurrentProject(Project project) {
         this.mCurrentProject = project;
     }
+
     public Project getCurrentProject() {
         return mCurrentProject;
     }
 
     public void applyChanges() {
 
+    }
+
+    public void switchNewProjectToState(Context context, boolean checked) {
+        if (mNewProject != null) {
+            mNewProject.mProjectType = checked ? Project.ProjectType.State : Project.ProjectType.Simple;
+            int[] resId = {R.string.lbl_title_quadrant1, R.string.lbl_title_quadrant2, R.string.lbl_title_quadrant3, R.string.lbl_title_quadrant4};
+            int[] resIdState = {R.string.lbl_title_state_quadrant1, R.string.lbl_title_state_quadrant2, R.string.lbl_title_state_quadrant3, R.string.lbl_title_state_quadrant4};
+            if (checked) {
+                for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                    mNewProject.mTitleQuadrants.put(type, context.getString(checked ? resIdState[type.ordinal()] : resId[type.ordinal()]));
+                }
+            }
+        }
+    }
+
+    public void updateQuadrantTitle(Project newProject, TaskItem.QuadrantType type, String value) {
+        if (newProject != null) {
+            newProject.mTitleQuadrants.put(type, value);
+        }
+    }
+
+    public void updateTitle(Project newProject, String value) {
+        if (newProject != null) {
+            newProject.mTitle = value;
+        }
     }
 }

@@ -38,7 +38,7 @@ public class AddProjectTask extends SpreadsheetTask {
     @Override
     public Object getDataFromApi() {
         int currentLastPosition = DataStore.getInstance().getLastProjectPosition();
-        String range = "A" + (currentLastPosition + 1) + ":N";
+        String range = "A" + (currentLastPosition + 1) + ":O";
         Boolean isUpdated = updateSheet(range, getData());
         if (!isUpdated) {
             onDisplayInfo("Could not add project");

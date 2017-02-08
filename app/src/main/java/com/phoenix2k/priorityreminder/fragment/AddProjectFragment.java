@@ -2,18 +2,29 @@ package com.phoenix2k.priorityreminder.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.task.AddProjectTask;
 
+import java.util.List;
+
 import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 /**
@@ -34,6 +45,14 @@ public class AddProjectFragment extends BasicFragment {
     TextView mProgressTextView;
     @BindView(R.id.lyt_button)
     View mLytButton;
+    @BindView(R.id.type_switch)
+    Switch mStatusSwitch;
+    @BindView(R.id.btn_add)
+    Button mBtnAdd;
+
+    @BindViews({R.id.q1_edt_title, R.id.q2_edt_title, R.id.q3_edt_title, R.id.q4_edt_title})
+    List<EditText> mQuadrantNameViews;
+
     private UpdateListener mUpdateListener;
 
     @Override
@@ -80,7 +99,71 @@ public class AddProjectFragment extends BasicFragment {
     }
 
     private void loadView() {
+        mStatusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                DataStore.getInstance().switchNewProjectToState(getContext(), isChecked);
+                loadView();
+            }
+        });
+        Project project = DataStore.getInstance().getNewProject();
+        if (project != null) {
+            mEditTitle.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    DataStore.getInstance().updateTitle(DataStore.getInstance().getNewProject(), mEditTitle.getText().toString());
+                    validateAddButton();
+                }
+            });
+
+
+            for (final TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                final EditText edt = mQuadrantNameViews.get(type.ordinal());
+                edt.setText(project.mTitleQuadrants.get(type));
+                edt.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        DataStore.getInstance().updateQuadrantTitle(DataStore.getInstance().getNewProject(), type, edt.getText().toString());
+                        validateAddButton();
+                    }
+                });
+            }
+        }
+        validateAddButton();
+    }
+
+    private void validateAddButton() {
+        Project project = DataStore.getInstance().getNewProject();
+        if (project != null) {
+            boolean enable = true;
+            for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                enable = enable && project.mTitleQuadrants.get(type).trim().length() > 0;
+            }
+            enable = enable && project.mTitle.trim().length() > 0;
+            enableAddButton(enable);
+        } else {
+            enableAddButton(false);
+        }
     }
 
     @OnClick(R.id.btn_cancel)
@@ -90,7 +173,6 @@ public class AddProjectFragment extends BasicFragment {
 
     @OnClick(R.id.btn_add)
     public void onClickAdd(View v) {
-        DataStore.getInstance().getNewProject().mTitle = mEditTitle.getText().toString();
         if (getUserCredentials() != null) {
             new AddProjectTask(getActivity(), getUserCredentials(), this).execute();
         }
@@ -106,18 +188,15 @@ public class AddProjectFragment extends BasicFragment {
         mEditTitle.setText(DataStore.getInstance().getNewProject().mTitle);
         mLytAddDetails.setVisibility(View.VISIBLE);
         mLytAddProject.setVisibility(View.GONE);
+        loadView();
     }
 
     public void collapse() {
         mEditTitle.setText("");
+        mStatusSwitch.setChecked(false);
         mLytAddDetails.setVisibility(View.GONE);
         mLytAddProject.setVisibility(View.VISIBLE);
     }
-//    @OnCheckedChanged(R.id.type_switch)
-//    public void onSwitchCheckedChanged(View view, boolean checked){
-//
-//    }
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -133,5 +212,9 @@ public class AddProjectFragment extends BasicFragment {
         if (context instanceof UpdateListener) {
             mUpdateListener = (UpdateListener) context;
         }
+    }
+
+    private void enableAddButton(boolean enable) {
+        mBtnAdd.setEnabled(enable);
     }
 }

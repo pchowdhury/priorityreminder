@@ -32,7 +32,7 @@ public class LoadProjectsTask extends SpreadsheetTask {
     @Override
     public Object getDataFromApi() {
         ArrayList<Project> results = null;
-        String range = "A1:N";
+        String range = "A1:O";
         List<List<Object>> values = readSheet(range);
         if (values != null) {
             results = new ArrayList<>();

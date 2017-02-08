@@ -267,7 +267,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
     }
 
     private int getEffectiveHeight() {
-        return this.getHeight();
+        return DeviceUtils.getScreenHeight(getContext())-getTop();
     }
 
     public void previous() {
