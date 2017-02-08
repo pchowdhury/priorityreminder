@@ -51,8 +51,6 @@ public class DashboardActivity extends BasicCommunicationActivity
         ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
         ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
-        ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
     }
 
     @Override
@@ -94,6 +92,10 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public boolean onProjectSelected(Project project) {
+        if (getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG) == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
+        }
         // Handle navigation view item clicks here.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -144,7 +146,7 @@ public class DashboardActivity extends BasicCommunicationActivity
         reloadDashboard();
     }
 
-    private void reloadDashboard(){
+    private void reloadDashboard() {
         FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
         if (fragment != null) {
             fragment.loadData();
