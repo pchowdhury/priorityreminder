@@ -169,11 +169,13 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         if (project != null) {
             for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
                 int color = project.mColorQuadrants.get(type);
-                mQuadrant[type.ordinal()].setBackgroundColor(color);
-                mQuadrant[type.ordinal()].setHeaderColor(DataUtils.getPaleColor(color));
-                mQuadrant[type.ordinal()].setHeader(project.mTitleQuadrants.get(type));
-                mTaskListAdapter[type.ordinal()].setListColor(color);
-                mTaskListAdapter[type.ordinal()].setTaskList(project.getTaskListForQuadrant(type));
+                int index = type.ordinal();
+                mQuadrant[index].setBackgroundColor(color);
+                mQuadrant[index].setHeaderColor(DataUtils.getPaleColor(color));
+                mQuadrant[index].setHeader(project.mTitleQuadrants.get(type));
+                mTaskListAdapter[index].setListColor(color);
+                mTaskListAdapter[index].setTaskList(project.getTaskListForQuadrant(type));
+                mQuadrant[index].setAdapter(mTaskListAdapter[index]);
             }
         }
         postDelayed(new Runnable() {

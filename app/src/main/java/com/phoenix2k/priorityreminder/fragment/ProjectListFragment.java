@@ -16,7 +16,9 @@ import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
 import com.phoenix2k.priorityreminder.model.Project;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
+import com.phoenix2k.priorityreminder.task.LoadAllTasks;
 import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
 
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ public class ProjectListFragment extends BasicFragment {
     @BindView(R.id.progress_text)
     TextView mProgressTextView;
     private OnNavigationListener mOnNavigationListener;
+    private ProjectsAdapter mAdapter;
 
     @Override
     public BasicFragment getMainFragment() {
@@ -76,28 +79,45 @@ public class ProjectListFragment extends BasicFragment {
                     List<Project> list = (List<Project>) result;
                     DataStore.getInstance().setProjects(new ArrayList<>(list));
                 }
+                new LoadAllTasks(getActivity(), getUserCredentials(), this).execute();
+                break;
+            case Sheet_Load_All_Tasks:
+                if (result != null) {
+                    List<TaskItem> list = (List<TaskItem>) result;
+                    DataStore.getInstance().setTasks(new ArrayList<>(list));
+                }
                 break;
         }
         loadView();
     }
 
     public void loadView() {
-        final ProjectsAdapter adapter = new ProjectsAdapter(getActivity());
+        mAdapter = new ProjectsAdapter(getActivity());
         RecyclerItemClickHelper.attach(mListView).withListener(new RecyclerItemClickHelper.OnItemClickListener() {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder) {
                 int position = holder.getAdapterPosition();
-                ((ProjectViewHolder) holder).mLytRoot.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-                ((ProjectViewHolder) holder).mNameTxt.setTextColor(Color.WHITE);
-                if (mOnNavigationListener != null) {
-                    mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position));
-                }
-                adapter.notifyItemChanged(adapter.mLastIndex);
-                adapter.mLastIndex = position;
+                selectProject(position);
+//                adapter.notifyItemChanged(adapter.mLastIndex);
+//                adapter.mLastIndex = position;
             }
         });
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mListView.setAdapter(adapter);
+        mListView.setAdapter(mAdapter);
+        if (DataStore.getInstance().getProjects().size() > 0 && DataStore.getInstance().getCurrentProject() == null) {
+            selectProject(0);
+        }else{
+            if (mOnNavigationListener != null) {
+                mOnNavigationListener.onProjectSelected(DataStore.getInstance().getCurrentProject());
+            }
+        }
+    }
+
+    private void selectProject(int position) {
+        mAdapter.setSelected(position);
+        if (mOnNavigationListener != null) {
+            mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position));
+        }
     }
 
     @Override
@@ -118,10 +138,17 @@ public class ProjectListFragment extends BasicFragment {
 
     private static class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {
         Context mContext;
-        int mLastIndex = -1;
+        int mSelectedIndex = 0;
 
         public ProjectsAdapter(Context context) {
             mContext = context;
+        }
+
+        public void setSelected(int position) {
+            int previousItem = mSelectedIndex;
+            mSelectedIndex = position;
+            notifyItemChanged(previousItem);
+            notifyItemChanged(position);
         }
 
         @Override
@@ -136,9 +163,13 @@ public class ProjectListFragment extends BasicFragment {
         public void onBindViewHolder(ProjectViewHolder projectViewHolder, int i) {
             Project project = DataStore.getInstance().getProjects().get(i);
             projectViewHolder.mNameTxt.setText(project.mTitle);
-            if (mLastIndex != -1) {
+
+            if (i == mSelectedIndex) {
+                projectViewHolder.mLytRoot.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+                projectViewHolder.mNameTxt.setTextColor(Color.WHITE);
+            } else {
                 projectViewHolder.mLytRoot.setBackgroundColor(Color.TRANSPARENT);
-                projectViewHolder.mNameTxt.setTextColor(Color.BLACK);
+                projectViewHolder.mNameTxt.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
             }
         }
 

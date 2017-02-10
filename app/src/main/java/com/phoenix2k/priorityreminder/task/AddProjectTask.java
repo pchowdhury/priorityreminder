@@ -37,9 +37,9 @@ public class AddProjectTask extends SpreadsheetTask {
 
     @Override
     public Object getDataFromApi() {
-        int currentLastPosition = DataStore.getInstance().getLastProjectPosition();
-        String range = "A" + (currentLastPosition + 1) + ":O";
-        Boolean isUpdated = updateSheet(range, getData());
+        Project project = DataStore.getInstance().getNewProject();
+        String range = "A" + project.mPosition + ":P";
+        Boolean isUpdated = updateSheet(range, getData(), getProjectSpreadsheetId());
         if (!isUpdated) {
             onDisplayInfo("Could not add project");
         }
@@ -51,6 +51,7 @@ public class AddProjectTask extends SpreadsheetTask {
         List<List<Object>> values = new ArrayList<>();
         ArrayList<Object> projectValues = new ArrayList() {{
             add(project.mId + "");
+            add(project.mPosition + "");
             add(project.mTitle + "");
             add(project.mIndex + "");
             add(project.mProjectType.ordinal() + "");

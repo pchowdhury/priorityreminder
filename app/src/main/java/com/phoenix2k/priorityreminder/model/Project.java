@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
 
+import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.ProjectsColumns;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
@@ -25,6 +26,7 @@ public class Project {
     }
 
     public String mId;
+    public String mPosition;
     public String mTitle;
     public int mIndex;
     public HashMap<TaskItem.QuadrantType, String> mTitleQuadrants = new HashMap<>();
@@ -39,6 +41,7 @@ public class Project {
     public static Project newProject(Context context) {
         Project project = new Project();
         project.mId = IDGenerator.generateUniqueId() + "";
+        project.mPosition = DataStore.getInstance().getLastProjectPosition() + 1 + "";
         project.mTitle = "";
         project.mIndex = 0;
         project.mProjectType = ProjectType.Simple;
@@ -53,6 +56,10 @@ public class Project {
         project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, ContextCompat.getColor(context, R.color.color_default_q2));
         project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, ContextCompat.getColor(context, R.color.color_default_q3));
         project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, ContextCompat.getColor(context, R.color.color_default_q4));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q1, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q2, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q3, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q4, new ArrayList<TaskItem>());
         return project;
     }
 
@@ -65,7 +72,10 @@ public class Project {
                     case ID:
                         project.mId = value;
                         break;
-                    case NAME:
+                    case POSITION:
+                        project.mPosition = value;
+                        break;
+                    case TITLE:
                         project.mTitle = value;
                         break;
                     case INDEX:
@@ -121,9 +131,12 @@ public class Project {
     }
 
     public void addfromTaskList(ArrayList<TaskItem> list) {
-        for (TaskItem item : list) {
-            if (item.mProjectId == mId) {
+        for (int i = 0; i < list.size(); i++) {
+            TaskItem item = list.get(i);
+            if (item.mProjectId.equalsIgnoreCase(mId)) {
                 mQuadrants.get(item.mQuadrantType).add(item);
+                list.remove(item);
+                i--;
             }
         }
     }
@@ -136,6 +149,7 @@ public class Project {
     public String toString() {
         return
                 "{\nId:" + mId +
+                        "\nmPosition:" + mPosition +
                         "\nmTitle:" + mTitle +
                         "\nmIndex:" + mIndex +
                         "\nmProjectType:" + mProjectType.name() +

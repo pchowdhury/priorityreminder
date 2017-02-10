@@ -39,11 +39,11 @@ public abstract class SpreadsheetTask extends BasicTask {
         return ServiceType.Spreadsheet;
     }
 
-    public List<List<Object>> readSheet(String range) {
+    public List<List<Object>> readSheet(String range, String sheetId) {
         try {
             ValueRange response;
             response = ((Sheets) getService()).spreadsheets().values()
-                    .get(getProjectSpreadsheetId(), range)
+                    .get(sheetId, range)
                     .execute();
             List<List<Object>> values = response.getValues();
             return values;
@@ -54,7 +54,7 @@ public abstract class SpreadsheetTask extends BasicTask {
         return null;
     }
 
-    public boolean updateSheet(String range, List<List<Object>> data) {
+    public boolean updateSheet(String range, List<List<Object>> data, String sheetId ) {
         try {
             ValueRange oRange = new ValueRange();
             oRange.setRange(range);
@@ -66,7 +66,7 @@ public abstract class SpreadsheetTask extends BasicTask {
             oRequest.setValueInputOption("RAW");
             oRequest.setData(oList);
 
-            BatchUpdateValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchUpdate(getProjectSpreadsheetId(), oRequest).execute();
+            BatchUpdateValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchUpdate(sheetId, oRequest).execute();
             return response.getTotalUpdatedRows() >= 0;
         } catch (Exception e) {
             setLastError(e);

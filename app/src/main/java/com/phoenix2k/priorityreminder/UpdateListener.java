@@ -6,4 +6,5 @@ package com.phoenix2k.priorityreminder;
 
 public interface UpdateListener {
     void onNewProjectAdded();
+    boolean onSelectBack();
 }

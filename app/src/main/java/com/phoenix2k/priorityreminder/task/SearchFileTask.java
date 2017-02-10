@@ -17,9 +17,12 @@ import java.util.List;
  * Created by Pushpan on 05/02/17.
  */
 
-public class FindDataFileTask extends BasicTask {
-    public FindDataFileTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
+public class SearchFileTask extends BasicTask {
+    private APIType mAPIType;
+
+    public SearchFileTask(Context context, GoogleAccountCredential credential, TaskListener listener, APIType apiType) {
         super(context, credential, listener);
+        this.mAPIType = apiType;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class FindDataFileTask extends BasicTask {
 
     @Override
     public APIType getAPITypeForTask() {
-        return APIType.Drive_File_List;
+        return mAPIType;
     }
 
     @Override
@@ -42,15 +45,16 @@ public class FindDataFileTask extends BasicTask {
         // Get a list of up to 10 files.
         FileList result;
         String appFolderId = PreferenceHelper.getSavedAppFolderId(getContext());
+        String searchedFileName = ((mAPIType == APIType.Drive_Search_Project_File) ? DataStore.PROJECT_FILE_NAME : DataStore.DATA_FILE_NAME);
         try {
-            result = ((Drive)getService()).files().list().setQ("mimeType = 'application/vnd.google-apps.spreadsheet' and trashed=false and '" + appFolderId + "' in parents and name = '" + DataStore.DATA_FILE_NAME + "'")
+            result = ((Drive) getService()).files().list().setQ("mimeType = 'application/vnd.google-apps.spreadsheet' and trashed=false and '" + appFolderId + "' in parents and name = '" + searchedFileName + "'")
                     .setFields("files(id, name)")
                     .execute();
             List<File> files = result.getFiles();
             LogUtils.printFileList(files);
             if (files != null) {
                 for (File file : files) {
-                    if (file.getName().equals(DataStore.DATA_FILE_NAME)) {
+                    if (file.getName().equals(searchedFileName)) {
                         return file.getId();
                     }
                 }

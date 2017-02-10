@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.TaskItem;
@@ -43,7 +44,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
 
     @Override
     public void onBindViewHolder(TaskItemHolder holder, int position) {
-        mTaskList.get(position);
+        String title = mTaskList.get(position).mTitle;
+        holder.mTextName.setText(title);
     }
 
     @Override
@@ -70,9 +72,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
     }
 
     public class TaskItemHolder extends RecyclerView.ViewHolder {
-
+        public TextView mTextName;
         public TaskItemHolder(View itemView) {
             super(itemView);
+            mTextName = (TextView) itemView.findViewById(R.id.name);
         }
     }
 }

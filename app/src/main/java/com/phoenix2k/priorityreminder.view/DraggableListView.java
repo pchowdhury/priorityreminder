@@ -2,6 +2,7 @@ package com.phoenix2k.priorityreminder.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.R;
+import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,7 +23,7 @@ public class DraggableListView extends LinearLayout {
     @BindView(R.id.txtTitle)
     TextView txtTitle;
     @BindView(R.id.listView)
-    RecyclerView listView;
+    RecyclerView mListView;
     @BindView(R.id.lytSelector)
     View boxSelector;
     @BindView(R.id.lytHeaderTopDivider)
@@ -47,6 +49,7 @@ public class DraggableListView extends LinearLayout {
     private void initializeView() {
         inflate(getContext(), R.layout.draggable_list_view, this);
         ButterKnife.bind(this);
+        mListView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     public void showTopDivider(boolean show) {
@@ -65,4 +68,7 @@ public class DraggableListView extends LinearLayout {
         txtTitle.setBackgroundColor(color);
     }
 
+    public void setAdapter(TaskListAdapter adapter) {
+        this.mListView.setAdapter(adapter);
+    }
 }

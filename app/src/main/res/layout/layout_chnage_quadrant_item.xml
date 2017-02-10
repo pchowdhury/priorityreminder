@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/item_general_margin"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/item_general_margin">
+
+    <TextView
+        android:id="@+id/txt_quadrant_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/item_general_margin"
+        android:layout_marginRight="@dimen/item_general_margin"
+        android:layout_weight="1" />
+
+    <View
+        android:id="@+id/lyt_color"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/color_default_q1" />
+</LinearLayout>

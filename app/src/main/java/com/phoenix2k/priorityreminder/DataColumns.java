@@ -6,12 +6,13 @@ package com.phoenix2k.priorityreminder;
 
 public enum DataColumns {
     ID,
+    POSITION,
     PROJECT_ID,
     TITLE,
     INDEX,
     QUARTER,
+    DESCRIPTION,
     STATUS,
-    TYPE,
     REPEAT,
     CREATED_ON,
     UPDATED_ON

@@ -98,15 +98,28 @@ public class AddProjectFragment extends BasicFragment {
         loadView();
     }
 
+    public void switchNewProjectToState(Project project, boolean checked) {
+        if (project != null) {
+            project.mProjectType = checked ? Project.ProjectType.State : Project.ProjectType.Simple;
+            int[] resId = {R.string.lbl_title_quadrant1, R.string.lbl_title_quadrant2, R.string.lbl_title_quadrant3, R.string.lbl_title_quadrant4};
+            int[] resIdState = {R.string.lbl_title_state_quadrant1, R.string.lbl_title_state_quadrant2, R.string.lbl_title_state_quadrant3, R.string.lbl_title_state_quadrant4};
+            if (checked) {
+                for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                    project.mTitleQuadrants.put(type, getContext().getString(checked ? resIdState[type.ordinal()] : resId[type.ordinal()]));
+                }
+            }
+        }
+    }
+
     private void loadView() {
+        final Project project = DataStore.getInstance().getNewProject();
         mStatusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                DataStore.getInstance().switchNewProjectToState(getContext(), isChecked);
+                switchNewProjectToState(project, isChecked);
                 loadView();
             }
         });
-        Project project = DataStore.getInstance().getNewProject();
         if (project != null) {
             mEditTitle.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -121,7 +134,9 @@ public class AddProjectFragment extends BasicFragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    DataStore.getInstance().updateTitle(DataStore.getInstance().getNewProject(), mEditTitle.getText().toString());
+                    if (project != null) {
+                        project.mTitle = mEditTitle.getText().toString();
+                    }
                     validateAddButton();
                 }
             });
@@ -143,7 +158,9 @@ public class AddProjectFragment extends BasicFragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        DataStore.getInstance().updateQuadrantTitle(DataStore.getInstance().getNewProject(), type, edt.getText().toString());
+                        if (project != null) {
+                            project.mTitleQuadrants.put(type, edt.getText().toString());
+                        }
                         validateAddButton();
                     }
                 });

@@ -6,7 +6,8 @@ package com.phoenix2k.priorityreminder;
 
 public enum ProjectsColumns {
     ID,
-    NAME,
+    POSITION,
+    TITLE,
     INDEX,
     TYPE,
     Q1_TITLE,

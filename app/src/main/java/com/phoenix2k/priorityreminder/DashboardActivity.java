@@ -1,8 +1,8 @@
 package com.phoenix2k.priorityreminder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,12 +14,12 @@ import android.view.View;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
+import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
 import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
-import com.phoenix2k.priorityreminder.view.FourQuadrantView;
 
 import butterknife.ButterKnife;
 
@@ -37,8 +37,7 @@ public class DashboardActivity extends BasicCommunicationActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                openTaskDetails(false);
             }
         });
 
@@ -51,6 +50,14 @@ public class DashboardActivity extends BasicCommunicationActivity
         ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
         ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+    }
+
+    private void openTaskDetails(boolean isEditMode) {
+        AddTaskFragment fragment = new AddTaskFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(AddTaskFragment.IS_EDIT_MODE, isEditMode);
+        fragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }
 
     @Override
@@ -92,6 +99,7 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public boolean onProjectSelected(Project project) {
+        DataStore.getInstance().setCurrentProject(project);
         if (getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG) == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
@@ -99,7 +107,6 @@ public class DashboardActivity extends BasicCommunicationActivity
         // Handle navigation view item clicks here.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        DataStore.getInstance().setCurrentProject(project);
         reloadDashboard();
         return true;
     }
@@ -146,10 +153,22 @@ public class DashboardActivity extends BasicCommunicationActivity
         reloadDashboard();
     }
 
-    private void reloadDashboard() {
-        FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
+    @Override
+    public boolean onSelectBack() {
+        AddTaskFragment fragment = (AddTaskFragment) getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG);
         if (fragment != null) {
-            fragment.loadData();
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            return true;
+        }else{
+            finish();
+        }
+        return false;
+    }
+
+    private void reloadDashboard() {
+        FourQuadrantFragment fragment2 = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
+        if (fragment2 != null) {
+            fragment2.loadData();
         }
     }
 }

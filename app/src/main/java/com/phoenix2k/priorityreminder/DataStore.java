@@ -18,8 +18,10 @@ public class DataStore {
     public static final String DATA_FILE_NAME = "Data";
     private static DataStore mInstance;
     private ArrayList<Project> mProjects = new ArrayList<>();
+    private ArrayList<TaskItem> mTasks = new ArrayList<>();
     private Project mNewProject;
     private Project mCurrentProject;
+    private TaskItem mCurrentTaskItem;
 
     public static DataStore getInstance() {
         if (mInstance == null) {
@@ -40,6 +42,7 @@ public class DataStore {
         mNewProject = project;
         if (mNewProject != null) {
             mNewProject.mIndex = getLastProjectIndex() + 1;
+            mNewProject.mPosition = getLastProjectPosition() + 1 + "";
         }
     }
 
@@ -77,28 +80,33 @@ public class DataStore {
 
     }
 
-    public void switchNewProjectToState(Context context, boolean checked) {
-        if (mNewProject != null) {
-            mNewProject.mProjectType = checked ? Project.ProjectType.State : Project.ProjectType.Simple;
-            int[] resId = {R.string.lbl_title_quadrant1, R.string.lbl_title_quadrant2, R.string.lbl_title_quadrant3, R.string.lbl_title_quadrant4};
-            int[] resIdState = {R.string.lbl_title_state_quadrant1, R.string.lbl_title_state_quadrant2, R.string.lbl_title_state_quadrant3, R.string.lbl_title_state_quadrant4};
-            if (checked) {
-                for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
-                    mNewProject.mTitleQuadrants.put(type, context.getString(checked ? resIdState[type.ordinal()] : resId[type.ordinal()]));
-                }
-            }
+    public TaskItem getCurrentTaskItem() {
+        return mCurrentTaskItem;
+    }
+
+    public void setCurrentTaskItem(TaskItem mCurrentTaskItem) {
+        this.mCurrentTaskItem = mCurrentTaskItem;
+    }
+
+    public ArrayList<TaskItem> getTasks() {
+        return mTasks;
+    }
+
+    public void setTasks(ArrayList<TaskItem> mTasks) {
+        this.mTasks = mTasks;
+        ArrayList<TaskItem> values = new ArrayList<>(mTasks);
+        for (Project project : getProjects()) {
+            project.addfromTaskList(values);
         }
     }
 
-    public void updateQuadrantTitle(Project newProject, TaskItem.QuadrantType type, String value) {
-        if (newProject != null) {
-            newProject.mTitleQuadrants.put(type, value);
-        }
+    public int getLastTaskPosition() {
+        return getTasks().size();
     }
 
-    public void updateTitle(Project newProject, String value) {
-        if (newProject != null) {
-            newProject.mTitle = value;
-        }
+    public void confirmSaveTaskItem() {
+        ArrayList<TaskItem> list = mCurrentProject.getTaskListForQuadrant(mCurrentTaskItem.mQuadrantType);
+        list.add(mCurrentTaskItem);
+        setCurrentTaskItem(null);
     }
 }

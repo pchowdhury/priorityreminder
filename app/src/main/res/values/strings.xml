@@ -9,6 +9,7 @@
     <string name="progress_validating_setup">Validating setup...</string>
     <string name="progress_loading_projects">Loading projects...</string>
     <string name="progress_adding_project">Adding project...</string>
+    <string name="progress_adding_task">Adding task...</string>
 
     <string name="lbl_project_title">Add Title</string>
     <string name="btn_add_project"> + Add Project</string>
@@ -35,4 +36,14 @@
     <string name="hint_q2">Add quadrant 2 title</string>
     <string name="hint_q3">Add quadrant 3 title</string>
     <string name="hint_q4">Add quadrant 4 title</string>
+
+
+    <!--edit task-->
+    <string name="hint_task_title">Add task title</string>
+    <string name="hint_task_desc">Add task description</string>
+    <string name="lbl_task_quadrant">Quadrant</string>
+    <string name="lbl_task_desc">Description</string>
+    <string name="lbl_task_type">Type</string>
+    <string name="lbl_task_status">Status</string>
+    <string name="lbl_task_repeat_type">Repeat type</string>
 </resources>
