@@ -33,7 +33,7 @@ import butterknife.OnClick;
 
 public class AddTaskFragment extends BasicFragment {
     public static final String TAG = "AddTaskFragment";
-    public static final String IS_EDIT_MODE = "com.phoenix2k.priorityreminder.AddTaskFragment.IS_EDIT_MODE";
+    public static final String ITEM_ID = "com.phoenix2k.priorityreminder.AddTaskFragment.ITEM_ID";
     @BindView(R.id.txtProjectTitle)
     TextView mProjectTitle;
     @BindView(R.id.content_view)
@@ -56,8 +56,20 @@ public class AddTaskFragment extends BasicFragment {
     View mProgressView;
     @BindView(R.id.progress_text)
     TextView mProgressTextView;
+    @BindView(R.id.imgDelete)
+    View mImgDelete;
 
     private UpdateListener mUpdateListener;
+    private int mTaskIndexBackup;
+    private TaskItem.QuadrantType mTaskQuadrantBackup;
+
+    public static AddTaskFragment getInstance(String itemId) {
+        AddTaskFragment fragment = new AddTaskFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(ITEM_ID, itemId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public BasicFragment getMainFragment() {
@@ -74,19 +86,28 @@ public class AddTaskFragment extends BasicFragment {
         Project project = DataStore.getInstance().getCurrentProject();
         if (project != null) {
             mProjectTitle.setText(project.mTitle);
-            TaskItem taskItem = TaskItem.newTaskItem();
-            taskItem.mProjectId = project.mId;
+            TaskItem taskItem;
+            String taskId = getTaskId();
+            if (taskId != null) {
+                taskItem = DataStore.getInstance().getTaskItemWithId(taskId);
+                mTaskIndexBackup = taskItem.mIndex;
+                mTaskQuadrantBackup = taskItem.mQuadrantType;
+            } else {
+                taskItem = TaskItem.newTaskItem();
+                taskItem.mProjectId = project.mId;
+                mImgDelete.setVisibility(View.GONE);
+            }
             DataStore.getInstance().setCurrentTaskItem(taskItem);
             loadView();
         }
     }
 
-    private boolean isInEditMode() {
+    private String getTaskId() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            return bundle.getBoolean(IS_EDIT_MODE, false);
+            return bundle.getString(ITEM_ID);
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -108,17 +129,29 @@ public class AddTaskFragment extends BasicFragment {
             case Sheet_Add_Task:
                 Boolean isUpdated = (Boolean) result;
                 if (isUpdated) {
-                    DataStore.getInstance().confirmSaveTaskItem();
-                    mUpdateListener.onSelectBack();
+                    if (getTaskId() != null) {//edited
+                        TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
+                        if (updatedItem.mQuadrantType != mTaskQuadrantBackup) {
+                            //quadrant is changed so need to delete from the quadrant
+                            Project project = DataStore.getInstance().getCurrentProject();
+                            project.getTaskListForQuadrant(mTaskQuadrantBackup).remove(updatedItem);
+                            DataStore.getInstance().confirmSaveTaskItem();
+                        }
+                    } else {
+                        DataStore.getInstance().confirmSaveTaskItem();
+                    }
+                    mUpdateListener.onTaskUpdated();
                 }
                 break;
         }
     }
 
     private void loadView() {
-        Project project = DataStore.getInstance().getCurrentProject();
+        final Project project = DataStore.getInstance().getCurrentProject();
         final TaskItem taskItem = DataStore.getInstance().getCurrentTaskItem();
         if (taskItem != null) {
+            mEditTaskTitle.setText(taskItem.mTitle);
+            mEditDescription.setText(taskItem.mDescription);
             mLytBgView.setBackgroundColor(project.mColorQuadrants.get(taskItem.mQuadrantType));
             mEditTaskTitle.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -156,12 +189,13 @@ public class AddTaskFragment extends BasicFragment {
             });
             SpinnerAdapter adapter = new SpinnerAdapter(taskItem.mQuadrantType);
             mSpinnerQuadrantType.setAdapter(adapter);
+            mSpinnerQuadrantType.setSelection(taskItem.mQuadrantType.ordinal());
             mSpinnerQuadrantType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     taskItem.mQuadrantType = TaskItem.QuadrantType.values()[position];
+                    mLytBgView.setBackgroundColor(project.mColorQuadrants.get(taskItem.mQuadrantType));
                     updateNewTaskIndex();
-                    loadView();
                 }
 
                 @Override
@@ -169,16 +203,14 @@ public class AddTaskFragment extends BasicFragment {
 
                 }
             });
-            mSpinnerQuadrantType.setSelection(taskItem.mQuadrantType.ordinal());
-
 
             adapter = new SpinnerAdapter(taskItem.mRepeatType);
             mSpinnerRepeatType.setAdapter(adapter);
+            mSpinnerRepeatType.setSelection(taskItem.mRepeatType.ordinal());
             mSpinnerRepeatType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     taskItem.mRepeatType = TaskItem.RepeatType.values()[position];
-                    loadView();
                 }
 
                 @Override
@@ -186,15 +218,14 @@ public class AddTaskFragment extends BasicFragment {
 
                 }
             });
-            mSpinnerRepeatType.setSelection(taskItem.mRepeatType.ordinal());
 
             adapter = new SpinnerAdapter(taskItem.mStatus);
             mSpinnerStatus.setAdapter(adapter);
+            mSpinnerStatus.setSelection(taskItem.mStatus.ordinal());
             mSpinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     taskItem.mStatus = TaskItem.Status.values()[position];
-                    loadView();
                 }
 
                 @Override
@@ -202,10 +233,7 @@ public class AddTaskFragment extends BasicFragment {
 
                 }
             });
-            mSpinnerStatus.setSelection(taskItem.mStatus.ordinal());
         }
-
-
         validateSaveButton();
     }
 
@@ -213,7 +241,11 @@ public class AddTaskFragment extends BasicFragment {
         Project project = DataStore.getInstance().getCurrentProject();
         TaskItem item = DataStore.getInstance().getCurrentTaskItem();
         if (project != null && item != null) {
-            item.mIndex = project.getTaskListForQuadrant(item.mQuadrantType).size();
+            if (getTaskId() != null && (item.mQuadrantType == mTaskQuadrantBackup)) {//editing
+                item.mIndex = mTaskIndexBackup;
+            } else {//new task
+                item.mIndex = project.getTaskListForQuadrant(item.mQuadrantType).size();
+            }
         }
     }
 

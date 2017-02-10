@@ -23,6 +23,8 @@ public class DataStore {
     private Project mCurrentProject;
     private TaskItem mCurrentTaskItem;
 
+
+
     public static DataStore getInstance() {
         if (mInstance == null) {
             mInstance = new DataStore();
@@ -108,5 +110,17 @@ public class DataStore {
         ArrayList<TaskItem> list = mCurrentProject.getTaskListForQuadrant(mCurrentTaskItem.mQuadrantType);
         list.add(mCurrentTaskItem);
         setCurrentTaskItem(null);
+    }
+
+    public TaskItem getTaskItemWithId(String taskId) {
+        for(TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()){
+            ArrayList<TaskItem> items = mCurrentProject.getTaskListForQuadrant(quadrantType);
+            for(TaskItem task : items){
+                if(task.mId.equals(taskId)){
+                    return task;
+                }
+            }
+        }
+        return null;
     }
 }

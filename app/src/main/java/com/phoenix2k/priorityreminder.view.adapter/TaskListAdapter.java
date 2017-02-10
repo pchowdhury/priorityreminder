@@ -48,6 +48,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         holder.mTextName.setText(title);
     }
 
+    public TaskItem getItemAt(int position) {
+        return mTaskList.get(position);
+    }
+
     @Override
     public int getItemCount() {
         return mTaskList.size();
@@ -66,13 +70,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
     }
 
 
-    public void setTaskList(ArrayList<TaskItem> list){
+    public void setTaskList(ArrayList<TaskItem> list) {
         this.mTaskList = list;
         notifyDataSetChanged();
     }
 
     public class TaskItemHolder extends RecyclerView.ViewHolder {
         public TextView mTextName;
+
         public TaskItemHolder(View itemView) {
             super(itemView);
             mTextName = (TextView) itemView.findViewById(R.id.name);

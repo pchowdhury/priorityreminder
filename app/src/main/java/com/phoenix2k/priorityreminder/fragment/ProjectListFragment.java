@@ -98,15 +98,13 @@ public class ProjectListFragment extends BasicFragment {
             public void onItemClick(RecyclerView.ViewHolder holder) {
                 int position = holder.getAdapterPosition();
                 selectProject(position);
-//                adapter.notifyItemChanged(adapter.mLastIndex);
-//                adapter.mLastIndex = position;
             }
         });
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mListView.setAdapter(mAdapter);
         if (DataStore.getInstance().getProjects().size() > 0 && DataStore.getInstance().getCurrentProject() == null) {
             selectProject(0);
-        }else{
+        } else {
             if (mOnNavigationListener != null) {
                 mOnNavigationListener.onProjectSelected(DataStore.getInstance().getCurrentProject());
             }

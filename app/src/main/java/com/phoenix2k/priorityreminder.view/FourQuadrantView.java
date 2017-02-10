@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.phoenix2k.priorityreminder.DataStore;
+import com.phoenix2k.priorityreminder.OnDashboardListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
@@ -269,7 +270,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
     }
 
     private int getEffectiveHeight() {
-        return DeviceUtils.getScreenHeight(getContext())-getTop();
+        return DeviceUtils.getScreenHeight(getContext()) - getTop();
     }
 
     public void previous() {
@@ -282,6 +283,12 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
 //        if (getUserActionListener() != null) {
 //            getUserActionListener().onNext();
 //        }
+    }
+
+    public void setOnDashboardListener(OnDashboardListener onDashboardListener) {
+        for (int i = 0; i < mQuadrant.length; i++) {
+            mQuadrant[i].setDashboardListener(onDashboardListener);
+        }
     }
 
     class QuadrantGestureDetector extends GestureDetector.SimpleOnGestureListener {

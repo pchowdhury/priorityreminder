@@ -18,13 +18,14 @@ import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
 import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
-        implements OnNavigationListener, UpdateListener {
+        implements OnNavigationListener, UpdateListener, OnDashboardListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class DashboardActivity extends BasicCommunicationActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openTaskDetails(false);
+                openTaskDetails(null);
             }
         });
 
@@ -50,14 +51,6 @@ public class DashboardActivity extends BasicCommunicationActivity
         ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
         ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
-    }
-
-    private void openTaskDetails(boolean isEditMode) {
-        AddTaskFragment fragment = new AddTaskFragment();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(AddTaskFragment.IS_EDIT_MODE, isEditMode);
-        fragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }
 
     @Override
@@ -165,10 +158,22 @@ public class DashboardActivity extends BasicCommunicationActivity
         return false;
     }
 
+    @Override
+    public void onTaskUpdated() {
+        reloadDashboard();
+        onSelectBack();
+    }
+
     private void reloadDashboard() {
         FourQuadrantFragment fragment2 = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
         if (fragment2 != null) {
             fragment2.loadData();
         }
+    }
+
+    @Override
+    public void openTaskDetails(String itemId) {
+        AddTaskFragment fragment = AddTaskFragment.getInstance(itemId);
+        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }
 }

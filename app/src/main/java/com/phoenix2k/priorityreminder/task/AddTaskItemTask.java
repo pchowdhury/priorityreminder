@@ -32,7 +32,7 @@ public class AddTaskItemTask extends SpreadsheetTask {
 
     @Override
     public String getProgressMessage() {
-        return getContext().getString(R.string.progress_adding_task);
+        return getContext().getString(R.string.progress_updating_task);
     }
 
     @Override

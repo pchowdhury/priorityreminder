@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.phoenix2k.priorityreminder.OnDashboardListener;
 import com.phoenix2k.priorityreminder.R;
+import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import butterknife.BindView;
@@ -30,6 +32,7 @@ public class DraggableListView extends LinearLayout {
     View lytHeaderTopDivider;
     @BindView(R.id.lytLeftDivider)
     View lytLeftDivider;
+    private OnDashboardListener mDashboardListener;
 
     public DraggableListView(Context context) {
         super(context);
@@ -50,6 +53,15 @@ public class DraggableListView extends LinearLayout {
         inflate(getContext(), R.layout.draggable_list_view, this);
         ButterKnife.bind(this);
         mListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        RecyclerItemClickHelper.attach(mListView).withListener(new RecyclerItemClickHelper.OnItemClickListener() {
+            @Override
+            public void onItemClick(RecyclerView.ViewHolder holder) {
+                int position = holder.getAdapterPosition();
+                if (mDashboardListener != null) {
+                    mDashboardListener.openTaskDetails(((TaskListAdapter) mListView.getAdapter()).getItemAt(position).mId);
+                }
+            }
+        });
     }
 
     public void showTopDivider(boolean show) {
@@ -70,5 +82,13 @@ public class DraggableListView extends LinearLayout {
 
     public void setAdapter(TaskListAdapter adapter) {
         this.mListView.setAdapter(adapter);
+    }
+
+    public OnDashboardListener getDashboardListener() {
+        return mDashboardListener;
+    }
+
+    public void setDashboardListener(OnDashboardListener mDashboardListener) {
+        this.mDashboardListener = mDashboardListener;
     }
 }
