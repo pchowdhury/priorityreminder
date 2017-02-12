@@ -1,13 +1,16 @@
 package com.phoenix2k.priorityreminder;
 
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,11 +24,13 @@ import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
+import com.phoenix2k.priorityreminder.view.DraggableListView;
 
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
         implements OnNavigationListener, UpdateListener, OnDashboardListener {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,39 @@ public class DashboardActivity extends BasicCommunicationActivity
         ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
         ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+        View.OnDragListener listener = new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                TaskItem item = (TaskItem) event.getLocalState();
+                int color = (v instanceof DraggableListView) ?
+                        DataStore.getInstance().getQuadrantColorFor(item) : ContextCompat.getColor(DashboardActivity.this, R.color.color_transparent);
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        v.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.colorPrimary));
+//                        getDraggableListView().autoScrollOnHover(
+//                                CommonViewHolder.getPositionFromView(v));
+                        return true;
+                    case DragEvent.ACTION_DRAG_EXITED:
+//                        int color = DataStore.getInstance().getQuadrantColorFor(item);
+                        v.setBackgroundColor(color);
+                        return true;
+
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        return true;
+//                        return processDragStarted(event);
+                    case DragEvent.ACTION_DROP:
+//                        v.setBackgroundColor(getListColor());
+                        v.setBackgroundColor(color);
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        v.setBackgroundColor(color);
+                        return true;
+                }
+                return false;
+            }
+        };
+
+        DataStore.getInstance().setDragListener(listener);
     }
 
     @Override
@@ -152,7 +190,7 @@ public class DashboardActivity extends BasicCommunicationActivity
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             return true;
-        }else{
+        } else {
             finish();
         }
         return false;

@@ -1,11 +1,14 @@
 package com.phoenix2k.priorityreminder;
 
 import android.content.Context;
+import android.view.DragEvent;
+import android.view.View;
 
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Pushpan on 08/01/17.
@@ -22,7 +25,8 @@ public class DataStore {
     private Project mNewProject;
     private Project mCurrentProject;
     private TaskItem mCurrentTaskItem;
-
+    private View.OnDragListener mDragListener;
+    private HashMap<String, Project> mProjectsMap = new HashMap<>();
 
 
     public static DataStore getInstance() {
@@ -34,6 +38,10 @@ public class DataStore {
 
     public void setProjects(ArrayList<Project> projects) {
         this.mProjects = projects;
+        mProjectsMap.clear();
+        for (Project project : projects) {
+            mProjectsMap.put(project.mId, project);
+        }
     }
 
     public ArrayList<Project> getProjects() {
@@ -113,14 +121,27 @@ public class DataStore {
     }
 
     public TaskItem getTaskItemWithId(String taskId) {
-        for(TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()){
+        for (TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()) {
             ArrayList<TaskItem> items = mCurrentProject.getTaskListForQuadrant(quadrantType);
-            for(TaskItem task : items){
-                if(task.mId.equals(taskId)){
+            for (TaskItem task : items) {
+                if (task.mId.equals(taskId)) {
                     return task;
                 }
             }
         }
         return null;
+    }
+
+    public View.OnDragListener getDragListener() {
+        return mDragListener;
+    }
+
+    public void setDragListener(View.OnDragListener listener) {
+        this.mDragListener = listener;
+    }
+
+    public int getQuadrantColorFor(TaskItem item) {
+        Project project = mProjectsMap.get(item.mProjectId);
+        return project.mColorQuadrants.get(item.mQuadrantType);
     }
 }

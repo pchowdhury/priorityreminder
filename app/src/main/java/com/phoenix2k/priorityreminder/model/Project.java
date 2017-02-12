@@ -5,7 +5,6 @@ import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
 
 import com.phoenix2k.priorityreminder.DataStore;
-import com.phoenix2k.priorityreminder.ProjectsColumns;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
@@ -19,6 +18,25 @@ import java.util.List;
  */
 
 public class Project {
+
+    public enum Column {
+        ID,
+        POSITION,
+        TITLE,
+        INDEX,
+        TYPE,
+        Q1_TITLE,
+        Q2_TITLE,
+        Q3_TITLE,
+        Q4_TITLE,
+        Q1_COLOR,
+        Q2_COLOR,
+        Q3_COLOR,
+        Q4_COLOR,
+        CENTER_IN_PERCENT,
+        CREATED_ON,
+        UPDATED_ON
+    }
 
     public enum ProjectType {
         Simple,
@@ -68,7 +86,7 @@ public class Project {
             Project project = Project.newProject(context);
             for (int i = 0; i < values.size(); i++) {
                 String value = (String) values.get(i);
-                switch (ProjectsColumns.values()[i]) {
+                switch (Column.values()[i]) {
                     case ID:
                         project.mId = value;
                         break;
@@ -143,6 +161,30 @@ public class Project {
 
     public ArrayList<TaskItem> getTaskListForQuadrant(TaskItem.QuadrantType type) {
         return mQuadrants.get(type);
+    }
+
+    public  static List<List<Object>> getProjectWriteback(final Project project){
+        List<List<Object>> values = new ArrayList<>();
+        ArrayList<Object> projectValues = new ArrayList() {{
+            add(project.mId + "");
+            add(project.mPosition + "");
+            add(project.mTitle + "");
+            add(project.mIndex + "");
+            add(project.mProjectType.ordinal() + "");
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q1) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q2) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q3) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q4) + "");
+            add(project.mCenterInPercent.x + "," + project.mCenterInPercent.y);
+            add(project.mCreatedOn + "");
+            add(project.mUpdatedOn + "");
+        }};
+        values.add(projectValues);
+        return values;
     }
 
     @Override

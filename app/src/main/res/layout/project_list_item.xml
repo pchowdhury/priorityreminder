@@ -11,4 +11,14 @@
         android:gravity="center_vertical"
         android:padding="5dp"
         android:textSize="20sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/item_side_margin"
+        android:layout_marginLeft="@dimen/item_side_margin"
+        android:layout_marginRight="@dimen/item_side_margin"
+        android:layout_marginStart="@dimen/item_side_margin"
+        android:background="@color/color_gray" />
 </RelativeLayout>

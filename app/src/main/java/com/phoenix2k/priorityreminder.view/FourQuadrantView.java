@@ -75,6 +75,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         int[] listViewResID = {R.id.listQuad1, R.id.listQuad2, R.id.listQuad3, R.id.listQuad4};
         for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
             mQuadrant[type.ordinal()] = (DraggableListView) findViewById(listViewResID[type.ordinal()]);
+//            mQuadrant[type.ordinal()].setOnDragListener(DataStore.getInstance().getDragListener());
             mTaskListAdapter[type.ordinal()] = new TaskListAdapter(getContext(),
                     mQuadrant[type.ordinal()], type);
 //            mQuadrant[type.ordinal()].setOnTouchListener(this);
@@ -172,7 +173,8 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
                 int color = project.mColorQuadrants.get(type);
                 int index = type.ordinal();
                 mQuadrant[index].setBackgroundColor(color);
-                mQuadrant[index].setHeaderColor(DataUtils.getPaleColor(color));
+//                mQuadrant[index].setOnDragListener(DataStore.getInstance().getDragListener());
+//                mQuadrant[index].setHeaderColor(DataUtils.getPaleColor(color));
                 mQuadrant[index].setHeader(project.mTitleQuadrants.get(type));
                 mTaskListAdapter[index].setListColor(color);
                 mTaskListAdapter[index].setTaskList(project.getTaskListForQuadrant(type));

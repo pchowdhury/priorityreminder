@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.view.DragableListView;
@@ -39,6 +40,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.project_list_item, parent, false);
         v.setBackgroundColor(mListColor);
+        v.setOnDragListener(DataStore.getInstance().getDragListener());
         return new TaskItemHolder(v);
     }
 

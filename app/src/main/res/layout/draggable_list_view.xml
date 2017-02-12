@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lytHeaderTopDivider"
-        android:background="@color/color_translucent_black"
+        android:background="@color/color_translucent_white"
         android:clickable="true"
         android:lines="1"
         android:padding="5dp"

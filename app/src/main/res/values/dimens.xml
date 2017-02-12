@@ -10,5 +10,6 @@
 
 
     <dimen name="item_top_margin">5dp</dimen>
+    <dimen name="item_side_margin">5dp</dimen>
     <dimen name="item_general_margin">5dp</dimen>
 </resources>

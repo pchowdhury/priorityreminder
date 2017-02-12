@@ -4,10 +4,11 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="color_translucent_black">#80000000</color>
+    <color name="color_translucent_white">#80ffffff</color>
     <color name="color_default_q1">#33FFE6</color>
     <color name="color_default_q2">#FF9933</color>
     <color name="color_default_q3">#33FFAC</color>
     <color name="color_default_q4">#FFFFFF</color>
     <color name="color_gray">#E1DEDC</color>
-
+    <color name="color_transparent">#00000000</color>
 </resources>

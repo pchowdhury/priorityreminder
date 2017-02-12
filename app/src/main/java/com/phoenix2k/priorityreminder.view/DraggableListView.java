@@ -1,6 +1,8 @@
 package com.phoenix2k.priorityreminder.view;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +14,8 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.OnDashboardListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
+import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import butterknife.BindView;
@@ -53,16 +57,34 @@ public class DraggableListView extends LinearLayout {
         inflate(getContext(), R.layout.draggable_list_view, this);
         ButterKnife.bind(this);
         mListView.setLayoutManager(new LinearLayoutManager(getContext()));
-        RecyclerItemClickHelper.attach(mListView).withListener(new RecyclerItemClickHelper.OnItemClickListener() {
+        RecyclerItemClickSupport.addTo(mListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
             @Override
-            public void onItemClick(RecyclerView.ViewHolder holder) {
-                int position = holder.getAdapterPosition();
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 if (mDashboardListener != null) {
                     mDashboardListener.openTaskDetails(((TaskListAdapter) mListView.getAdapter()).getItemAt(position).mId);
                 }
             }
         });
+
+        RecyclerItemClickSupport.addTo(mListView).setOnItemLongClickListener(new RecyclerItemClickSupport.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClicked(RecyclerView recyclerView, int position, View v) {
+               TaskItem task = ((TaskListAdapter)  mListView.getAdapter()).getItemAt(position);
+                ClipData data = ClipData.newPlainText("clipData", task.toString()+"");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    v.startDragAndDrop(data, shadowBuilder, task, 0);
+                }else{
+                    v.startDrag(data, shadowBuilder, task, 0);
+                }
+                return false;
+            }
+        });
     }
+
+
+
+
 
     public void showTopDivider(boolean show) {
         lytHeaderTopDivider.setVisibility(show ? VISIBLE : GONE);

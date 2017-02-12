@@ -1,6 +1,5 @@
 package com.phoenix2k.priorityreminder.model;
 
-import com.phoenix2k.priorityreminder.DataColumns;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
@@ -12,6 +11,20 @@ import java.util.List;
  */
 
 public class TaskItem {
+
+    public enum Column {
+        ID,
+        POSITION,
+        PROJECT_ID,
+        TITLE,
+        INDEX,
+        QUARTER,
+        DESCRIPTION,
+        STATUS,
+        REPEAT,
+        CREATED_ON,
+        UPDATED_ON
+    }
 
     public enum QuadrantType {
         Q1, Q2, Q3, Q4
@@ -69,7 +82,7 @@ public class TaskItem {
             TaskItem taskItem = TaskItem.newTaskItem();
             for (int i = 0; i < values.size(); i++) {
                 String value = (String) values.get(i);
-                switch (DataColumns.values()[i]) {
+                switch (Column.values()[i]) {
                     case ID:
                         taskItem.mId = value;
                         break;
