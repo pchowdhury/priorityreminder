@@ -18,6 +18,7 @@ public class IDGenerator {
     private static IDGenerator mInstance;
     private long mCurrentMillis;
     private Timer mTimer;
+    private boolean mInitialized = false;
 
 
 //    public static int generateUniqueId() {
@@ -44,6 +45,9 @@ public class IDGenerator {
                     URLConnection conn;
                     conn = obj.openConnection();
                     String dateStr = conn.getHeaderField("Date");
+                    if (dateStr != null) {
+                        mInstance.mInitialized = true;
+                    }
                     LogUtils.logI("Date", dateStr);
                     //Tue, 07 Feb 2017 17:42:57 GMT
                     SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
@@ -58,7 +62,7 @@ public class IDGenerator {
                         }
                     }, 0, 1);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.printException(e);
                 }
             }
         }).start();
@@ -69,6 +73,10 @@ public class IDGenerator {
             mInstance.mTimer.cancel();
         }
         mInstance = null;
+    }
+
+    public static boolean isInitialized() {
+        return mInstance.mInitialized;
     }
 
 }

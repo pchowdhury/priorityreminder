@@ -42,7 +42,7 @@ public abstract class SpreadsheetTask extends BasicTask {
         return null;
     }
 
-    public boolean updateSheet(String range, List<List<Object>> data, String sheetId ) {
+    public boolean updateSheet(String range, List<List<Object>> data, String sheetId) {
         try {
             ValueRange oRange = new ValueRange();
             oRange.setRange(range);
@@ -50,6 +50,29 @@ public abstract class SpreadsheetTask extends BasicTask {
             List<ValueRange> oList = new ArrayList<>();
             oList.add(oRange);
 
+            BatchUpdateValuesRequest oRequest = new BatchUpdateValuesRequest();
+            oRequest.setValueInputOption("RAW");
+            oRequest.setData(oList);
+
+            BatchUpdateValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchUpdate(sheetId, oRequest).execute();
+            return response.getTotalUpdatedRows() >= 0;
+        } catch (Exception e) {
+            setLastError(e);
+            LogUtils.printException(e);
+        }
+        return false;
+    }
+
+    public boolean updateMultipleItemsSheet(ArrayList<String> ranges, List<List<List<Object>>> data, String sheetId) {
+        try {
+            List<ValueRange> oList = new ArrayList<>();
+            for (int i = 0; i < ranges.size(); i++) {
+                String range = ranges.get(i);
+                ValueRange oRange = new ValueRange();
+                oRange.setRange(range);
+                oRange.setValues(data.get(i));
+                oList.add(oRange);
+            }
             BatchUpdateValuesRequest oRequest = new BatchUpdateValuesRequest();
             oRequest.setValueInputOption("RAW");
             oRequest.setData(oList);
@@ -102,10 +125,11 @@ public abstract class SpreadsheetTask extends BasicTask {
 //        }
 //    }
 
-    public String getDataSpreadsheetId(){
+    public String getDataSpreadsheetId() {
         return PreferenceHelper.getSavedDataFileId(getContext());
     }
-    public String getProjectSpreadsheetId(){
+
+    public String getProjectSpreadsheetId() {
         return PreferenceHelper.getSavedProjectFileId(getContext());
     }
 }

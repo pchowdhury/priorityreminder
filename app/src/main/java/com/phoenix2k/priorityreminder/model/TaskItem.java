@@ -4,6 +4,7 @@ import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -121,6 +122,26 @@ public class TaskItem {
             return taskItem;
         }
         return null;
+    }
+
+
+    public  static List<List<Object>> getTaskItemWriteback(final TaskItem taskItem) {
+        List<List<Object>> values = new ArrayList<>();
+        ArrayList<Object> taskItemValues = new ArrayList() {{
+            add(taskItem.mId + "");
+            add(taskItem.mPosition + "");
+            add(taskItem.mProjectId + "");
+            add(taskItem.mTitle + "");
+            add(taskItem.mIndex + "");
+            add(taskItem.mQuadrantType.ordinal() + "");
+            add(taskItem.mDescription + "");
+            add(taskItem.mStatus.ordinal() + "");
+            add(taskItem.mRepeatType.ordinal() + "");
+            add(taskItem.mCreatedOn + "");
+            add(taskItem.mUpdatedOn + "");
+        }};
+        values.add(taskItemValues);
+        return values;
     }
 
     @Override

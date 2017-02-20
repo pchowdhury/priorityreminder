@@ -11,4 +11,5 @@
     <color name="color_default_q4">#FFFFFF</color>
     <color name="color_gray">#E1DEDC</color>
     <color name="color_transparent">#00000000</color>
+    <color name="color_more_translucent_white">#60ffffff</color>
 </resources>

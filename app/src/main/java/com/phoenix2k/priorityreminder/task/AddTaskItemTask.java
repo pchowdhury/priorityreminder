@@ -47,23 +47,7 @@ public class AddTaskItemTask extends SpreadsheetTask {
     }
 
     public List<List<Object>> getData() {
-        final TaskItem taskItem = DataStore.getInstance().getCurrentTaskItem();
-        List<List<Object>> values = new ArrayList<>();
-        ArrayList<Object> projectValues = new ArrayList() {{
-            add(taskItem.mId + "");
-            add(taskItem.mPosition + "");
-            add(taskItem.mProjectId + "");
-            add(taskItem.mTitle + "");
-            add(taskItem.mIndex + "");
-            add(taskItem.mQuadrantType.ordinal()+"");
-            add(taskItem.mDescription+"");
-            add(taskItem.mStatus.ordinal()+"");
-            add(taskItem.mRepeatType.ordinal()+"");
-            add(taskItem.mCreatedOn + "");
-            add(taskItem.mUpdatedOn + "");
-        }};
-        values.add(projectValues);
-        return values;
+        return TaskItem.getTaskItemWriteback( DataStore.getInstance().getCurrentTaskItem());
     }
 
 }

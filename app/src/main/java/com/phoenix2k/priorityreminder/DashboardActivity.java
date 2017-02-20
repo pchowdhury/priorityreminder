@@ -25,6 +25,7 @@ import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
+import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import butterknife.ButterKnife;
 
@@ -59,9 +60,15 @@ public class DashboardActivity extends BasicCommunicationActivity
         View.OnDragListener listener = new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
-                TaskItem item = (TaskItem) event.getLocalState();
-                int color = (v instanceof DraggableListView) ?
-                        DataStore.getInstance().getQuadrantColorFor(item) : ContextCompat.getColor(DashboardActivity.this, R.color.color_transparent);
+                TaskItem draggedTtem = (TaskItem) event.getLocalState();
+                TaskItem draggedOverItem = null;
+                if (v instanceof DraggableListView) {
+                    draggedOverItem = ((DraggableListView) v).getTaskItemPlaceholder();
+                } else {
+                    draggedOverItem = TaskListAdapter.getTaskItemFromView(v);
+                }
+
+                int color = ContextCompat.getColor(DashboardActivity.this, draggedOverItem.mProjectId != null ? R.color.color_more_translucent_white : R.color.color_transparent);
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_ENTERED:
                         v.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.colorPrimary));
@@ -79,6 +86,9 @@ public class DashboardActivity extends BasicCommunicationActivity
                     case DragEvent.ACTION_DROP:
 //                        v.setBackgroundColor(getListColor());
                         v.setBackgroundColor(color);
+                        DataStore.getInstance().moveTaskItem(draggedTtem, draggedOverItem);
+                        reloadDashboard();
+                        SyncManager.getInstance().startSync(DashboardActivity.this, getUserCredentials());
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
                         v.setBackgroundColor(color);
@@ -146,6 +156,15 @@ public class DashboardActivity extends BasicCommunicationActivity
     public void onAddNewProject() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public void onUpdateCurrentProject() {
+        AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+        if (fragment != null) {
+
+            fragment.loadData();
+        }
     }
 
     @Override

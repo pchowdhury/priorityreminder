@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/lyt_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/item_side_margin"
+    android:background="@color/color_more_translucent_white">
 
     <TextView
         android:id="@+id/name"
@@ -20,5 +22,6 @@
         android:layout_marginLeft="@dimen/item_side_margin"
         android:layout_marginRight="@dimen/item_side_margin"
         android:layout_marginStart="@dimen/item_side_margin"
-        android:background="@color/color_gray" />
+        android:background="@color/color_transparent"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -14,7 +14,6 @@ import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.utils.ConstantUtils;
-import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.DeviceUtils;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
@@ -176,7 +175,8 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
 //                mQuadrant[index].setOnDragListener(DataStore.getInstance().getDragListener());
 //                mQuadrant[index].setHeaderColor(DataUtils.getPaleColor(color));
                 mQuadrant[index].setHeader(project.mTitleQuadrants.get(type));
-                mTaskListAdapter[index].setListColor(color);
+//                mTaskListAdapter[index].setListColor(color);
+                mTaskListAdapter[index].setProjectId(project.mId);
                 mTaskListAdapter[index].setTaskList(project.getTaskListForQuadrant(type));
                 mQuadrant[index].setAdapter(mTaskListAdapter[index]);
             }

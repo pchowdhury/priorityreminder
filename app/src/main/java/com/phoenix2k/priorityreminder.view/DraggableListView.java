@@ -113,4 +113,8 @@ public class DraggableListView extends LinearLayout {
     public void setDashboardListener(OnDashboardListener mDashboardListener) {
         this.mDashboardListener = mDashboardListener;
     }
+
+    public TaskItem getTaskItemPlaceholder() {
+        return ((TaskListAdapter)mListView.getAdapter()).getTaskItemPlaceholder();
+    }
 }

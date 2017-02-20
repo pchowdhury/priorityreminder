@@ -10,6 +10,7 @@
     <string name="progress_loading_projects">Loading projects...</string>
     <string name="progress_adding_project">Adding project...</string>
     <string name="progress_updating_task">Updating task...</string>
+    <string name="progress_updating">Updating ...</string>
 
     <string name="lbl_project_title">Add Title</string>
     <string name="btn_add_project"> + Add Project</string>

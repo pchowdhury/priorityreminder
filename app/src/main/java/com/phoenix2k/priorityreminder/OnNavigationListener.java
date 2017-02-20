@@ -22,4 +22,5 @@ public interface OnNavigationListener {
      */
      boolean onProjectSelected(@NonNull Project item);
      void onAddNewProject();
+    void onUpdateCurrentProject();
 }

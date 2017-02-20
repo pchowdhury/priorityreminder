@@ -1,8 +1,10 @@
 package com.phoenix2k.priorityreminder.fragment;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,11 +17,13 @@ import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
+import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.task.LoadAllTasks;
 import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
+import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,11 +97,19 @@ public class ProjectListFragment extends BasicFragment {
 
     public void loadView() {
         mAdapter = new ProjectsAdapter(getActivity());
-        RecyclerItemClickHelper.attach(mListView).withListener(new RecyclerItemClickHelper.OnItemClickListener() {
+        RecyclerItemClickSupport.addTo(mListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
             @Override
-            public void onItemClick(RecyclerView.ViewHolder holder) {
-                int position = holder.getAdapterPosition();
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 selectProject(position);
+            }
+        });
+        RecyclerItemClickSupport.addTo(mListView).setOnItemLongClickListener(new RecyclerItemClickSupport.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClicked(RecyclerView recyclerView, int position, View v) {
+                if (mOnNavigationListener != null) {
+                    mOnNavigationListener.onUpdateCurrentProject();
+                }
+                return false;
             }
         });
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
