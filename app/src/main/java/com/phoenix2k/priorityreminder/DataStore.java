@@ -140,6 +140,8 @@ public class DataStore {
     public void confirmSaveTaskItem() {
         ArrayList<TaskItem> list = mCurrentProject.getTaskListForQuadrant(mCurrentTaskItem.mQuadrantType);
         list.add(mCurrentTaskItem);
+        //add to main task list to update the new position
+        mTasks.add(mCurrentTaskItem);
         setCurrentTaskItem(null);
     }
 
