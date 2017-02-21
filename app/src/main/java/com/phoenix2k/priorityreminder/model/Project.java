@@ -9,6 +9,9 @@ import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +58,13 @@ public class Project {
     public long mUpdatedOn;
 
     private HashMap<TaskItem.QuadrantType, ArrayList<TaskItem>> mQuadrants = new HashMap<>();
+
+    public Project(){
+        mQuadrants.put(TaskItem.QuadrantType.Q1, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q2, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q3, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q4, new ArrayList<TaskItem>());
+    }
 
     public static Project newProject(Context context) {
         Project project = new Project();
@@ -163,7 +173,7 @@ public class Project {
         return mQuadrants.get(type);
     }
 
-    public  static List<List<Object>> getProjectWriteback(final Project project){
+    public static List<List<Object>> getProjectWriteback(final Project project) {
         List<List<Object>> values = new ArrayList<>();
         ArrayList<Object> projectValues = new ArrayList() {{
             add(project.mId + "");
@@ -202,5 +212,90 @@ public class Project {
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
                         "\n}";
+    }
+
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put(Column.ID.name(), mId);
+            json.put(Column.POSITION.name(), mPosition);
+            json.put(Column.TITLE.name(), mTitle);
+            json.put(Column.INDEX.name(), mIndex);
+            json.put(Column.TYPE.name(), mProjectType.ordinal());
+            json.put(Column.Q1_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q1));
+            json.put(Column.Q2_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q2));
+            json.put(Column.Q3_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q3));
+            json.put(Column.Q4_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q4));
+            json.put(Column.Q1_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
+            json.put(Column.Q2_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
+            json.put(Column.Q3_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
+            json.put(Column.Q4_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
+            json.put(Column.CENTER_IN_PERCENT.name(), mCenterInPercent.x + "," + mCenterInPercent.y);
+            json.put(Column.CREATED_ON.name(), mCreatedOn);
+            json.put(Column.UPDATED_ON.name(), mUpdatedOn);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    public static Project getProjectFromJSON(JSONObject json) {
+        Project project = new Project();
+        try {
+            if (json.has(Project.Column.ID.name())) {
+                project.mId = json.getString(Project.Column.ID.name());
+            }
+            if (json.has(Project.Column.POSITION.name())) {
+                project.mPosition = json.getString(Project.Column.POSITION.name());
+            }
+            if (json.has(Project.Column.TITLE.name())) {
+                project.mTitle = json.getString(Project.Column.TITLE.name());
+            }
+            if (json.has(Project.Column.INDEX.name())) {
+                project.mIndex = json.getInt(Project.Column.INDEX.name());
+            }
+            if (json.has(Column.TYPE.name())) {
+                project.mProjectType = ProjectType.values()[json.getInt(Column.TYPE.name())];
+            }
+            if (json.has(Column.Q1_COLOR.name())) {
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, json.getInt(Column.Q1_COLOR.name()));
+            }
+            if (json.has(Project.Column.Q2_COLOR.name())) {
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, json.getInt(Column.Q2_COLOR.name()));
+            }
+            if (json.has(Project.Column.Q3_COLOR.name())) {
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, json.getInt(Column.Q3_COLOR.name()));
+            }
+            if (json.has(Project.Column.Q4_COLOR.name())) {
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, json.getInt(Column.Q4_COLOR.name()));
+            }
+            if (json.has(Project.Column.Q1_TITLE.name())) {
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, json.getString(Column.Q1_TITLE.name()));
+            }
+            if (json.has(Project.Column.Q2_TITLE.name())) {
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, json.getString(Project.Column.Q2_TITLE.name()));
+            }
+            if (json.has(Project.Column.Q3_TITLE.name())) {
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, json.getString(Project.Column.Q3_TITLE.name()));
+            }
+            if (json.has(Project.Column.Q4_TITLE.name())) {
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, json.getString(Project.Column.Q4_TITLE.name()));
+            }
+            if (json.has(Column.CENTER_IN_PERCENT.name())) {
+                String centre = json.getString(Column.CENTER_IN_PERCENT.name());
+                String[] values = centre.split(",");
+                project.mCenterInPercent.x = DataUtils.parseIntValue(values[0]);
+                project.mCenterInPercent.y = DataUtils.parseIntValue(values[1]);
+            }
+            if (json.has(Project.Column.CREATED_ON.name())) {
+                project.mCreatedOn = json.getLong(Project.Column.CREATED_ON.name());
+            }
+            if (json.has(Project.Column.UPDATED_ON.name())) {
+                project.mUpdatedOn = json.getLong(Project.Column.UPDATED_ON.name());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return project;
     }
 }

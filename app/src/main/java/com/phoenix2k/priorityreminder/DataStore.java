@@ -1,7 +1,5 @@
 package com.phoenix2k.priorityreminder;
 
-import android.content.Context;
-import android.view.DragEvent;
 import android.view.View;
 
 import com.phoenix2k.priorityreminder.model.Project;

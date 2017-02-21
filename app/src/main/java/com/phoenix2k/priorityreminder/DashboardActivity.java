@@ -26,6 +26,7 @@ import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
+import com.phoenix2k.priorityreminder.utils.StaticDataProvider;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
@@ -33,7 +34,9 @@ import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
         implements OnNavigationListener, UpdateListener, OnDashboardListener {
-
+    private static final boolean ENABLE_CACHE = true;
+    private static final boolean GENERATE_CACHE = false;
+    private static final boolean USE_ASSET_CACHE = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,8 @@ public class DashboardActivity extends BasicCommunicationActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+        setUpCache();
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
         ft = getSupportFragmentManager().beginTransaction();
@@ -63,7 +68,7 @@ public class DashboardActivity extends BasicCommunicationActivity
             @Override
             public boolean onDrag(View v, DragEvent event) {
                 TaskItem draggedTtem = (TaskItem) event.getLocalState();
-                TaskItem draggedOverItem = null;
+                TaskItem draggedOverItem;
                 if (v instanceof DraggableListView) {
                     draggedOverItem = ((DraggableListView) v).getTaskItemPlaceholder();
                 } else {
@@ -101,6 +106,10 @@ public class DashboardActivity extends BasicCommunicationActivity
         };
 
         DataStore.getInstance().setDragListener(listener);
+    }
+
+    private void setUpCache() {
+        StaticDataProvider.init(this).setEnableStaticEngine(ENABLE_CACHE).setUseAssetCacheDebugOption(USE_ASSET_CACHE).setUseSDCard(true).setGenerateCacheDebugOption(GENERATE_CACHE);
     }
 
     @Override

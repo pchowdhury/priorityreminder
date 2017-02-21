@@ -4,6 +4,9 @@ import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +128,7 @@ public class TaskItem {
     }
 
 
-    public  static List<List<Object>> getTaskItemWriteback(final TaskItem taskItem) {
+    public static List<List<Object>> getTaskItemWriteback(final TaskItem taskItem) {
         List<List<Object>> values = new ArrayList<>();
         ArrayList<Object> taskItemValues = new ArrayList() {{
             add(taskItem.mId + "");
@@ -159,5 +162,67 @@ public class TaskItem {
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
                         "\n}";
+    }
+
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put(Column.ID.name(), mId);
+            json.put(Column.POSITION.name(), mPosition);
+            json.put(Column.PROJECT_ID.name(), mProjectId);
+            json.put(Column.TITLE.name(), mTitle);
+            json.put(Column.INDEX.name(), mIndex);
+            json.put(Column.QUARTER.name(), mQuadrantType.ordinal());
+            json.put(Column.DESCRIPTION.name(), mDescription);
+            json.put(Column.STATUS.name(), mStatus.ordinal());
+            json.put(Column.REPEAT.name(), mRepeatType.ordinal());
+            json.put(Column.CREATED_ON.name(), mCreatedOn);
+            json.put(Column.UPDATED_ON.name(), mUpdatedOn);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    public static TaskItem getTaskFromJSON(JSONObject json) {
+        TaskItem taskItem = new TaskItem();
+        try {
+            if (json.has(Column.ID.name())) {
+                taskItem.mId = json.getString(Column.ID.name());
+            }
+            if (json.has(Column.POSITION.name())) {
+                taskItem.mPosition = json.getString(Column.POSITION.name());
+            }
+            if (json.has(Column.PROJECT_ID.name())) {
+                taskItem.mProjectId = json.getString(Column.PROJECT_ID.name());
+            }
+            if (json.has(Column.TITLE.name())) {
+                taskItem.mTitle = json.getString(Column.TITLE.name());
+            }
+            if (json.has(Column.INDEX.name())) {
+                taskItem.mIndex = json.getInt(Column.INDEX.name());
+            }
+            if (json.has(Column.QUARTER.name())) {
+                taskItem.mQuadrantType = QuadrantType.values()[json.getInt(Column.QUARTER.name())];
+            }
+            if (json.has(Column.DESCRIPTION.name())) {
+                taskItem.mDescription = json.getString(Column.DESCRIPTION.name());
+            }
+            if (json.has(Column.STATUS.name())) {
+                taskItem.mStatus = Status.values()[json.getInt(Column.STATUS.name())];
+            }
+            if (json.has(Column.REPEAT.name())) {
+                taskItem.mRepeatType = RepeatType.values()[json.getInt(Column.REPEAT.name())];
+            }
+            if (json.has(Column.CREATED_ON.name())) {
+                taskItem.mCreatedOn = json.getLong(Column.CREATED_ON.name());
+            }
+            if (json.has(Column.UPDATED_ON.name())) {
+                taskItem.mUpdatedOn = json.getLong(Column.UPDATED_ON.name());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return taskItem;
     }
 }
