@@ -54,7 +54,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
             mDummyPlaceHolderItem.mIndex = position;
         }
         String title = item.mTitle;
-        holder.mViewParent.setBackgroundColor(ContextCompat.getColor(holder.mViewParent.getContext(), item.mProjectId != null ? R.color.color_more_translucent_white : R.color.color_transparent));
+        holder.mViewParent.setBackgroundColor(ContextCompat.getColor(holder.mViewParent.getContext(), item.mUpdatedOn != -1 ? R.color.color_more_translucent_white : R.color.color_transparent));
         holder.mTextName.setText(title);
         holder.mTextName.setTag(item);
     }
@@ -98,6 +98,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
 
     public TaskItem getTaskItemPlaceholder() {
         return mDummyPlaceHolderItem;
+    }
+
+    public void setProjectId(String projectId) {
+        mDummyPlaceHolderItem.mProjectId = projectId;
     }
 
     public class TaskItemHolder extends RecyclerView.ViewHolder {

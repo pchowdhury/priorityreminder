@@ -244,7 +244,9 @@ public class DataStore {
     }
 
     public DataStore addToUpdate(Object updatedItem) {
-        mUpdates.add(updatedItem);
+        if (!mUpdates.contains(updatedItem)) {
+            mUpdates.add(updatedItem);
+        }
         return this;
     }
 

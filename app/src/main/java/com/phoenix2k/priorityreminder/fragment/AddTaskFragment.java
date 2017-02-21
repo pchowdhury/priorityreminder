@@ -254,7 +254,7 @@ public class AddTaskFragment extends BasicFragment {
         if (taskItem != null) {
             boolean enable = true;
             enable = enable && taskItem.mTitle.trim().length() > 0;
-            enable = enable && taskItem.mDescription.trim().length() > 0;
+//            enable = enable && taskItem.mDescription.trim().length() > 0;
             enableSaveButton(enable);
         } else {
             enableSaveButton(false);

@@ -1,6 +1,8 @@
 package com.phoenix2k.priorityreminder;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
@@ -120,6 +122,7 @@ public class DashboardActivity extends BasicCommunicationActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.dashboard, menu);
+        applyMenuThemeElements(menu, Color.WHITE);
         return true;
     }
 
@@ -131,7 +134,8 @@ public class DashboardActivity extends BasicCommunicationActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sync) {
+            SyncManager.getInstance().startSync(this, getUserCredentials());
             return true;
         }
 

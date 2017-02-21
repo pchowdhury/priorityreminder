@@ -5,11 +5,15 @@ import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -60,6 +64,16 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    protected final void applyMenuThemeElements(Menu menu, @ColorInt int tintColor) {
+        for (int i = 0; i < menu.size(); i++) {
+            final Drawable icon = menu.getItem(i)
+                    .getIcon();
+            if (icon != null) {
+                icon.mutate().setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
+            }
+        }
     }
 
     @Override
