@@ -1,8 +1,6 @@
 package com.phoenix2k.priorityreminder;
 
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
@@ -11,7 +9,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,9 +31,6 @@ import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
         implements OnNavigationListener, UpdateListener, OnDashboardListener {
-    private static final boolean ENABLE_CACHE = true;
-    private static final boolean GENERATE_CACHE = false;
-    private static final boolean USE_ASSET_CACHE = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +52,6 @@ public class DashboardActivity extends BasicCommunicationActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        setUpCache();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
@@ -106,10 +99,6 @@ public class DashboardActivity extends BasicCommunicationActivity
         };
 
         DataStore.getInstance().setDragListener(listener);
-    }
-
-    private void setUpCache() {
-        StaticDataProvider.init(this).setEnableStaticEngine(ENABLE_CACHE).setUseAssetCacheDebugOption(USE_ASSET_CACHE).setUseSDCard(true).setGenerateCacheDebugOption(GENERATE_CACHE);
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.phoenix2k.priorityreminder.task.FindAppFolderTask;
 import com.phoenix2k.priorityreminder.task.SearchFileTask;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
+import com.phoenix2k.priorityreminder.utils.StaticDataProvider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,8 +23,10 @@ import butterknife.ButterKnife;
  */
 
 public class SignInActivity extends BasicCommunicationActivity {
-
     private static final String TAG = "SignInActivity";
+    private static final boolean ENABLE_CACHE = true;
+    private static final boolean GENERATE_CACHE = false;
+    private static final boolean USE_ASSET_CACHE = true;
     @BindView(R.id.progress)
     View mProgressView;
     @BindView(R.id.text_log)
@@ -34,8 +37,14 @@ public class SignInActivity extends BasicCommunicationActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
         ButterKnife.bind(this);
+        setUpCache();
         attemptSignIn();
     }
+
+    private void setUpCache() {
+        StaticDataProvider.init(this).setEnableStaticEngine(ENABLE_CACHE).setUseAssetCacheDebugOption(USE_ASSET_CACHE).setUseSDCard(true).setGenerateCacheDebugOption(GENERATE_CACHE);
+    }
+
     @Override
     public void onAccountValidationComplete() {
         if (PreferenceHelper.getSavedDataFileId(this) == null || PreferenceHelper.getSavedProjectFileId(this) == null) {
