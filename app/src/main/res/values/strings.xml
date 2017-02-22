@@ -4,6 +4,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_sync">Sync</string>
+    <string name="action_logout">Logout</string>
 
     <!--progress messages-->
     <string name="progress_validating_setup">Validating setup...</string>
@@ -11,11 +12,23 @@
     <string name="progress_adding_project">Adding project...</string>
     <string name="progress_updating_task">Updating task...</string>
     <string name="progress_updating">Updating ...</string>
+    <string name="progress_getting_ready">Getting ready ...</string>
+
+    <string name="dialog_lbl_fatal_error_recoverable">Failed to initialize. Please check your internet connection and retry.</string>
+    <string name="dialog_title_fatal_error_recoverable">Error</string>
+
+    <string name="dialog_lbl_logout_confirmation">Do you really want to logout?</string>
+    <string name="dialog_title_logout">Logout</string>
 
     <string name="lbl_project_title">Add Title</string>
     <string name="btn_add_project"> + Add Project</string>
     <string name="btn_add">+ Add</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+
+    <string name="btn_retry">Retry</string>
+    <string name="btn_exit">Exit</string>
 
     <string name="lbl_status">Project with status</string>
     <string name="hint_add_project">Add project title</string>

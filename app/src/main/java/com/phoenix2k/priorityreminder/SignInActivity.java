@@ -146,6 +146,7 @@ public class SignInActivity extends BasicCommunicationActivity {
     }
 
     private void onSetupValidationComplete() {
+        //initialize id generator
         IDGenerator.init();
         Intent intent = new Intent(this, DashboardActivity.class);
         startActivity(intent);

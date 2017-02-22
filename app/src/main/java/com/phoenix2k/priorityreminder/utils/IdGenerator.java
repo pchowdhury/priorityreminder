@@ -19,7 +19,7 @@ public class IDGenerator {
     private long mCurrentMillis;
     private Timer mTimer;
     private boolean mInitialized = false;
-
+    String mError;
 
 //    public static int generateUniqueId() {
 //        UUID idOne = UUID.randomUUID();
@@ -37,6 +37,11 @@ public class IDGenerator {
 
     public static void init() {
         mInstance = new IDGenerator();
+        restart();
+    }
+
+    public static void restart() {
+        mInstance.mError = null;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -47,6 +52,8 @@ public class IDGenerator {
                     String dateStr = conn.getHeaderField("Date");
                     if (dateStr != null) {
                         mInstance.mInitialized = true;
+                    } else {
+                        mInstance.mError = "No Date";
                     }
                     LogUtils.logI("Date", dateStr);
                     //Tue, 07 Feb 2017 17:42:57 GMT
@@ -63,6 +70,7 @@ public class IDGenerator {
                     }, 0, 1);
                 } catch (Exception e) {
                     LogUtils.printException(e);
+                    mInstance.mError = e.getLocalizedMessage();
                 }
             }
         }).start();
@@ -77,6 +85,13 @@ public class IDGenerator {
 
     public static boolean isInitialized() {
         return mInstance.mInitialized;
+    }
+
+    public static boolean hasError() {
+        if (mInstance != null) {
+            return mInstance.mError != null;
+        }
+        return false;
     }
 
 }

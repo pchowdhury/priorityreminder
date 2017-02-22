@@ -1,6 +1,9 @@
 package com.phoenix2k.priorityreminder;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
@@ -8,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.DragEvent;
 import android.view.Menu;
@@ -23,14 +27,19 @@ import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
-import com.phoenix2k.priorityreminder.utils.StaticDataProvider;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
         implements OnNavigationListener, UpdateListener, OnDashboardListener {
+    @BindView(R.id.main_progress)
+    public View mMainProress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +62,6 @@ public class DashboardActivity extends BasicCommunicationActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
-        ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
         View.OnDragListener listener = new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
@@ -99,6 +104,97 @@ public class DashboardActivity extends BasicCommunicationActivity
         };
 
         DataStore.getInstance().setDragListener(listener);
+        validateInitialization();
+    }
+
+    /**
+     * Wait till the IDGenerator is initialized
+     */
+    private void validateInitialization() {
+        showProgress(true);
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (IDGenerator.isInitialized()) {
+                    timer.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finishInitialization();
+                        }
+                    });
+                } else {
+                    if (IDGenerator.hasError()) {
+                        timer.cancel();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showProgress(false);
+                                showFatalErrorDialog();
+                            }
+                        });
+                    }
+                }
+            }
+        }, 0, 500);
+    }
+
+    private void showFatalErrorDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_title_fatal_error_recoverable).setMessage(getResources().getString(R.string.dialog_lbl_fatal_error_recoverable));
+        builder.setPositiveButton(R.string.btn_retry, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                IDGenerator.restart();
+                validateInitialization();
+            }
+        });
+        builder.setNegativeButton(R.string.btn_exit, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
+    private void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_title_logout).setMessage(getResources().getString(R.string.dialog_lbl_logout_confirmation));
+        builder.setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                IDGenerator.deInit();
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.btn_no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
+    private void finishInitialization() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+        showProgress(false);
     }
 
     @Override
@@ -132,6 +228,10 @@ public class DashboardActivity extends BasicCommunicationActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.action_logout) {
+            showLogoutConfirmationDialog();
+            return true;
+        }
         if (id == R.id.action_sync) {
             SyncManager.getInstance().startSync(this, getUserCredentials());
             return true;
@@ -195,12 +295,6 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     @Override
-    protected void onDestroy() {
-        IDGenerator.deInit();
-        super.onDestroy();
-    }
-
-    @Override
     public void onNewProjectAdded() {
         reloadDashboard();
     }
@@ -234,5 +328,9 @@ public class DashboardActivity extends BasicCommunicationActivity
     public void openTaskDetails(String itemId) {
         AddTaskFragment fragment = AddTaskFragment.getInstance(itemId);
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+    }
+
+    public void showProgress(boolean show) {
+        mMainProress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }
