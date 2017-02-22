@@ -1,10 +1,8 @@
 package com.phoenix2k.priorityreminder.fragment;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,14 +14,12 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.task.LoadAllTasks;
 import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
-import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,19 +110,16 @@ public class ProjectListFragment extends BasicFragment {
         });
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mListView.setAdapter(mAdapter);
-        if (DataStore.getInstance().getProjects().size() > 0 && DataStore.getInstance().getCurrentProject() == null) {
-            selectProject(0);
-        } else {
-            if (mOnNavigationListener != null) {
-                mOnNavigationListener.onProjectSelected(DataStore.getInstance().getCurrentProject());
-            }
-        }
+        selectProject(DataStore.getInstance().getCurrentProjectIndex());
     }
 
     private void selectProject(int position) {
-        mAdapter.setSelected(position);
-        if (mOnNavigationListener != null) {
-            mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position));
+        if (DataStore.getInstance().getProjects().size() > 0) {
+            DataStore.getInstance().setCurrentProjectIndex(position);
+            mAdapter.setSelected(position);
+            if (mOnNavigationListener != null) {
+                mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position));
+            }
         }
     }
 

@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 
 public class SignInActivity extends BasicCommunicationActivity {
     private static final String TAG = "SignInActivity";
-    private static final boolean ENABLE_CACHE = true;
+    private static final boolean ENABLE_CACHE = false;
     private static final boolean GENERATE_CACHE = false;
     private static final boolean USE_ASSET_CACHE = true;
     @BindView(R.id.progress)

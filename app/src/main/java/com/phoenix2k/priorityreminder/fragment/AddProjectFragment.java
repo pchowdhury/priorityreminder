@@ -2,10 +2,14 @@ package com.phoenix2k.priorityreminder.fragment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.widget.SwitchCompat;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -14,24 +18,24 @@ import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
+import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
-import com.phoenix2k.priorityreminder.task.APIType;
-import com.phoenix2k.priorityreminder.task.AddProjectTask;
+import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.BindViews;
-import butterknife.OnCheckedChanged;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
  * Created by Pushpan on 06/02/17.
  */
 
-public class AddProjectFragment extends BasicFragment {
+public class AddProjectFragment extends Fragment {
     public static final String TAG = "AddProjectFragment";
     @BindView(R.id.btn_add_project)
     View mLytAddProject;
@@ -54,49 +58,20 @@ public class AddProjectFragment extends BasicFragment {
     List<EditText> mQuadrantNameViews;
 
     private UpdateListener mUpdateListener;
+    private Project mCurrentProject;
 
+    @Nullable
     @Override
-    public BasicFragment getMainFragment() {
-        return this;
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.layout_add_project, null);
+        ButterKnife.bind(this, v);
+        loadData();
+        return v;
     }
 
-    @Override
-    public int getViewResource() {
-        return R.layout.layout_add_project;
-    }
-
-    @Override
     public void loadData() {
     }
 
-    @Override
-    public void onProgress(boolean show, String msg) {
-        if (show) {
-            mLytButton.setVisibility(View.INVISIBLE);
-            mProgressView.setVisibility(View.VISIBLE);
-            mProgressTextView.setText(msg);
-        } else {
-            mLytButton.setVisibility(View.VISIBLE);
-            mProgressView.setVisibility(View.GONE);
-            mProgressTextView.setText("");
-        }
-
-    }
-
-    @Override
-    public void onFinishQuery(APIType type, Object result) {
-        switch (type) {
-            case Sheet_Add_Project:
-                Boolean isUpdated = (Boolean) result;
-                if (isUpdated) {
-                    DataStore.getInstance().confirmSaveNewProject();
-                    mUpdateListener.onNewProjectAdded();
-                }
-                collapse();
-                break;
-        }
-        loadView();
-    }
 
     public void switchNewProjectToState(Project project, boolean checked) {
         if (project != null) {
@@ -112,16 +87,42 @@ public class AddProjectFragment extends BasicFragment {
     }
 
     private void loadView() {
-        final Project project = DataStore.getInstance().getNewProject();
         mStatusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                switchNewProjectToState(project, isChecked);
+                if (getCurrentProject() != null) {
+                    switchNewProjectToState(getCurrentProject(), isChecked);
+                }
                 loadView();
             }
         });
-        if (project != null) {
-            mEditTitle.addTextChangedListener(new TextWatcher() {
+        mEditTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (getCurrentProject() != null) {
+                    getCurrentProject().mTitle = mEditTitle.getText().toString();
+                }
+                validateAddButton();
+            }
+        });
+
+
+        for (final TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+            final EditText edt = mQuadrantNameViews.get(type.ordinal());
+            if (getCurrentProject() != null) {
+                edt.setText(getCurrentProject().mTitleQuadrants.get(type));
+            }
+            edt.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -134,37 +135,12 @@ public class AddProjectFragment extends BasicFragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (project != null) {
-                        project.mTitle = mEditTitle.getText().toString();
+                    if (getCurrentProject() != null) {
+                        getCurrentProject().mTitleQuadrants.put(type, edt.getText().toString());
                     }
                     validateAddButton();
                 }
             });
-
-
-            for (final TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
-                final EditText edt = mQuadrantNameViews.get(type.ordinal());
-                edt.setText(project.mTitleQuadrants.get(type));
-                edt.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (project != null) {
-                            project.mTitleQuadrants.put(type, edt.getText().toString());
-                        }
-                        validateAddButton();
-                    }
-                });
-            }
         }
         validateAddButton();
     }
@@ -185,14 +161,22 @@ public class AddProjectFragment extends BasicFragment {
 
     @OnClick(R.id.btn_cancel)
     public void onClickCancel(View v) {
+        KeyboardUtils.hideKeyboard(getActivity());
         collapse();
     }
 
     @OnClick(R.id.btn_add)
     public void onClickAdd(View v) {
-        if (getUserCredentials() != null) {
-            new AddProjectTask(getActivity(), getUserCredentials(), this).execute();
-        }
+        KeyboardUtils.hideKeyboard(getActivity());
+        SyncManager.getInstance().addToUpdates(DataStore.getInstance().getNewProject());
+        DataStore.getInstance().confirmSaveNewProject();
+        setCurrentProject(null);
+        mUpdateListener.onNewProjectAdded();
+        collapse();
+//
+//        if (getUserCredentials() != null) {
+//            new AddProjectTask(getActivity(), getUserCredentials(), this).execute();
+//        }
     }
 
     @OnClick(R.id.btn_add_project)
@@ -202,6 +186,7 @@ public class AddProjectFragment extends BasicFragment {
 
     public void expand() {
         DataStore.getInstance().setNewProject(Project.newProject(getContext()));
+        setCurrentProject(DataStore.getInstance().getNewProject());
         mEditTitle.setText(DataStore.getInstance().getNewProject().mTitle);
         mLytAddDetails.setVisibility(View.VISIBLE);
         mLytAddProject.setVisibility(View.GONE);
@@ -233,5 +218,13 @@ public class AddProjectFragment extends BasicFragment {
 
     private void enableAddButton(boolean enable) {
         mBtnAdd.setEnabled(enable);
+    }
+
+    public Project getCurrentProject() {
+        return mCurrentProject;
+    }
+
+    public void setCurrentProject(Project mCurrentProject) {
+        this.mCurrentProject = mCurrentProject;
     }
 }

@@ -38,32 +38,46 @@ public class SyncTask extends SpreadsheetTask {
 
     @Override
     public Object getDataFromApi() {
-        ArrayList<String> ranges = new ArrayList<>();
-        List<List<List<Object>>> data = new ArrayList<>();
+        ArrayList<String> projectRanges = new ArrayList<>();
+        ArrayList<String> taskRanges = new ArrayList<>();
+        List<List<List<Object>>> projectData = new ArrayList<>();
+        List<List<List<Object>>> taskData = new ArrayList<>();
 
         for(Object obj : DataStore.getInstance().getUpdates()){
             if(obj instanceof TaskItem){
                 final TaskItem taskItem = (TaskItem) obj;
                 String range = "A" + taskItem.mPosition + ":K";
-                ranges.add(range);
+                taskRanges.add(range);
                 List<List<Object>> itemData =  TaskItem.getTaskItemWriteback(taskItem);
-                data.add(itemData);
+                taskData.add(itemData);
             }else{
                 final Project project = (Project) obj;
                 String range = "A" + project.mPosition + ":P";
-                ranges.add(range);
+                projectRanges.add(range);
                 List<List<Object>> itemData =  Project.getProjectWriteback(project);
-                data.add(itemData);
+                projectData.add(itemData);
             }
         }
-        Boolean isUpdated = updateMultipleItemsSheet(ranges, data, getDataSpreadsheetId());
-        if(isUpdated){
-            DataStore.getInstance().clearUpdates();
+
+        Boolean isUpdatedProject = true;
+        Boolean isUpdatedTasks = true;
+        if(projectRanges.size()>0) {
+             isUpdatedProject = updateMultipleItemsSheet(projectRanges, projectData, getProjectSpreadsheetId());
+            if(isUpdatedProject){
+                DataStore.getInstance().clearUpdatedProjects();
+            }
         }
-        if (!isUpdated) {
+        if(taskRanges.size()>0) {
+            isUpdatedTasks = updateMultipleItemsSheet(taskRanges, taskData, getDataSpreadsheetId());
+            if(isUpdatedTasks){
+                DataStore.getInstance().clearUpdatedTaskItems();
+            }
+        }
+
+        if (!isUpdatedTasks || !isUpdatedTasks) {
             onDisplayInfo("Could not push updates");
         }
-        return isUpdated;
+        return (isUpdatedTasks && isUpdatedTasks);
     }
 
 }

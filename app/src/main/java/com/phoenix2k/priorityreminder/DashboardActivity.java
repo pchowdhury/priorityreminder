@@ -296,6 +296,8 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public void onNewProjectAdded() {
+        SyncManager.getInstance().startSync(this, getUserCredentials());
+        reloadProjectList();
         reloadDashboard();
     }
 
@@ -318,9 +320,16 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     private void reloadDashboard() {
-        FourQuadrantFragment fragment2 = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
-        if (fragment2 != null) {
-            fragment2.loadData();
+        FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
+        if (fragment != null) {
+            fragment.loadView();
+        }
+    }
+
+    private void reloadProjectList() {
+        ProjectListFragment fragment = (ProjectListFragment) getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG);
+        if (fragment != null) {
+            fragment.loadView();
         }
     }
 

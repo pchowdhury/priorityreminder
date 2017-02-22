@@ -21,6 +21,7 @@ import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.task.AddProjectTask;
 import com.phoenix2k.priorityreminder.task.AddTaskItemTask;
+import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
 
 import java.util.ArrayList;
 
@@ -283,6 +284,7 @@ public class AddTaskFragment extends BasicFragment {
 
     @OnClick(R.id.imgSave)
     public void onClickSave(View v) {
+        KeyboardUtils.hideKeyboard(getActivity());
         if (getUserCredentials() != null) {
             new AddTaskItemTask(getActivity(), getUserCredentials(), this).execute();
         }
@@ -290,12 +292,13 @@ public class AddTaskFragment extends BasicFragment {
 
     @OnClick(R.id.imgCancel)
     public void onClickCancel(View v) {
+        KeyboardUtils.hideKeyboard(getActivity());
         mUpdateListener.onSelectBack();
     }
 
     @OnClick(R.id.imgDelete)
     public void onClickDelete(View v) {
-
+        KeyboardUtils.hideKeyboard(getActivity());
     }
 
     public class SpinnerAdapter extends BaseAdapter {

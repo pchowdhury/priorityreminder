@@ -31,6 +31,15 @@ public class DataStore {
     private HashMap<String, Project> mProjectsMap = new HashMap<>();
     private ArrayList<Object> mUpdates = new ArrayList<>();
     private SortType mSortType = Index;
+    private int mCurrentProjectIndex = 0;
+
+    public int getCurrentProjectIndex() {
+        return mCurrentProjectIndex;
+    }
+
+    public void setCurrentProjectIndex(int mProjectPosition) {
+        this.mCurrentProjectIndex = mProjectPosition;
+    }
 
     public enum SortType {
         Index,
@@ -72,9 +81,10 @@ public class DataStore {
     }
 
     public void confirmSaveNewProject() {
-        getProjects().add(getNewProject());
-        setCurrentProject(getNewProject());
-        setNewProject(null);
+        getProjects().add(mNewProject);
+        setCurrentProject(mNewProject);
+        mNewProject = null;
+        mCurrentProjectIndex = mProjects.size() - 1;
     }
 
     public int getLastProjectPosition() {
@@ -256,6 +266,27 @@ public class DataStore {
 
     public void clearUpdates() {
         mUpdates.clear();
+    }
+
+    public void clearUpdatedProjects() {
+        for (int i = 0; i < mUpdates.size(); i++) {
+            Object item = mUpdates.get(i);
+            if (item instanceof Project) {
+                mUpdates.remove(item);
+                i--;
+            }
+        }
+    }
+
+
+    public void clearUpdatedTaskItems() {
+        for (int i = 0; i < mUpdates.size(); i++) {
+            Object item = mUpdates.get(i);
+            if (item instanceof TaskItem) {
+                mUpdates.remove(item);
+                i--;
+            }
+        }
     }
 
     ArrayList<Comparator<TaskItem>> mSortCompartor = new ArrayList() {{
