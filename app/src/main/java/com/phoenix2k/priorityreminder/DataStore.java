@@ -145,11 +145,14 @@ public class DataStore {
         return getTasks().size();
     }
 
-    public void confirmSaveTaskItem() {
+    public void confirmSaveTaskItem(boolean isNewItem) {
         ArrayList<TaskItem> list = mCurrentProject.getTaskListForQuadrant(mCurrentTaskItem.mQuadrantType);
         list.add(mCurrentTaskItem);
+        Collections.sort(list, mSortCompartor.get(mSortType.ordinal()));
         //add to main task list to update the new position
-        mTasks.add(mCurrentTaskItem);
+        if (isNewItem) {
+            mTasks.add(mCurrentTaskItem);
+        }
         setCurrentTaskItem(null);
     }
 

@@ -3,8 +3,11 @@ package com.phoenix2k.priorityreminder.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,24 +18,21 @@ import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
+import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
-import com.phoenix2k.priorityreminder.task.APIType;
-import com.phoenix2k.priorityreminder.task.AddProjectTask;
-import com.phoenix2k.priorityreminder.task.AddTaskItemTask;
 import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
  * Created by Pushpan on 06/02/17.
  */
 
-public class AddTaskFragment extends BasicFragment {
+public class AddTaskFragment extends Fragment {
     public static final String TAG = "AddTaskFragment";
     public static final String ITEM_ID = "com.phoenix2k.priorityreminder.AddTaskFragment.ITEM_ID";
     @BindView(R.id.txtProjectTitle)
@@ -63,6 +63,8 @@ public class AddTaskFragment extends BasicFragment {
     private UpdateListener mUpdateListener;
     private int mTaskIndexBackup;
     private TaskItem.QuadrantType mTaskQuadrantBackup;
+    private Project mCurrentProject;
+    private TaskItem mCurrentTaskItem;
 
     public static AddTaskFragment getInstance(String itemId) {
         AddTaskFragment fragment = new AddTaskFragment();
@@ -72,17 +74,15 @@ public class AddTaskFragment extends BasicFragment {
         return fragment;
     }
 
+    @Nullable
     @Override
-    public BasicFragment getMainFragment() {
-        return this;
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_add_task, null);
+        ButterKnife.bind(this, v);
+        loadData();
+        return v;
     }
 
-    @Override
-    public int getViewResource() {
-        return R.layout.fragment_add_task;
-    }
-
-    @Override
     public void loadData() {
         Project project = DataStore.getInstance().getCurrentProject();
         if (project != null) {
@@ -98,7 +98,9 @@ public class AddTaskFragment extends BasicFragment {
                 taskItem.mProjectId = project.mId;
                 mImgDelete.setVisibility(View.GONE);
             }
+            setCurrentProject(DataStore.getInstance().getCurrentProject());
             DataStore.getInstance().setCurrentTaskItem(taskItem);
+            setCurrentTaskItem(taskItem);
             loadView();
         }
     }
@@ -111,49 +113,11 @@ public class AddTaskFragment extends BasicFragment {
         return null;
     }
 
-    @Override
-    public void onProgress(boolean show, String msg) {
-        if (show) {
-            mProgressView.setVisibility(View.VISIBLE);
-            mProgressTextView.setText(msg);
-            enableSaveButton(false);
-        } else {
-            mProgressView.setVisibility(View.GONE);
-            mProgressTextView.setText("");
-            enableSaveButton(true);
-        }
-    }
-
-    @Override
-    public void onFinishQuery(APIType type, Object result) {
-        switch (type) {
-            case Sheet_Add_Task:
-                Boolean isUpdated = (Boolean) result;
-                if (isUpdated) {
-                    if (getTaskId() != null) {//edited
-                        TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
-                        if (updatedItem.mQuadrantType != mTaskQuadrantBackup) {
-                            //quadrant is changed so need to delete from the quadrant
-                            Project project = DataStore.getInstance().getCurrentProject();
-                            project.getTaskListForQuadrant(mTaskQuadrantBackup).remove(updatedItem);
-                            DataStore.getInstance().confirmSaveTaskItem();
-                        }
-                    } else {
-                        DataStore.getInstance().confirmSaveTaskItem();
-                    }
-                    mUpdateListener.onTaskUpdated();
-                }
-                break;
-        }
-    }
-
     private void loadView() {
-        final Project project = DataStore.getInstance().getCurrentProject();
-        final TaskItem taskItem = DataStore.getInstance().getCurrentTaskItem();
-        if (taskItem != null) {
-            mEditTaskTitle.setText(taskItem.mTitle);
-            mEditDescription.setText(taskItem.mDescription);
-            mLytBgView.setBackgroundColor(project.mColorQuadrants.get(taskItem.mQuadrantType));
+        if (getCurrentTaskItem() != null) {
+            mEditTaskTitle.setText(getCurrentTaskItem().mTitle);
+            mEditDescription.setText(getCurrentTaskItem().mDescription);
+            mLytBgView.setBackgroundColor(getCurrentProject().mColorQuadrants.get(getCurrentTaskItem().mQuadrantType));
             mEditTaskTitle.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -167,7 +131,9 @@ public class AddTaskFragment extends BasicFragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    taskItem.mTitle = mEditTaskTitle.getText().toString();
+                    if (getCurrentTaskItem() != null) {
+                        getCurrentTaskItem().mTitle = mEditTaskTitle.getText().toString();
+                    }
                     validateSaveButton();
                 }
             });
@@ -184,18 +150,20 @@ public class AddTaskFragment extends BasicFragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    taskItem.mDescription = mEditDescription.getText().toString();
+                    if (getCurrentTaskItem() != null) {
+                        getCurrentTaskItem().mDescription = mEditDescription.getText().toString();
+                    }
                     validateSaveButton();
                 }
             });
-            SpinnerAdapter adapter = new SpinnerAdapter(taskItem.mQuadrantType);
+            SpinnerAdapter adapter = new SpinnerAdapter(getCurrentTaskItem().mQuadrantType);
             mSpinnerQuadrantType.setAdapter(adapter);
-            mSpinnerQuadrantType.setSelection(taskItem.mQuadrantType.ordinal());
+            mSpinnerQuadrantType.setSelection(getCurrentTaskItem().mQuadrantType.ordinal());
             mSpinnerQuadrantType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    taskItem.mQuadrantType = TaskItem.QuadrantType.values()[position];
-                    mLytBgView.setBackgroundColor(project.mColorQuadrants.get(taskItem.mQuadrantType));
+                    getCurrentTaskItem().mQuadrantType = TaskItem.QuadrantType.values()[position];
+                    mLytBgView.setBackgroundColor(getCurrentProject().mColorQuadrants.get(getCurrentTaskItem().mQuadrantType));
                     updateNewTaskIndex();
                 }
 
@@ -205,13 +173,13 @@ public class AddTaskFragment extends BasicFragment {
                 }
             });
 
-            adapter = new SpinnerAdapter(taskItem.mRepeatType);
+            adapter = new SpinnerAdapter(getCurrentTaskItem().mRepeatType);
             mSpinnerRepeatType.setAdapter(adapter);
-            mSpinnerRepeatType.setSelection(taskItem.mRepeatType.ordinal());
+            mSpinnerRepeatType.setSelection(getCurrentTaskItem().mRepeatType.ordinal());
             mSpinnerRepeatType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    taskItem.mRepeatType = TaskItem.RepeatType.values()[position];
+                    getCurrentTaskItem().mRepeatType = TaskItem.RepeatType.values()[position];
                 }
 
                 @Override
@@ -220,13 +188,13 @@ public class AddTaskFragment extends BasicFragment {
                 }
             });
 
-            adapter = new SpinnerAdapter(taskItem.mStatus);
+            adapter = new SpinnerAdapter(getCurrentTaskItem().mStatus);
             mSpinnerStatus.setAdapter(adapter);
-            mSpinnerStatus.setSelection(taskItem.mStatus.ordinal());
+            mSpinnerStatus.setSelection(getCurrentTaskItem().mStatus.ordinal());
             mSpinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    taskItem.mStatus = TaskItem.Status.values()[position];
+                    getCurrentTaskItem().mStatus = TaskItem.Status.values()[position];
                 }
 
                 @Override
@@ -285,9 +253,19 @@ public class AddTaskFragment extends BasicFragment {
     @OnClick(R.id.imgSave)
     public void onClickSave(View v) {
         KeyboardUtils.hideKeyboard(getActivity());
-        if (getUserCredentials() != null) {
-            new AddTaskItemTask(getActivity(), getUserCredentials(), this).execute();
+        TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
+        SyncManager.getInstance().addToUpdates(updatedItem);
+        if (getTaskId() != null) {//edited
+            if (updatedItem.mQuadrantType != mTaskQuadrantBackup) {
+                //quadrant is changed so need to delete from the quadrant
+                Project project = DataStore.getInstance().getCurrentProject();
+                project.getTaskListForQuadrant(mTaskQuadrantBackup).remove(updatedItem);
+                DataStore.getInstance().confirmSaveTaskItem(false);
+            }
+        } else {
+            DataStore.getInstance().confirmSaveTaskItem(true);
         }
+        mUpdateListener.onTaskUpdated();
     }
 
     @OnClick(R.id.imgCancel)
@@ -299,6 +277,22 @@ public class AddTaskFragment extends BasicFragment {
     @OnClick(R.id.imgDelete)
     public void onClickDelete(View v) {
         KeyboardUtils.hideKeyboard(getActivity());
+    }
+
+    public TaskItem getCurrentTaskItem() {
+        return mCurrentTaskItem;
+    }
+
+    public void setCurrentTaskItem(TaskItem mCurrentTaskItem) {
+        this.mCurrentTaskItem = mCurrentTaskItem;
+    }
+
+    public Project getCurrentProject() {
+        return mCurrentProject;
+    }
+
+    public void setCurrentProject(Project mCurrentProject) {
+        this.mCurrentProject = mCurrentProject;
     }
 
     public class SpinnerAdapter extends BaseAdapter {

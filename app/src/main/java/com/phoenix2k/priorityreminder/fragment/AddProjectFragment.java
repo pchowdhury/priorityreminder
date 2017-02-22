@@ -173,10 +173,6 @@ public class AddProjectFragment extends Fragment {
         setCurrentProject(null);
         mUpdateListener.onNewProjectAdded();
         collapse();
-//
-//        if (getUserCredentials() != null) {
-//            new AddProjectTask(getActivity(), getUserCredentials(), this).execute();
-//        }
     }
 
     @OnClick(R.id.btn_add_project)

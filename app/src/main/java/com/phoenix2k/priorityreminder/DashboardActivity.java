@@ -315,6 +315,7 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public void onTaskUpdated() {
+        SyncManager.getInstance().startSync(this, getUserCredentials());
         reloadDashboard();
         onSelectBack();
     }
