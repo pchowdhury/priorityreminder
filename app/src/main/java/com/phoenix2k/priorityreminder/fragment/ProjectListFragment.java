@@ -3,6 +3,8 @@ package com.phoenix2k.priorityreminder.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +42,12 @@ public class ProjectListFragment extends BasicFragment {
     TextView mProgressTextView;
     private OnNavigationListener mOnNavigationListener;
     private ProjectsAdapter mAdapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Override
     public BasicFragment getMainFragment() {
@@ -91,6 +99,7 @@ public class ProjectListFragment extends BasicFragment {
         loadView();
     }
 
+    @Override
     public void loadView() {
         mAdapter = new ProjectsAdapter(getActivity());
         RecyclerItemClickSupport.addTo(mListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {

@@ -25,6 +25,7 @@ public class FourQuadrantFragment extends BasicFragment {
     FourQuadrantView mQuadrantView;
     private OnDashboardListener mOnDashboardListener;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class FourQuadrantFragment extends BasicFragment {
 
     @Override
     public void loadData() {
-        loadView();
+        mQuadrantView.loadData();
     }
 
 
@@ -59,7 +60,7 @@ public class FourQuadrantFragment extends BasicFragment {
     }
 
     public void loadView() {
-       mQuadrantView.loadData();
+       mQuadrantView.loadView();
     }
 
     @Override

@@ -18,12 +18,11 @@
         android:layout_below="@+id/lytHeaderTopDivider"
         android:background="@color/color_translucent_white"
         android:clickable="true"
-        android:lines="1"
+        android:maxLines="1"
         android:padding="5dp"
-        android:singleLine="true"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold" android:ellipsize="end" android:scrollHorizontally="true"/>
 
     <View
         android:layout_width="match_parent"

@@ -40,7 +40,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
     public TaskItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.project_list_item, parent, false);
+                .inflate(R.layout.task_item, parent, false);
         v.setOnDragListener(DataStore.getInstance().getDragListener());
         TaskItemHolder holder = new TaskItemHolder(v);
         v.setTag(holder);

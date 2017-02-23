@@ -191,6 +191,16 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         }, 100);
     }
 
+    public void loadView(){
+        Project project = DataStore.getInstance().getCurrentProject();
+        if (project != null) {
+            for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                int index = type.ordinal();
+                mTaskListAdapter[index].notifyDataSetChanged();
+            }
+        }
+    }
+
     private void adjustPosition() {
         // int statusHeight = DeviceUtils.getScreenHeight(mView.getContext())
         // - mView.getHeight();

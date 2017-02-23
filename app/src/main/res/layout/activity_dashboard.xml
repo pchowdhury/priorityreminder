@@ -14,7 +14,7 @@
 
     <LinearLayout
         android:id="@+id/navigation_view"
-        android:layout_width="400dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@android:color/white"

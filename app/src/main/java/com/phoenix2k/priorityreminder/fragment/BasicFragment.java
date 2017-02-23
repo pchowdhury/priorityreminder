@@ -27,9 +27,13 @@ public abstract class BasicFragment extends Fragment implements TaskListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(getViewResource(), null);
         ButterKnife.bind(getMainFragment(), v);
-        loadData();
+        if (savedInstanceState == null) {
+            loadData();
+        }
         return v;
     }
+
+    protected abstract void loadView();
 
     public abstract BasicFragment getMainFragment();
 

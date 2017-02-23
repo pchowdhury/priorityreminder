@@ -1,9 +1,7 @@
 package com.phoenix2k.priorityreminder;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
@@ -73,7 +71,7 @@ public class DashboardActivity extends BasicCommunicationActivity
                     draggedOverItem = TaskListAdapter.getTaskItemFromView(v);
                 }
 
-                int color = ContextCompat.getColor(DashboardActivity.this, draggedOverItem.mProjectId != null ? R.color.color_more_translucent_white : R.color.color_transparent);
+                int color = ContextCompat.getColor(DashboardActivity.this, draggedOverItem.mUpdatedOn != -1 ? R.color.color_more_translucent_white : R.color.color_transparent);
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_ENTERED:
                         v.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.colorPrimary));
@@ -92,7 +90,7 @@ public class DashboardActivity extends BasicCommunicationActivity
 //                        v.setBackgroundColor(getListColor());
                         v.setBackgroundColor(color);
                         DataStore.getInstance().moveTaskItem(draggedTtem, draggedOverItem);
-                        reloadDashboard();
+                        reloadDashboard(true);
                         SyncManager.getInstance().startSync(DashboardActivity.this, getUserCredentials());
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
@@ -190,10 +188,15 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     private void finishInitialization() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
-        ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+        FragmentTransaction ft;
+        if (getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG) == null) {
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
+        }
+        if (getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG) == null) {
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+        }
         showProgress(false);
     }
 
@@ -208,7 +211,7 @@ public class DashboardActivity extends BasicCommunicationActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            showLogoutConfirmationDialog();
         }
     }
 
@@ -245,12 +248,12 @@ public class DashboardActivity extends BasicCommunicationActivity
         DataStore.getInstance().setCurrentProject(project);
         if (getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG) == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
+            ft.replace(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
         }
         // Handle navigation view item clicks here.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        reloadDashboard();
+        reloadDashboard(false);
         return true;
     }
 
@@ -298,7 +301,7 @@ public class DashboardActivity extends BasicCommunicationActivity
     public void onNewProjectAdded() {
         SyncManager.getInstance().startSync(this, getUserCredentials());
         reloadProjectList();
-        reloadDashboard();
+        reloadDashboard(false);
     }
 
     @Override
@@ -316,14 +319,18 @@ public class DashboardActivity extends BasicCommunicationActivity
     @Override
     public void onTaskUpdated() {
         SyncManager.getInstance().startSync(this, getUserCredentials());
-        reloadDashboard();
+        reloadDashboard(true);
         onSelectBack();
     }
 
-    private void reloadDashboard() {
+    private void reloadDashboard(boolean refreshOnly) {
         FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
         if (fragment != null) {
-            fragment.loadView();
+            if (refreshOnly) {
+                fragment.loadView();
+            } else {
+                fragment.loadData();
+            }
         }
     }
 
@@ -343,4 +350,5 @@ public class DashboardActivity extends BasicCommunicationActivity
     public void showProgress(boolean show) {
         mMainProress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
+
 }
