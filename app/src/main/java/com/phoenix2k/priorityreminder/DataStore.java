@@ -80,11 +80,13 @@ public class DataStore {
         return mNewProject;
     }
 
-    public void confirmSaveNewProject() {
-        getProjects().add(mNewProject);
-        setCurrentProject(mNewProject);
-        mNewProject = null;
-        mCurrentProjectIndex = mProjects.size() - 1;
+    public void confirmSaveProject() {
+        if (mNewProject != null) {
+            getProjects().add(mNewProject);
+            setCurrentProject(mNewProject);
+            mNewProject = null;
+            mCurrentProjectIndex = mProjects.size() - 1;
+        }
     }
 
     public int getLastProjectPosition() {

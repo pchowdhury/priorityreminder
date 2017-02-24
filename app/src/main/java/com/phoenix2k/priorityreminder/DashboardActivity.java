@@ -244,17 +244,27 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     @Override
-    public boolean onProjectSelected(Project project) {
+    public boolean onProjectSelected(Project project, boolean closeSlider) {
         DataStore.getInstance().setCurrentProject(project);
         if (getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG) == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
         }
-        // Handle navigation view item clicks here.
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        if (closeSlider) {
+            // Handle navigation view item clicks here.
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        cancelProjectEdit();
         reloadDashboard(false);
         return true;
+    }
+
+    private void cancelProjectEdit() {
+        AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+        if (fragment != null) {
+            fragment.cancelEdit();
+        }
     }
 
     @Override
@@ -267,8 +277,7 @@ public class DashboardActivity extends BasicCommunicationActivity
     public void onUpdateCurrentProject() {
         AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
         if (fragment != null) {
-
-            fragment.loadData();
+            fragment.openToEdit(false);
         }
     }
 

@@ -20,7 +20,7 @@ public interface OnNavigationListener {
      *
      * @return true to display the item as the selected item
      */
-     boolean onProjectSelected(@NonNull Project item);
+     boolean onProjectSelected(@NonNull Project item, boolean closeSlider);
      void onAddNewProject();
     void onUpdateCurrentProject();
 }

@@ -105,12 +105,13 @@ public class ProjectListFragment extends BasicFragment {
         RecyclerItemClickSupport.addTo(mListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                selectProject(position);
+                selectProject(position, true);
             }
         });
         RecyclerItemClickSupport.addTo(mListView).setOnItemLongClickListener(new RecyclerItemClickSupport.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClicked(RecyclerView recyclerView, int position, View v) {
+                selectProject(position, false);
                 if (mOnNavigationListener != null) {
                     mOnNavigationListener.onUpdateCurrentProject();
                 }
@@ -119,15 +120,15 @@ public class ProjectListFragment extends BasicFragment {
         });
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mListView.setAdapter(mAdapter);
-        selectProject(DataStore.getInstance().getCurrentProjectIndex());
+        selectProject(DataStore.getInstance().getCurrentProjectIndex(), true);
     }
 
-    private void selectProject(int position) {
+    private void selectProject(int position, boolean closeDrawer) {
         if (DataStore.getInstance().getProjects().size() > 0) {
             DataStore.getInstance().setCurrentProjectIndex(position);
             mAdapter.setSelected(position);
             if (mOnNavigationListener != null) {
-                mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position));
+                mOnNavigationListener.onProjectSelected(DataStore.getInstance().getProjects().get(position), closeDrawer);
             }
         }
     }

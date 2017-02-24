@@ -79,10 +79,10 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
                     mQuadrant[type.ordinal()], type);
 //            mQuadrant[type.ordinal()].setOnTouchListener(this);
         }
-        mQuadrant[TaskItem.QuadrantType.Q1.ordinal()].showLeftDivider(true);
-        mQuadrant[TaskItem.QuadrantType.Q2.ordinal()].showTopDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q2.ordinal()].showLeftDivider(true);
         mQuadrant[TaskItem.QuadrantType.Q3.ordinal()].showTopDivider(true);
-        mQuadrant[TaskItem.QuadrantType.Q3.ordinal()].showLeftDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q4.ordinal()].showTopDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q4.ordinal()].showLeftDivider(true);
 
         mImgAnchor.setOnTouchListener(this);
 

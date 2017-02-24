@@ -59,6 +59,7 @@ public class AddProjectFragment extends Fragment {
 
     private UpdateListener mUpdateListener;
     private Project mCurrentProject;
+    private Project mEditBackup;
 
     @Nullable
     @Override
@@ -146,7 +147,7 @@ public class AddProjectFragment extends Fragment {
     }
 
     private void validateAddButton() {
-        Project project = DataStore.getInstance().getNewProject();
+        Project project = getCurrentProject();
         if (project != null) {
             boolean enable = true;
             for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
@@ -161,15 +162,14 @@ public class AddProjectFragment extends Fragment {
 
     @OnClick(R.id.btn_cancel)
     public void onClickCancel(View v) {
-        KeyboardUtils.hideKeyboard(getActivity());
-        collapse();
+        cancelEdit();
     }
 
     @OnClick(R.id.btn_add)
     public void onClickAdd(View v) {
         KeyboardUtils.hideKeyboard(getActivity());
-        SyncManager.getInstance().addToUpdates(DataStore.getInstance().getNewProject());
-        DataStore.getInstance().confirmSaveNewProject();
+        SyncManager.getInstance().addToUpdates(getCurrentProject());
+        DataStore.getInstance().confirmSaveProject();
         setCurrentProject(null);
         mUpdateListener.onNewProjectAdded();
         collapse();
@@ -177,19 +177,17 @@ public class AddProjectFragment extends Fragment {
 
     @OnClick(R.id.btn_add_project)
     public void onClickLayoutAdd(View v) {
-        expand();
+        openToEdit(true);
     }
 
     public void expand() {
-        DataStore.getInstance().setNewProject(Project.newProject(getContext()));
-        setCurrentProject(DataStore.getInstance().getNewProject());
-        mEditTitle.setText(DataStore.getInstance().getNewProject().mTitle);
         mLytAddDetails.setVisibility(View.VISIBLE);
         mLytAddProject.setVisibility(View.GONE);
         loadView();
     }
 
     public void collapse() {
+        mBtnAdd.setText(getString(R.string.btn_add));
         mEditTitle.setText("");
         mStatusSwitch.setChecked(false);
         mLytAddDetails.setVisibility(View.GONE);
@@ -222,5 +220,39 @@ public class AddProjectFragment extends Fragment {
 
     public void setCurrentProject(Project mCurrentProject) {
         this.mCurrentProject = mCurrentProject;
+    }
+
+    public void openToEdit(boolean isCreateNew) {
+        if (isCreateNew) {
+            DataStore.getInstance().setNewProject(Project.newProject(getContext()));
+            setCurrentProject(DataStore.getInstance().getNewProject());
+        } else {
+            setCurrentProject(DataStore.getInstance().getCurrentProject());
+            mEditBackup = new Project();
+            DataStore.getInstance().getCurrentProject().copyTo(mEditBackup);
+        }
+        mEditTitle.setText(getCurrentProject().mTitle);
+        mBtnAdd.setText(getString(isCreateNew ? R.string.btn_add : R.string.btn_update));
+        validateAddButton();
+        expand();
+    }
+
+    public void cancelEdit() {
+        if (isExpanded()) {
+            //if editing project
+            if (DataStore.getInstance().getNewProject() == null) {
+                if (mEditBackup != null) {
+                    mEditBackup.copyTo(DataStore.getInstance().getCurrentProject());
+                    mEditBackup = null;
+                }
+            }
+            setCurrentProject(null);
+            KeyboardUtils.hideKeyboard(getActivity());
+            collapse();
+        }
+    }
+
+    private boolean isExpanded() {
+        return mLytAddProject.getVisibility() == View.GONE;
     }
 }

@@ -59,7 +59,7 @@ public class Project {
 
     private HashMap<TaskItem.QuadrantType, ArrayList<TaskItem>> mQuadrants = new HashMap<>();
 
-    public Project(){
+    public Project() {
         mQuadrants.put(TaskItem.QuadrantType.Q1, new ArrayList<TaskItem>());
         mQuadrants.put(TaskItem.QuadrantType.Q2, new ArrayList<TaskItem>());
         mQuadrants.put(TaskItem.QuadrantType.Q3, new ArrayList<TaskItem>());
@@ -89,6 +89,30 @@ public class Project {
         project.mQuadrants.put(TaskItem.QuadrantType.Q3, new ArrayList<TaskItem>());
         project.mQuadrants.put(TaskItem.QuadrantType.Q4, new ArrayList<TaskItem>());
         return project;
+    }
+
+    public void copyTo(Project project) {
+        project.mId = mId;
+        project.mPosition = mPosition;
+        project.mTitle = mTitle;
+        project.mIndex = mIndex;
+        project.mProjectType = mProjectType;
+        project.mCreatedOn = mCreatedOn;
+        project.mUpdatedOn = mCreatedOn;
+        project.mCenterInPercent.x = mCenterInPercent.x;
+        project.mCenterInPercent.y = mCenterInPercent.y;
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, mColorQuadrants.get(TaskItem.QuadrantType.Q1));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, mColorQuadrants.get(TaskItem.QuadrantType.Q2));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, mColorQuadrants.get(TaskItem.QuadrantType.Q3));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, mColorQuadrants.get(TaskItem.QuadrantType.Q4));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q1, mQuadrants.get(TaskItem.QuadrantType.Q1));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q2, mQuadrants.get(TaskItem.QuadrantType.Q2));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q3, mQuadrants.get(TaskItem.QuadrantType.Q3));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q4, mQuadrants.get(TaskItem.QuadrantType.Q4));
     }
 
     public static Project getProjectFrom(Context context, List<Object> values) {
