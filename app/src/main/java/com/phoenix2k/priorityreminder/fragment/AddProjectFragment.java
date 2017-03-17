@@ -79,10 +79,10 @@ public class AddProjectFragment extends Fragment {
             project.mProjectType = checked ? Project.ProjectType.State : Project.ProjectType.Simple;
             int[] resId = {R.string.lbl_title_quadrant1, R.string.lbl_title_quadrant2, R.string.lbl_title_quadrant3, R.string.lbl_title_quadrant4};
             int[] resIdState = {R.string.lbl_title_state_quadrant1, R.string.lbl_title_state_quadrant2, R.string.lbl_title_state_quadrant3, R.string.lbl_title_state_quadrant4};
-            if (checked) {
+//            if (checked) {
                 for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
                     project.mTitleQuadrants.put(type, getContext().getString(checked ? resIdState[type.ordinal()] : resId[type.ordinal()]));
-                }
+//                }
             }
         }
     }

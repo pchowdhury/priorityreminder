@@ -1,6 +1,8 @@
 package com.phoenix2k.priorityreminder.fragment;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,9 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
@@ -23,6 +28,9 @@ import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,10 +43,15 @@ import butterknife.OnClick;
 public class AddTaskFragment extends Fragment {
     public static final String TAG = "AddTaskFragment";
     public static final String ITEM_ID = "com.phoenix2k.priorityreminder.AddTaskFragment.ITEM_ID";
+    SimpleDateFormat mDateFormat = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
+    private static final int START_DATE_PICKER = 0;
+    private static final int DUE_DATE_PICKER = 1;
     @BindView(R.id.txtProjectTitle)
     TextView mProjectTitle;
     @BindView(R.id.content_view)
     View mLytBgView;
+    @BindView(R.id.txt_task_title)
+    TextView mQuadrandTaskTitle;
     @BindView(R.id.edt_task_title)
     EditText mEditTaskTitle;
     @BindView(R.id.spinner_quadrant_type)
@@ -49,8 +62,6 @@ public class AddTaskFragment extends Fragment {
     View mLytStatusType;
     @BindView(R.id.spinner_repeat_type)
     Spinner mSpinnerRepeatType;
-    @BindView(R.id.spinner_status)
-    Spinner mSpinnerStatus;
     @BindView(R.id.imgSave)
     View mImgSave;
     @BindView(R.id.progress)
@@ -59,12 +70,23 @@ public class AddTaskFragment extends Fragment {
     TextView mProgressTextView;
     @BindView(R.id.imgDelete)
     View mImgDelete;
+    @BindView(R.id.start_date_picker)
+    TextView mTextStartDate;
+    @BindView(R.id.due_date_picker)
+    TextView mTextDueDate;
+    @BindView(R.id.reset_start_date)
+    ImageView mResetStartDate;
+    @BindView(R.id.reset_due_date)
+    ImageView mResetDueDate;
+
 
     private UpdateListener mUpdateListener;
     private int mTaskIndexBackup;
     private TaskItem.QuadrantType mTaskQuadrantBackup;
     private Project mCurrentProject;
     private TaskItem mCurrentTaskItem;
+    private int mPickerType;
+    private Calendar mCalender;
 
     public static AddTaskFragment getInstance(String itemId) {
         AddTaskFragment fragment = new AddTaskFragment();
@@ -156,6 +178,7 @@ public class AddTaskFragment extends Fragment {
                     validateSaveButton();
                 }
             });
+
             SpinnerAdapter adapter = new SpinnerAdapter(getCurrentTaskItem().mQuadrantType);
             mSpinnerQuadrantType.setAdapter(adapter);
             mSpinnerQuadrantType.setSelection(getCurrentTaskItem().mQuadrantType.ordinal());
@@ -188,20 +211,12 @@ public class AddTaskFragment extends Fragment {
                 }
             });
 
-            adapter = new SpinnerAdapter(getCurrentTaskItem().mStatus);
-            mSpinnerStatus.setAdapter(adapter);
-            mSpinnerStatus.setSelection(getCurrentTaskItem().mStatus.ordinal());
-            mSpinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    getCurrentTaskItem().mStatus = TaskItem.Status.values()[position];
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
+            updateTime();
+            boolean isSimple = getCurrentProject().mProjectType == Project.ProjectType.Simple;
+            if (isSimple) {
+                mLytStatusType.setVisibility(View.GONE);
+            }
+            mQuadrandTaskTitle.setText(getString(isSimple ? R.string.lbl_task_quadrant : R.string.lbl_task_status));
         }
         validateSaveButton();
     }
@@ -279,6 +294,31 @@ public class AddTaskFragment extends Fragment {
         KeyboardUtils.hideKeyboard(getActivity());
     }
 
+
+    @OnClick(R.id.start_date_picker)
+    public void onClickStartDatePicker(View v) {
+        mPickerType = START_DATE_PICKER;
+        showDateTimePicker();
+    }
+
+    @OnClick(R.id.due_date_picker)
+    public void onClickDueDatePicker(View v) {
+        mPickerType = DUE_DATE_PICKER;
+        showDateTimePicker();
+    }
+
+    @OnClick(R.id.reset_start_date)
+    public void onClickResetStartDate(View v) {
+        getCurrentTaskItem().mStartTime = 0;
+        updateTime();
+    }
+
+    @OnClick(R.id.reset_due_date)
+    public void onClickResetDueDate(View v) {
+        getCurrentTaskItem().mDueTime = 0;
+        updateTime();
+    }
+
     public TaskItem getCurrentTaskItem() {
         return mCurrentTaskItem;
     }
@@ -295,6 +335,58 @@ public class AddTaskFragment extends Fragment {
         this.mCurrentProject = mCurrentProject;
     }
 
+    public void showDateTimePicker() {
+        Calendar currentDate = Calendar.getInstance();
+        new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                mCalender = Calendar.getInstance();
+                mCalender.set(year, monthOfYear, dayOfMonth);
+                if (mPickerType == START_DATE_PICKER) {
+                    getCurrentTaskItem().mStartTime = mCalender.getTimeInMillis();
+                } else {
+                    getCurrentTaskItem().mDueTime = mCalender.getTimeInMillis();
+                }
+                updateTime();
+                new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        mCalender.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        mCalender.set(Calendar.MINUTE, minute);
+                        if (mPickerType == START_DATE_PICKER) {
+                            getCurrentTaskItem().mStartTime = mCalender.getTimeInMillis();
+                        } else {
+                            getCurrentTaskItem().mDueTime = mCalender.getTimeInMillis();
+                        }
+                        updateTime();
+                    }
+                }, mCalender.get(Calendar.HOUR_OF_DAY), mCalender.get(Calendar.MINUTE), false).show();
+            }
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
+    }
+
+    void updateTime() {
+        long time = getCurrentTaskItem().mStartTime;
+        if (time != 0) {
+            Calendar calender = Calendar.getInstance();
+            calender.setTimeInMillis(time);
+            mTextStartDate.setText(mDateFormat.format(calender.getTime()));
+        }else{
+            mTextStartDate.setText(getString(R.string.lbl_not_set));
+        }
+
+        time = getCurrentTaskItem().mDueTime;
+        if (time != 0) {
+            Calendar calender = Calendar.getInstance();
+            calender.setTimeInMillis(time);
+            mTextDueDate.setText(mDateFormat.format(calender.getTime()));
+        }else{
+            mTextDueDate.setText(getString(R.string.lbl_not_set));
+        }
+        mResetStartDate.setEnabled(getCurrentTaskItem().mStartTime != 0);
+        mResetDueDate.setEnabled(getCurrentTaskItem().mDueTime != 0);
+    }
+
     public class SpinnerAdapter extends BaseAdapter {
         Object mType;
 
@@ -308,8 +400,6 @@ public class AddTaskFragment extends Fragment {
                 return TaskItem.QuadrantType.values().length;
             } else if (mType instanceof TaskItem.RepeatType) {
                 return TaskItem.RepeatType.values().length;
-            } else if (mType instanceof TaskItem.Status) {
-                return TaskItem.Status.values().length;
             } else {
                 return 0;
             }
@@ -340,8 +430,6 @@ public class AddTaskFragment extends Fragment {
                 holder.mTextItem.setText(project.mTitleQuadrants.get(TaskItem.QuadrantType.values()[position]));
             } else if (mType instanceof TaskItem.RepeatType) {
                 holder.mTextItem.setText(TaskItem.RepeatType.values()[position].name());
-            } else if (mType instanceof TaskItem.Status) {
-                holder.mTextItem.setText(TaskItem.Status.values()[position].name());
             }
             convertView.setTag(holder);
             return convertView;

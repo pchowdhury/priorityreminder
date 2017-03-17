@@ -17,6 +17,7 @@ import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
+import com.phoenix2k.priorityreminder.manager.PRNotificationManager;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.task.APIType;
@@ -94,6 +95,8 @@ public class ProjectListFragment extends BasicFragment {
                     List<TaskItem> list = (List<TaskItem>) result;
                     DataStore.getInstance().setTasks(new ArrayList<>(list));
                 }
+                PRNotificationManager.init(getActivity().getApplicationContext());
+                DataStore.getInstance().setUpNotifications();
                 break;
         }
         loadView();

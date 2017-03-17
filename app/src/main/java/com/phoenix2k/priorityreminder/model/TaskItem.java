@@ -15,6 +15,7 @@ import java.util.List;
  */
 
 public class TaskItem {
+    public static final String TASK_ITEM = "com.phoenix2k.priorityreminder.model.TASK_ITEM";
 
     public enum Column {
         ID,
@@ -24,14 +25,15 @@ public class TaskItem {
         INDEX,
         QUARTER,
         DESCRIPTION,
-        STATUS,
+        STARTS_ON,
+        DUE_ON,
         REPEAT,
         CREATED_ON,
         UPDATED_ON
     }
 
     public enum QuadrantType {
-        Q1, Q2, Q3, Q4
+        Q1_OR_UPCOMING, Q2_OR_DUE, Q3_OR_IN_PROGRESS, Q4_OR_COMPLETED
     }
 
     public enum RepeatType {
@@ -43,13 +45,6 @@ public class TaskItem {
         Yearly
     }
 
-    public enum Status {
-        NotStarted,
-        Started,
-        Done,
-        Postpone
-    }
-
     public String mId;
     public String mPosition;
     public String mProjectId;
@@ -57,8 +52,9 @@ public class TaskItem {
     public int mIndex;
     public QuadrantType mQuadrantType;
     public String mDescription;
+    public long mStartTime;
+    public long mDueTime;
 
-    public Status mStatus = Status.NotStarted;
     public RepeatType mRepeatType = RepeatType.None;
 
     public long mCreatedOn;
@@ -72,8 +68,9 @@ public class TaskItem {
         item.mTitle = "";
         item.mIndex = 0;
         item.mDescription = "";
-        item.mStatus = Status.NotStarted;
-        item.mQuadrantType = QuadrantType.Q1;
+        item.mQuadrantType = QuadrantType.Q1_OR_UPCOMING;
+        item.mStartTime = 0;
+        item.mDueTime = 0;
         item.mRepeatType = RepeatType.None;
         item.mCreatedOn = IDGenerator.generateUniqueId();
         item.mUpdatedOn = item.mCreatedOn;
@@ -108,8 +105,11 @@ public class TaskItem {
                     case DESCRIPTION:
                         taskItem.mDescription = value;
                         break;
-                    case STATUS:
-                        taskItem.mStatus = Status.values()[Integer.valueOf(value)];
+                    case STARTS_ON:
+                        taskItem.mStartTime = Long.valueOf(value);
+                        break;
+                    case DUE_ON:
+                        taskItem.mDueTime = Long.valueOf(value);
                         break;
                     case REPEAT:
                         taskItem.mRepeatType = RepeatType.values()[Integer.valueOf(value)];
@@ -138,7 +138,8 @@ public class TaskItem {
             add(taskItem.mIndex + "");
             add(taskItem.mQuadrantType.ordinal() + "");
             add(taskItem.mDescription + "");
-            add(taskItem.mStatus.ordinal() + "");
+            add(taskItem.mStartTime + "");
+            add(taskItem.mDueTime + "");
             add(taskItem.mRepeatType.ordinal() + "");
             add(taskItem.mCreatedOn + "");
             add(taskItem.mUpdatedOn + "");
@@ -157,7 +158,8 @@ public class TaskItem {
                         "\nmQuadrantType:" + mQuadrantType.name() +
                         "\nmIndex:" + mIndex +
                         "\nmDescription:" + mDescription +
-                        "\nmStatus:" + mStatus.name() +
+                        "\nmStartTime:" + mStartTime +
+                        "\nmDueTime:" + mDueTime +
                         "\nmRepeatType:" + mRepeatType.name() +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
@@ -174,7 +176,8 @@ public class TaskItem {
             json.put(Column.INDEX.name(), mIndex);
             json.put(Column.QUARTER.name(), mQuadrantType.ordinal());
             json.put(Column.DESCRIPTION.name(), mDescription);
-            json.put(Column.STATUS.name(), mStatus.ordinal());
+            json.put(Column.STARTS_ON.name(), mStartTime+"");
+            json.put(Column.DUE_ON.name(), mDueTime+"");
             json.put(Column.REPEAT.name(), mRepeatType.ordinal());
             json.put(Column.CREATED_ON.name(), mCreatedOn);
             json.put(Column.UPDATED_ON.name(), mUpdatedOn);
@@ -208,8 +211,11 @@ public class TaskItem {
             if (json.has(Column.DESCRIPTION.name())) {
                 taskItem.mDescription = json.getString(Column.DESCRIPTION.name());
             }
-            if (json.has(Column.STATUS.name())) {
-                taskItem.mStatus = Status.values()[json.getInt(Column.STATUS.name())];
+            if (json.has(Column.STARTS_ON.name())) {
+                taskItem.mStartTime =json.getLong(Column.STARTS_ON.name());
+            }
+            if (json.has(Column.DUE_ON.name())) {
+                taskItem.mDueTime =json.getLong(Column.DUE_ON.name());
             }
             if (json.has(Column.REPEAT.name())) {
                 taskItem.mRepeatType = RepeatType.values()[json.getInt(Column.REPEAT.name())];

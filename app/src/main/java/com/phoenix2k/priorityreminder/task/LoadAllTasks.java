@@ -56,7 +56,9 @@ public class LoadAllTasks extends SpreadsheetTask {
                 }
             }
         } else {
-            String range = "A1:K";
+            int len = TaskItem.Column.values().length;
+            char ch = (char) (64 + len);
+            String range = "A1:" + ch;
             List<List<Object>> values = readSheet(range, getDataSpreadsheetId());
             if (values != null) {
                 results = new ArrayList<>();

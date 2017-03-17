@@ -189,7 +189,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
             int[] location = new int[2];
             mRecyclerView.getLocationOnScreen(location);
             View v = mRecyclerView.findChildViewUnder(e.getRawX() - location[0], e.getRawY() - location[1]);
-            int pos = mRecyclerView.getChildAdapterPosition(v);
             if (mOnTaskInteractionListener != null) {
                 mOnTaskInteractionListener.onClickTaskItem((getTaskItemFromView(v)));
             }
@@ -206,7 +205,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
 
         @Override
         public void onLongPress(MotionEvent e) {
-            View v = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+            int[] location = new int[2];
+            mRecyclerView.getLocationOnScreen(location);
+            View v = mRecyclerView.findChildViewUnder(e.getRawX() - location[0], e.getRawY() - location[1]);
             if (!mDragging) {
                 mDragging = true;
                 TaskItem task = getTaskItemFromView(v);
@@ -228,7 +229,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            View v = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+            int[] location = new int[2];
+            mRecyclerView.getLocationOnScreen(location);
+            View v = mRecyclerView.findChildViewUnder(e.getRawX() - location[0], e.getRawY() - location[1]);
             if (mOnTaskInteractionListener != null) {
                 mOnTaskInteractionListener.onMaximizeQuadrant((getTaskItemFromView(v)));
             }

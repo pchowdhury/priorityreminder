@@ -60,10 +60,10 @@ public class Project {
     private HashMap<TaskItem.QuadrantType, ArrayList<TaskItem>> mQuadrants = new HashMap<>();
 
     public Project() {
-        mQuadrants.put(TaskItem.QuadrantType.Q1, new ArrayList<TaskItem>());
-        mQuadrants.put(TaskItem.QuadrantType.Q2, new ArrayList<TaskItem>());
-        mQuadrants.put(TaskItem.QuadrantType.Q3, new ArrayList<TaskItem>());
-        mQuadrants.put(TaskItem.QuadrantType.Q4, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, new ArrayList<TaskItem>());
+        mQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, new ArrayList<TaskItem>());
     }
 
     public static Project newProject(Context context) {
@@ -76,18 +76,18 @@ public class Project {
         project.mCreatedOn = IDGenerator.generateUniqueId();
         project.mUpdatedOn = project.mCreatedOn;
         project.mCenterInPercent.x = project.mCenterInPercent.y = 50;
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, context.getString(R.string.lbl_title_quadrant1));
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, context.getString(R.string.lbl_title_quadrant2));
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, context.getString(R.string.lbl_title_quadrant3));
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, context.getString(R.string.lbl_title_quadrant4));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, ContextCompat.getColor(context, R.color.color_default_q1));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, ContextCompat.getColor(context, R.color.color_default_q2));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, ContextCompat.getColor(context, R.color.color_default_q3));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, ContextCompat.getColor(context, R.color.color_default_q4));
-        project.mQuadrants.put(TaskItem.QuadrantType.Q1, new ArrayList<TaskItem>());
-        project.mQuadrants.put(TaskItem.QuadrantType.Q2, new ArrayList<TaskItem>());
-        project.mQuadrants.put(TaskItem.QuadrantType.Q3, new ArrayList<TaskItem>());
-        project.mQuadrants.put(TaskItem.QuadrantType.Q4, new ArrayList<TaskItem>());
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, context.getString(R.string.lbl_title_quadrant1));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, context.getString(R.string.lbl_title_quadrant2));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, context.getString(R.string.lbl_title_quadrant3));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, context.getString(R.string.lbl_title_quadrant4));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, ContextCompat.getColor(context, R.color.color_default_q1));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, ContextCompat.getColor(context, R.color.color_default_q2));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, ContextCompat.getColor(context, R.color.color_default_q3));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, ContextCompat.getColor(context, R.color.color_default_q4));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, new ArrayList<TaskItem>());
         return project;
     }
 
@@ -101,18 +101,18 @@ public class Project {
         project.mUpdatedOn = mCreatedOn;
         project.mCenterInPercent.x = mCenterInPercent.x;
         project.mCenterInPercent.y = mCenterInPercent.y;
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
-        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, mColorQuadrants.get(TaskItem.QuadrantType.Q1));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, mColorQuadrants.get(TaskItem.QuadrantType.Q2));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, mColorQuadrants.get(TaskItem.QuadrantType.Q3));
-        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, mColorQuadrants.get(TaskItem.QuadrantType.Q4));
-        project.mQuadrants.put(TaskItem.QuadrantType.Q1, mQuadrants.get(TaskItem.QuadrantType.Q1));
-        project.mQuadrants.put(TaskItem.QuadrantType.Q2, mQuadrants.get(TaskItem.QuadrantType.Q2));
-        project.mQuadrants.put(TaskItem.QuadrantType.Q3, mQuadrants.get(TaskItem.QuadrantType.Q3));
-        project.mQuadrants.put(TaskItem.QuadrantType.Q4, mQuadrants.get(TaskItem.QuadrantType.Q4));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, mTitleQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, mTitleQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, mTitleQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, mTitleQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, mColorQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, mColorQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, mColorQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, mColorQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, mQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, mQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, mQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, mQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
     }
 
     public static Project getProjectFrom(Context context, List<Object> values) {
@@ -137,28 +137,28 @@ public class Project {
                         project.mProjectType = Project.ProjectType.values()[Integer.valueOf(value)];
                         break;
                     case Q1_TITLE:
-                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, value);
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, value);
                         break;
                     case Q2_TITLE:
-                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, value);
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, value);
                         break;
                     case Q3_TITLE:
-                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, value);
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, value);
                         break;
                     case Q4_TITLE:
-                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, value);
+                        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, value);
                         break;
                     case Q1_COLOR:
-                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, DataUtils.parseIntValue(value));
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, DataUtils.parseIntValue(value));
                         break;
                     case Q2_COLOR:
-                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, DataUtils.parseIntValue(value));
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, DataUtils.parseIntValue(value));
                         break;
                     case Q3_COLOR:
-                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, DataUtils.parseIntValue(value));
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, DataUtils.parseIntValue(value));
                         break;
                     case Q4_COLOR:
-                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, DataUtils.parseIntValue(value));
+                        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, DataUtils.parseIntValue(value));
                         break;
                     case CENTER_IN_PERCENT:
                         String[] points = value.split(",");
@@ -205,14 +205,14 @@ public class Project {
             add(project.mTitle + "");
             add(project.mIndex + "");
             add(project.mProjectType.ordinal() + "");
-            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
-            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
-            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
-            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
-            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q1) + "");
-            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q2) + "");
-            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q3) + "");
-            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q4) + "");
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+            add(project.mTitleQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS) + "");
+            add(project.mColorQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED) + "");
             add(project.mCenterInPercent.x + "," + project.mCenterInPercent.y);
             add(project.mCreatedOn + "");
             add(project.mUpdatedOn + "");
@@ -229,10 +229,10 @@ public class Project {
                         "\nmTitle:" + mTitle +
                         "\nmIndex:" + mIndex +
                         "\nmProjectType:" + mProjectType.name() +
-                        "\nmColorQ1:" + mColorQuadrants.get(TaskItem.QuadrantType.Q1) +
-                        "\nmColorQ2:" + mColorQuadrants.get(TaskItem.QuadrantType.Q2) +
-                        "\nmColorQ3:" + mColorQuadrants.get(TaskItem.QuadrantType.Q3) +
-                        "\nmColorQ4:" + mColorQuadrants.get(TaskItem.QuadrantType.Q4) +
+                        "\nmColorQ1:" + mColorQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING) +
+                        "\nmColorQ2:" + mColorQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE) +
+                        "\nmColorQ3:" + mColorQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS) +
+                        "\nmColorQ4:" + mColorQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED) +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
                         "\n}";
@@ -246,14 +246,14 @@ public class Project {
             json.put(Column.TITLE.name(), mTitle);
             json.put(Column.INDEX.name(), mIndex);
             json.put(Column.TYPE.name(), mProjectType.ordinal());
-            json.put(Column.Q1_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q1));
-            json.put(Column.Q2_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q2));
-            json.put(Column.Q3_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q3));
-            json.put(Column.Q4_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q4));
-            json.put(Column.Q1_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q1));
-            json.put(Column.Q2_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q2));
-            json.put(Column.Q3_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q3));
-            json.put(Column.Q4_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q4));
+            json.put(Column.Q1_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+            json.put(Column.Q2_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+            json.put(Column.Q3_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+            json.put(Column.Q4_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
+            json.put(Column.Q1_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+            json.put(Column.Q2_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+            json.put(Column.Q3_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+            json.put(Column.Q4_TITLE.name(), mTitleQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
             json.put(Column.CENTER_IN_PERCENT.name(), mCenterInPercent.x + "," + mCenterInPercent.y);
             json.put(Column.CREATED_ON.name(), mCreatedOn);
             json.put(Column.UPDATED_ON.name(), mUpdatedOn);
@@ -282,28 +282,28 @@ public class Project {
                 project.mProjectType = ProjectType.values()[json.getInt(Column.TYPE.name())];
             }
             if (json.has(Column.Q1_COLOR.name())) {
-                project.mColorQuadrants.put(TaskItem.QuadrantType.Q1, json.getInt(Column.Q1_COLOR.name()));
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, json.getInt(Column.Q1_COLOR.name()));
             }
             if (json.has(Project.Column.Q2_COLOR.name())) {
-                project.mColorQuadrants.put(TaskItem.QuadrantType.Q2, json.getInt(Column.Q2_COLOR.name()));
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, json.getInt(Column.Q2_COLOR.name()));
             }
             if (json.has(Project.Column.Q3_COLOR.name())) {
-                project.mColorQuadrants.put(TaskItem.QuadrantType.Q3, json.getInt(Column.Q3_COLOR.name()));
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, json.getInt(Column.Q3_COLOR.name()));
             }
             if (json.has(Project.Column.Q4_COLOR.name())) {
-                project.mColorQuadrants.put(TaskItem.QuadrantType.Q4, json.getInt(Column.Q4_COLOR.name()));
+                project.mColorQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, json.getInt(Column.Q4_COLOR.name()));
             }
             if (json.has(Project.Column.Q1_TITLE.name())) {
-                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1, json.getString(Column.Q1_TITLE.name()));
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, json.getString(Column.Q1_TITLE.name()));
             }
             if (json.has(Project.Column.Q2_TITLE.name())) {
-                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2, json.getString(Project.Column.Q2_TITLE.name()));
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, json.getString(Project.Column.Q2_TITLE.name()));
             }
             if (json.has(Project.Column.Q3_TITLE.name())) {
-                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3, json.getString(Project.Column.Q3_TITLE.name()));
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, json.getString(Project.Column.Q3_TITLE.name()));
             }
             if (json.has(Project.Column.Q4_TITLE.name())) {
-                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4, json.getString(Project.Column.Q4_TITLE.name()));
+                project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, json.getString(Project.Column.Q4_TITLE.name()));
             }
             if (json.has(Column.CENTER_IN_PERCENT.name())) {
                 String centre = json.getString(Column.CENTER_IN_PERCENT.name());

@@ -56,7 +56,9 @@ public class LoadProjectsTask extends SpreadsheetTask {
                 }
             }
         } else {
-            String range = "A1:P";
+            int len = Project.Column.values().length;
+            char ch = (char) (64 + len);
+            String range = "A1:"+ch;
             List<List<Object>> values = readSheet(range, getProjectSpreadsheetId());
             if (values != null) {
                 results = new ArrayList<>();

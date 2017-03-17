@@ -2,8 +2,12 @@ package com.phoenix2k.priorityreminder;
 
 import android.view.View;
 
+import com.phoenix2k.priorityreminder.manager.PRNotificationManager;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
+import com.phoenix2k.priorityreminder.receiver.AlarmReceiver;
+import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import static com.phoenix2k.priorityreminder.DataStore.SortType.Index;
+import static java.security.AccessController.getContext;
 
 /**
  * Created by Pushpan on 08/01/17.
@@ -156,7 +161,43 @@ public class DataStore {
             mTasks.add(mCurrentTaskItem);
         }
         setCurrentTaskItem(null);
+        setUpNotifications();
     }
+
+    public void setUpNotifications() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (BuildConfig.DEBUG) {
+                    LogUtils.logD(TAG, "setUpNotifications");
+                }
+                clearAllAlertsConfigurations();
+
+                for (int i = 0; i < mProjects.size(); i++) {
+                    Project project = mProjects.get(i);
+                    if (project.mProjectType == Project.ProjectType.State) {
+                        ArrayList<TaskItem> list = new ArrayList();
+                        for (TaskItem.QuadrantType quad : TaskItem.QuadrantType.values()) {
+                            list.addAll(project.getTaskListForQuadrant(quad));
+                        }
+                        for (TaskItem task : list) {
+                            if (task.mQuadrantType == TaskItem.QuadrantType.Q1_OR_UPCOMING) {
+                                PRNotificationManager.getInstance().scheduleNotfication(task);
+                            }
+                        }
+                    }
+                }
+            }
+        }).start();
+
+    }
+
+    public void clearAllAlertsConfigurations() {
+        PRNotificationManager.getInstance().clearAllAlarmNotifications();
+        AlarmReceiver.clearAllNotifications(PRNotificationManager.getInstance().getContext());
+        PreferenceHelper.clearNotification(PRNotificationManager.getInstance().getContext());
+    }
+
 
     public TaskItem getTaskItemWithId(String taskId) {
         for (TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()) {

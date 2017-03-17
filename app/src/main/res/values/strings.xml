@@ -57,8 +57,18 @@
     <string name="hint_task_title">Add task title</string>
     <string name="hint_task_desc">Add task description</string>
     <string name="lbl_task_quadrant">Quadrant</string>
+    <string name="lbl_task_status">Status</string>
     <string name="lbl_task_desc">Description</string>
     <string name="lbl_task_type">Type</string>
-    <string name="lbl_task_status">Status</string>
+    <string name="lbl_task_starts_on">Starts on</string>
+    <string name="lbl_task_due_on">Due on</string>
     <string name="lbl_task_repeat_type">Repeat type</string>
+    <string name="lbl_not_set">Not Set</string>
+
+    <!--intent constant-->
+    <string name="intent_notification_id">notification_id</string>
+    <string name="intent_taskitem_message">taskitem_message</string>
+
+    <!--action-->
+    <string name="action_notify">Task pending need your attention</string>
 </resources>

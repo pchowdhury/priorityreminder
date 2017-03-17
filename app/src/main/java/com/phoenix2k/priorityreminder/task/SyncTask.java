@@ -46,13 +46,17 @@ public class SyncTask extends SpreadsheetTask {
         for(Object obj : DataStore.getInstance().getUpdates()){
             if(obj instanceof TaskItem){
                 final TaskItem taskItem = (TaskItem) obj;
-                String range = "A" + taskItem.mPosition + ":K";
+                int len = TaskItem.Column.values().length;
+                char ch = (char) (64 + len);
+                String range = "A" + taskItem.mPosition + ":" + ch;
                 taskRanges.add(range);
                 List<List<Object>> itemData =  TaskItem.getTaskItemWriteback(taskItem);
                 taskData.add(itemData);
             }else{
                 final Project project = (Project) obj;
-                String range = "A" + project.mPosition + ":P";
+                int len = Project.Column.values().length;
+                char ch = (char) (64 + len);
+                String range = "A" + project.mPosition + ":" + ch;
                 projectRanges.add(range);
                 List<List<Object>> itemData =  Project.getProjectWriteback(project);
                 projectData.add(itemData);

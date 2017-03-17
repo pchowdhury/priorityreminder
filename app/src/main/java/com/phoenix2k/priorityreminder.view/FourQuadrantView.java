@@ -77,10 +77,10 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
             mTaskListAdapter[type.ordinal()] = new TaskListAdapter(getContext(),
                     mQuadrant[type.ordinal()].mListView, type);
         }
-        mQuadrant[TaskItem.QuadrantType.Q2.ordinal()].showLeftDivider(true);
-        mQuadrant[TaskItem.QuadrantType.Q3.ordinal()].showTopDivider(true);
-        mQuadrant[TaskItem.QuadrantType.Q4.ordinal()].showTopDivider(true);
-        mQuadrant[TaskItem.QuadrantType.Q4.ordinal()].showLeftDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q2_OR_DUE.ordinal()].showLeftDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q3_OR_IN_PROGRESS.ordinal()].showTopDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q4_OR_COMPLETED.ordinal()].showTopDivider(true);
+        mQuadrant[TaskItem.QuadrantType.Q4_OR_COMPLETED.ordinal()].showLeftDivider(true);
 
         mImgAnchor.setOnTouchListener(this);
 
@@ -223,8 +223,8 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
 
         // Cell 1
         params = new LayoutParams((int) mAnchorX, (int) mAnchorY);
-        mQuadrant[TaskItem.QuadrantType.Q1.ordinal()].setLayoutParams(params);
-        mTaskListAdapter[TaskItem.QuadrantType.Q1.ordinal()].setTextWidth((int) mAnchorX);
+        mQuadrant[TaskItem.QuadrantType.Q1_OR_UPCOMING.ordinal()].setLayoutParams(params);
+        mTaskListAdapter[TaskItem.QuadrantType.Q1_OR_UPCOMING.ordinal()].setTextWidth((int) mAnchorX);
         params.leftMargin = 0;
         params.topMargin = 0;
         params.gravity = Gravity.TOP;
@@ -232,8 +232,8 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         // Cell 2
         params = new LayoutParams(getEffectiveWidth()
                 - (int) mAnchorX, (int) mAnchorY);
-        mQuadrant[TaskItem.QuadrantType.Q2.ordinal()].setLayoutParams(params);
-        mTaskListAdapter[TaskItem.QuadrantType.Q2.ordinal()].setTextWidth(getEffectiveWidth()
+        mQuadrant[TaskItem.QuadrantType.Q2_OR_DUE.ordinal()].setLayoutParams(params);
+        mTaskListAdapter[TaskItem.QuadrantType.Q2_OR_DUE.ordinal()].setTextWidth(getEffectiveWidth()
                 - (int) mAnchorX);
         params.leftMargin = (int) mAnchorX;
         params.topMargin = 0;
@@ -242,8 +242,8 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         // Cell 3
         params = new LayoutParams((int) mAnchorX, getHeight()
                 - (int) mAnchorY);
-        mQuadrant[TaskItem.QuadrantType.Q3.ordinal()].setLayoutParams(params);
-        mTaskListAdapter[TaskItem.QuadrantType.Q3.ordinal()].setTextWidth((int) mAnchorX);
+        mQuadrant[TaskItem.QuadrantType.Q3_OR_IN_PROGRESS.ordinal()].setLayoutParams(params);
+        mTaskListAdapter[TaskItem.QuadrantType.Q3_OR_IN_PROGRESS.ordinal()].setTextWidth((int) mAnchorX);
         params.leftMargin = 0;
         params.topMargin = (int) mAnchorY;
         params.gravity = Gravity.TOP;
@@ -251,8 +251,8 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         // Cell 4
         params = new LayoutParams(getEffectiveWidth()
                 - (int) mAnchorX, getHeight() - (int) mAnchorY);
-        mQuadrant[TaskItem.QuadrantType.Q4.ordinal()].setLayoutParams(params);
-        mTaskListAdapter[TaskItem.QuadrantType.Q4.ordinal()].setTextWidth(getEffectiveWidth()
+        mQuadrant[TaskItem.QuadrantType.Q4_OR_COMPLETED.ordinal()].setLayoutParams(params);
+        mTaskListAdapter[TaskItem.QuadrantType.Q4_OR_COMPLETED.ordinal()].setTextWidth(getEffectiveWidth()
                 - (int) mAnchorX);
         params.leftMargin = (int) mAnchorX;
         params.topMargin = (int) mAnchorY;
