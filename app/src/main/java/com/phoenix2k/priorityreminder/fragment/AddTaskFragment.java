@@ -58,6 +58,8 @@ public class AddTaskFragment extends Fragment {
     Spinner mSpinnerQuadrantType;
     @BindView(R.id.edt_task_desc)
     EditText mEditDescription;
+    @BindView(R.id.img_icon)
+    ImageView mImgIcon;
     @BindView(R.id.lyt_status_type)
     View mLytStatusType;
     @BindView(R.id.spinner_repeat_type)
@@ -78,6 +80,7 @@ public class AddTaskFragment extends Fragment {
     ImageView mResetStartDate;
     @BindView(R.id.reset_due_date)
     ImageView mResetDueDate;
+
 
 
     private UpdateListener mUpdateListener;

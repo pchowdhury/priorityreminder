@@ -89,21 +89,46 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left|start"
-                        android:layout_marginTop="@dimen/item_top_margin"
-                        android:text="@string/lbl_task_desc" />
-
-                    <EditText
-                        android:id="@+id/edt_task_desc"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:gravity="top|left|start"
-                        android:hint="@string/hint_task_desc"
-                        android:minLines="4" />
+                        android:layout_marginTop="@dimen/item_top_margin"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="left|start"
+
+                                android:text="@string/lbl_task_desc" />
+
+                            <EditText
+                                android:id="@+id/edt_task_desc"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:gravity="top|left|start"
+                                android:hint="@string/hint_task_desc"
+                                android:minLines="4" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView android:id="@+id/img_icon"
+                                android:layout_width="150dp"
+                                android:layout_height="150dp"
+                                android:src="@drawable/blue_clock" />
+                        </LinearLayout>
+                    </LinearLayout>
+
 
                     <LinearLayout
                         android:id="@+id/lyt_status_type"
