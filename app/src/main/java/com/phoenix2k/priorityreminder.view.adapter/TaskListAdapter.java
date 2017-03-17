@@ -186,12 +186,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-//            View v = mRecyclerView.findChildViewUnder(e.getRawX()-mRecyclerView.getX(), e.getRawY()-mRecyclerView.getY());
-//            int pos =  mRecyclerView.getChildAdapterPosition(v);
-//            if (mOnTaskInteractionListener != null) {
-//                mOnTaskInteractionListener.onClickTaskItem((getTaskItemFromView(v)));
-//            }
-//            mActionTaken = true;
+            int[] location = new int[2];
+            mRecyclerView.getLocationOnScreen(location);
+            View v = mRecyclerView.findChildViewUnder(e.getRawX() - location[0], e.getRawY() - location[1]);
+            int pos = mRecyclerView.getChildAdapterPosition(v);
+            if (mOnTaskInteractionListener != null) {
+                mOnTaskInteractionListener.onClickTaskItem((getTaskItemFromView(v)));
+            }
+            mActionTaken = true;
             return false;
         }
 
@@ -205,7 +207,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         @Override
         public void onLongPress(MotionEvent e) {
             View v = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
-            if(!mDragging){
+            if (!mDragging) {
                 mDragging = true;
                 TaskItem task = getTaskItemFromView(v);
                 ClipData data = ClipData.newPlainText("clipData", task.toString() + "");
@@ -236,6 +238,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
 
     public interface OnTaskInteractionListener {
         void onClickTaskItem(TaskItem task);
+
         void onMaximizeQuadrant(TaskItem task);
     }
 }
