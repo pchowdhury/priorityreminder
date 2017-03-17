@@ -23,6 +23,7 @@ public class TaskItem {
         INDEX,
         QUARTER,
         DESCRIPTION,
+        ICON,
         STARTS_ON,
         DUE_ON,
         REPEAT,
@@ -50,6 +51,7 @@ public class TaskItem {
     public int mIndex;
     public QuadrantType mQuadrantType;
     public String mDescription;
+    public int mIcon;
     public long mStartTime;
     public long mDueTime;
 
@@ -66,6 +68,7 @@ public class TaskItem {
         item.mTitle = "";
         item.mIndex = 0;
         item.mDescription = "";
+        item.mIcon = 0;
         item.mQuadrantType = QuadrantType.Q1_OR_UPCOMING;
         item.mStartTime = 0;
         item.mDueTime = 0;
@@ -103,6 +106,9 @@ public class TaskItem {
                     case DESCRIPTION:
                         taskItem.mDescription = value;
                         break;
+                    case ICON:
+                        taskItem.mIcon = Integer.valueOf(value);
+                        break;
                     case STARTS_ON:
                         taskItem.mStartTime = Long.valueOf(value);
                         break;
@@ -136,6 +142,7 @@ public class TaskItem {
             add(taskItem.mIndex + "");
             add(taskItem.mQuadrantType.ordinal() + "");
             add(taskItem.mDescription + "");
+            add(taskItem.mIcon + "");
             add(taskItem.mStartTime + "");
             add(taskItem.mDueTime + "");
             add(taskItem.mRepeatType.ordinal() + "");
@@ -156,6 +163,7 @@ public class TaskItem {
                         "\nmQuadrantType:" + mQuadrantType.name() +
                         "\nmIndex:" + mIndex +
                         "\nmDescription:" + mDescription +
+                        "\nmIcon:" + mIcon +
                         "\nmStartTime:" + mStartTime +
                         "\nmDueTime:" + mDueTime +
                         "\nmRepeatType:" + mRepeatType.name() +
@@ -174,6 +182,7 @@ public class TaskItem {
             json.put(Column.INDEX.name(), mIndex);
             json.put(Column.QUARTER.name(), mQuadrantType.ordinal());
             json.put(Column.DESCRIPTION.name(), mDescription);
+            json.put(Column.ICON.name(), mIcon);
             json.put(Column.STARTS_ON.name(), mStartTime+"");
             json.put(Column.DUE_ON.name(), mDueTime+"");
             json.put(Column.REPEAT.name(), mRepeatType.ordinal());
@@ -208,6 +217,9 @@ public class TaskItem {
             }
             if (json.has(Column.DESCRIPTION.name())) {
                 taskItem.mDescription = json.getString(Column.DESCRIPTION.name());
+            }
+            if (json.has(Column.ICON.name())) {
+                taskItem.mIcon = json.getInt(Column.ICON.name());
             }
             if (json.has(Column.STARTS_ON.name())) {
                 taskItem.mStartTime =json.getLong(Column.STARTS_ON.name());
