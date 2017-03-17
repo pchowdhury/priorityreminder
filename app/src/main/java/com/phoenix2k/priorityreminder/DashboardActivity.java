@@ -1,6 +1,10 @@
 package com.phoenix2k.priorityreminder;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +27,7 @@ import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
@@ -368,5 +373,29 @@ public class DashboardActivity extends BasicCommunicationActivity
     private void openTaskDetails(String id) {
         AddTaskFragment fragment = AddTaskFragment.getInstance(id);
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+    }
+
+    BroadcastReceiver mNotificationBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            DataStore.getInstance().validateTaskStatus();
+            DataStore.getInstance().setUpNotifications();
+            SyncManager.getInstance().startSync(DashboardActivity.this, getUserCredentials());
+            reloadDashboard(true);
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(getString(R.string.action_notify));
+        registerReceiver(mNotificationBroadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mNotificationBroadcastReceiver);
     }
 }

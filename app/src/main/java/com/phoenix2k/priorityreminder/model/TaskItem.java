@@ -15,8 +15,6 @@ import java.util.List;
  */
 
 public class TaskItem {
-    public static final String TASK_ITEM = "com.phoenix2k.priorityreminder.model.TASK_ITEM";
-
     public enum Column {
         ID,
         POSITION,

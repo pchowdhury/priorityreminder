@@ -7,9 +7,11 @@ import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.receiver.AlarmReceiver;
+import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -172,7 +174,6 @@ public class DataStore {
                     LogUtils.logD(TAG, "setUpNotifications");
                 }
                 clearAllAlertsConfigurations();
-
                 for (int i = 0; i < mProjects.size(); i++) {
                     Project project = mProjects.get(i);
                     if (project.mProjectType == Project.ProjectType.State) {
@@ -275,6 +276,41 @@ public class DataStore {
                 }
                 //sort the list
                 Collections.sort(taskList, mSortCompartor.get(mSortType.ordinal()));
+            }
+        }
+    }
+
+    /**
+     * Check all the state tasks for due dates. If any of them is already in due date then change the sate to due quadrant
+     * and update
+     */
+    public void validateTaskStatus() {
+        for (int i = 0; i < mProjects.size(); i++) {
+            Project project = mProjects.get(i);
+            if (project.mProjectType == Project.ProjectType.State) {
+                ArrayList<TaskItem> list = new ArrayList();
+                for (TaskItem.QuadrantType quad : TaskItem.QuadrantType.values()) {
+                    list.addAll(project.getTaskListForQuadrant(quad));
+                }
+                for (TaskItem task : list) {
+                    if (task.mQuadrantType == TaskItem.QuadrantType.Q1_OR_UPCOMING) {
+                        long now = System.currentTimeMillis();
+                        long startTime = task.mStartTime;
+                        LogUtils.logI("Time Now", DataUtils.getTime(now));
+                        LogUtils.logI("Time Start", DataUtils.getTime(startTime));
+                        if (startTime != 0 && startTime < now) {
+                            ArrayList<TaskItem> duelist = project.getTaskListForQuadrant(TaskItem.QuadrantType.Q2_OR_DUE);
+                            TaskItem dummyTask = getNewTaskItemPlaceHolder();
+                            dummyTask.mQuadrantType = TaskItem.QuadrantType.Q2_OR_DUE;
+                            if (duelist.size() > 0) {
+                                dummyTask.mIndex = duelist.size();
+                            } else {
+                                dummyTask.mIndex = 0;
+                            }
+                            moveTaskItem(task, dummyTask);
+                        }
+                    }
+                }
             }
         }
     }

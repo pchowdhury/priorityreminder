@@ -276,6 +276,8 @@ public class AddTaskFragment extends Fragment {
                 Project project = DataStore.getInstance().getCurrentProject();
                 project.getTaskListForQuadrant(mTaskQuadrantBackup).remove(updatedItem);
                 DataStore.getInstance().confirmSaveTaskItem(false);
+            }else{
+                DataStore.getInstance().setUpNotifications();
             }
         } else {
             DataStore.getInstance().confirmSaveTaskItem(true);

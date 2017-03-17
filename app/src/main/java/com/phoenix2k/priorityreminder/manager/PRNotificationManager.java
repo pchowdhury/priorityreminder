@@ -14,6 +14,7 @@ import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.receiver.AlarmReceiver;
+import com.phoenix2k.priorityreminder.utils.DataUtils;
 
 public class PRNotificationManager {
     private static final String TAG = "PMNotificationManager";
@@ -49,7 +50,7 @@ public class PRNotificationManager {
                 return;
             }
         }
-        int notificationId = -1;
+        int notificationId;
         if (taskItem.mQuadrantType == TaskItem.QuadrantType.Q1_OR_UPCOMING) {
             // check if not started yet
             if (itemStartTime > now) {
@@ -74,7 +75,7 @@ public class PRNotificationManager {
 
                 // Get the AlarmManager service
                 AlarmManager am = (AlarmManager) getContext().getSystemService(
-                        getContext().ALARM_SERVICE);
+                        Context.ALARM_SERVICE);
                 am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), sender);
                 if (BuildConfig.DEBUG) {
                     Log.e(TAG,
@@ -87,7 +88,7 @@ public class PRNotificationManager {
     }
 
     public String showDate(long millis) {
-        return new Date(millis).toLocaleString();
+        return DataUtils.getTime(millis);
     }
 
     public Context getContext() {

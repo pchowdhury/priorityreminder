@@ -2,6 +2,9 @@ package com.phoenix2k.priorityreminder.utils;
 
 import android.graphics.Color;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by Pushpan on 08/02/17.
  */
@@ -41,7 +44,14 @@ public class DataUtils {
         float[] hsv = new float[3];
         Color.colorToHSV(argb, hsv);
         hsv[1] /= 3;
-        hsv[2] = (2+hsv[2])/3;
+        hsv[2] = (2 + hsv[2]) / 3;
         return Color.HSVToColor(hsv);
+    }
+
+    public static String getTime(long time) {
+        SimpleDateFormat mDateFormat = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        return mDateFormat.format(cal.getTime());
     }
 }

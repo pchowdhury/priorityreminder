@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
+import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.manager.PRNotificationManager;
 import com.phoenix2k.priorityreminder.model.Project;
@@ -97,9 +98,20 @@ public class ProjectListFragment extends BasicFragment {
                 }
                 PRNotificationManager.init(getActivity().getApplicationContext());
                 DataStore.getInstance().setUpNotifications();
+                validateTasks();
                 break;
         }
         loadView();
+    }
+
+
+    /**
+     * Check all the state tasks for due dates. If any of them is already in due date then change the sate to due quadrant
+     * and update by calling sync
+     */
+    private void validateTasks() {
+        DataStore.getInstance().validateTaskStatus();
+        SyncManager.getInstance().startSync(getActivity(), getUserCredentials());
     }
 
     @Override

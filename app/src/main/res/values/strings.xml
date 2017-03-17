@@ -68,7 +68,7 @@
     <!--intent constant-->
     <string name="intent_notification_id">notification_id</string>
     <string name="intent_taskitem_message">taskitem_message</string>
-
+    <string name="intent_action_notification">intent_actionn_notification</string>
     <!--action-->
     <string name="action_notify">Task pending need your attention</string>
 </resources>
