@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.phoenix2k.priorityreminder.DataStore;
-import com.phoenix2k.priorityreminder.OnDashboardListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
@@ -76,8 +75,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
             mQuadrant[type.ordinal()] = (DraggableListView) findViewById(listViewResID[type.ordinal()]);
 //            mQuadrant[type.ordinal()].setOnDragListener(DataStore.getInstance().getDragListener());
             mTaskListAdapter[type.ordinal()] = new TaskListAdapter(getContext(),
-                    mQuadrant[type.ordinal()], type);
-//            mQuadrant[type.ordinal()].setOnTouchListener(this);
+                    mQuadrant[type.ordinal()].mListView, type);
         }
         mQuadrant[TaskItem.QuadrantType.Q2.ordinal()].showLeftDivider(true);
         mQuadrant[TaskItem.QuadrantType.Q3.ordinal()].showTopDivider(true);
@@ -297,9 +295,9 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
 //        }
     }
 
-    public void setOnDashboardListener(OnDashboardListener onDashboardListener) {
-        for (int i = 0; i < mQuadrant.length; i++) {
-            mQuadrant[i].setDashboardListener(onDashboardListener);
+    public void setOnTaskInteractionListener(TaskListAdapter.OnTaskInteractionListener onTaskInteractionListener) {
+        for (int i = 0; i < mTaskListAdapter.length; i++) {
+            mTaskListAdapter[i].setOnTaskInteractionListener(onTaskInteractionListener);
         }
     }
 

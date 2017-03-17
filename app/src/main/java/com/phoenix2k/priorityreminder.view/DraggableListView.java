@@ -11,9 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.phoenix2k.priorityreminder.OnDashboardListener;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.helper.RecyclerItemClickHelper;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
@@ -36,7 +34,6 @@ public class DraggableListView extends LinearLayout {
     View lytHeaderTopDivider;
     @BindView(R.id.lytLeftDivider)
     View lytLeftDivider;
-    private OnDashboardListener mDashboardListener;
 
     public DraggableListView(Context context) {
         super(context);
@@ -57,34 +54,7 @@ public class DraggableListView extends LinearLayout {
         inflate(getContext(), R.layout.draggable_list_view, this);
         ButterKnife.bind(this);
         mListView.setLayoutManager(new LinearLayoutManager(getContext()));
-        RecyclerItemClickSupport.addTo(mListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                if (mDashboardListener != null) {
-                    mDashboardListener.openTaskDetails(((TaskListAdapter) mListView.getAdapter()).getItemAt(position).mId);
-                }
-            }
-        });
-
-        RecyclerItemClickSupport.addTo(mListView).setOnItemLongClickListener(new RecyclerItemClickSupport.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClicked(RecyclerView recyclerView, int position, View v) {
-               TaskItem task = ((TaskListAdapter)  mListView.getAdapter()).getItemAt(position);
-                ClipData data = ClipData.newPlainText("clipData", task.toString()+"");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    v.startDragAndDrop(data, shadowBuilder, task, 0);
-                }else{
-                    v.startDrag(data, shadowBuilder, task, 0);
-                }
-                return false;
-            }
-        });
     }
-
-
-
-
 
     public void showTopDivider(boolean show) {
         lytHeaderTopDivider.setVisibility(show ? VISIBLE : GONE);
@@ -104,14 +74,6 @@ public class DraggableListView extends LinearLayout {
 
     public void setAdapter(TaskListAdapter adapter) {
         this.mListView.setAdapter(adapter);
-    }
-
-    public OnDashboardListener getDashboardListener() {
-        return mDashboardListener;
-    }
-
-    public void setDashboardListener(OnDashboardListener mDashboardListener) {
-        this.mDashboardListener = mDashboardListener;
     }
 
     public TaskItem getTaskItemPlaceholder() {

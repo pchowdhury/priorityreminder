@@ -35,7 +35,7 @@
     <string name="hint_add_project">Add project title</string>
 
     <string name="lbl_theme">Select Project Theme</string>
-
+    <dimen name="drag_threshold">5dp</dimen>
 
     <string name="lbl_title_quadrant1">Quadrant 1</string>
     <string name="lbl_title_quadrant2">Quadrant 2</string>

@@ -8,10 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.phoenix2k.priorityreminder.OnDashboardListener;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.view.FourQuadrantView;
+import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import butterknife.BindView;
 
@@ -23,14 +23,14 @@ public class FourQuadrantFragment extends BasicFragment {
     public static final String TAG = "FourQuadrantFragment";
     @BindView(R.id.quadrant_view)
     FourQuadrantView mQuadrantView;
-    private OnDashboardListener mOnDashboardListener;
+    private TaskListAdapter.OnTaskInteractionListener mOnTaskInteractionListener;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        mQuadrantView.setOnDashboardListener(mOnDashboardListener);
+        mQuadrantView.setOnTaskInteractionListener(mOnTaskInteractionListener);
         return v;
     }
 
@@ -66,16 +66,16 @@ public class FourQuadrantFragment extends BasicFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if(activity instanceof OnDashboardListener){
-            mOnDashboardListener = (OnDashboardListener) activity;
+        if(activity instanceof TaskListAdapter.OnTaskInteractionListener){
+            mOnTaskInteractionListener = (TaskListAdapter.OnTaskInteractionListener) activity;
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof OnDashboardListener){
-            mOnDashboardListener = (OnDashboardListener) context;
+        if(context instanceof TaskListAdapter.OnTaskInteractionListener){
+            mOnTaskInteractionListener = (TaskListAdapter.OnTaskInteractionListener) context;
         }
     }
 }

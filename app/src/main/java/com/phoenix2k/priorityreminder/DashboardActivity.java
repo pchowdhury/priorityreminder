@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class DashboardActivity extends BasicCommunicationActivity
-        implements OnNavigationListener, UpdateListener, OnDashboardListener {
+        implements OnNavigationListener, UpdateListener, TaskListAdapter.OnTaskInteractionListener {
     @BindView(R.id.main_progress)
     public View mMainProress;
 
@@ -350,14 +350,23 @@ public class DashboardActivity extends BasicCommunicationActivity
         }
     }
 
-    @Override
-    public void openTaskDetails(String itemId) {
-        AddTaskFragment fragment = AddTaskFragment.getInstance(itemId);
-        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
-    }
 
     public void showProgress(boolean show) {
         mMainProress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
+    @Override
+    public void onClickTaskItem(TaskItem task) {
+        openTaskDetails(task.mId);
+    }
+
+    @Override
+    public void onMaximizeQuadrant(TaskItem task) {
+
+    }
+
+    private void openTaskDetails(String id) {
+        AddTaskFragment fragment = AddTaskFragment.getInstance(id);
+        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+    }
 }
