@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/lyt_main"
         android:layout_width="500dp"
         android:layout_height="600dp"
         android:layout_centerInParent="true"
@@ -89,44 +90,40 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|start"
+                        android:layout_marginTop="@dimen/item_top_margin"
+                        android:text="@string/lbl_task_desc" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/item_top_margin"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <LinearLayout
+                        <EditText
+                            android:id="@+id/edt_task_desc"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:gravity="top|left|start"
+                            android:hint="@string/hint_task_desc"
+                            android:minLines="4" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="left|start"
+                        <ImageView
+                            android:id="@+id/img_icon"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/blue_clock" />
 
-                                android:text="@string/lbl_task_desc" />
-
-                            <EditText
-                                android:id="@+id/edt_task_desc"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:gravity="top|left|start"
-                                android:hint="@string/hint_task_desc"
-                                android:minLines="4" />
-                        </LinearLayout>
-
-                        <LinearLayout
+                        <ImageView
+                            android:id="@+id/img_arrow"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <ImageView android:id="@+id/img_icon"
-                                android:layout_width="150dp"
-                                android:layout_height="150dp"
-                                android:src="@drawable/blue_clock" />
-                        </LinearLayout>
+                            android:layout_height="100dp" />
                     </LinearLayout>
 
 
@@ -257,4 +254,17 @@
                 android:src="@drawable/undelete" />
         </LinearLayout>
     </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/icon_list"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/lyt_main"
+        android:layout_alignEnd="@+id/lyt_main"
+        android:layout_alignRight="@+id/lyt_main"
+        android:layout_alignTop="@+id/lyt_main"
+        android:layout_marginBottom="43dp"
+        android:layout_marginTop="46dp"
+        android:background="@color/colorPrimary"
+        android:visibility="gone" />
 </RelativeLayout>

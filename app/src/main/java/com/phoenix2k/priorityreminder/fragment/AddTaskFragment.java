@@ -7,6 +7,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -25,9 +27,11 @@ import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.UpdateListener;
+import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
+import com.phoenix2k.priorityreminder.view.adapter.IconListAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,6 +39,8 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static android.view.View.GONE;
 
 /**
  * Created by Pushpan on 06/02/17.
@@ -80,8 +86,8 @@ public class AddTaskFragment extends Fragment {
     ImageView mResetStartDate;
     @BindView(R.id.reset_due_date)
     ImageView mResetDueDate;
-
-
+    @BindView(R.id.icon_list)
+    RecyclerView mIconListView;
 
     private UpdateListener mUpdateListener;
     private int mTaskIndexBackup;
@@ -121,7 +127,7 @@ public class AddTaskFragment extends Fragment {
             } else {
                 taskItem = TaskItem.newTaskItem();
                 taskItem.mProjectId = project.mId;
-                mImgDelete.setVisibility(View.GONE);
+                mImgDelete.setVisibility(GONE);
             }
             setCurrentProject(DataStore.getInstance().getCurrentProject());
             DataStore.getInstance().setCurrentTaskItem(taskItem);
@@ -217,11 +223,36 @@ public class AddTaskFragment extends Fragment {
             updateTime();
             boolean isSimple = getCurrentProject().mProjectType == Project.ProjectType.Simple;
             if (isSimple) {
-                mLytStatusType.setVisibility(View.GONE);
+                mLytStatusType.setVisibility(GONE);
             }
             mQuadrandTaskTitle.setText(getString(isSimple ? R.string.lbl_task_quadrant : R.string.lbl_task_status));
         }
+        updateIcon(DataStore.getInstance().getIconResId(getCurrentTaskItem().mIcon));
         validateSaveButton();
+    }
+
+    private void showIconList(boolean show) {
+        if (show) {
+            mIconListView.setVisibility(View.VISIBLE);
+            mIconListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            final IconListAdapter iconAdapter = new IconListAdapter();
+            mIconListView.setAdapter(iconAdapter);
+            RecyclerItemClickSupport.addTo(mIconListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
+                @Override
+                public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                    getCurrentTaskItem().mIcon = position;
+                    updateIcon(DataStore.getInstance().getIconResId(position));
+                    iconAdapter.notifyItemMoved(getCurrentTaskItem().mIcon, position);
+                }
+            });
+        } else {
+            mIconListView.setVisibility(GONE);
+        }
+    }
+
+    private void updateIcon(int resId) {
+        mImgIcon.setImageResource(resId);
+        showIconList(false);
     }
 
     private void updateNewTaskIndex() {
@@ -279,7 +310,7 @@ public class AddTaskFragment extends Fragment {
                 Project project = DataStore.getInstance().getCurrentProject();
                 project.getTaskListForQuadrant(mTaskQuadrantBackup).remove(updatedItem);
                 DataStore.getInstance().confirmSaveTaskItem(false);
-            }else{
+            } else {
                 DataStore.getInstance().setUpNotifications();
             }
         } else {
@@ -322,6 +353,11 @@ public class AddTaskFragment extends Fragment {
     public void onClickResetDueDate(View v) {
         getCurrentTaskItem().mDueTime = 0;
         updateTime();
+    }
+
+    @OnClick(R.id.img_icon)
+    public void onClickIcon(View v) {
+        showIconList(true);
     }
 
     public TaskItem getCurrentTaskItem() {
@@ -376,7 +412,7 @@ public class AddTaskFragment extends Fragment {
             Calendar calender = Calendar.getInstance();
             calender.setTimeInMillis(time);
             mTextStartDate.setText(mDateFormat.format(calender.getTime()));
-        }else{
+        } else {
             mTextStartDate.setText(getString(R.string.lbl_not_set));
         }
 
@@ -385,7 +421,7 @@ public class AddTaskFragment extends Fragment {
             Calendar calender = Calendar.getInstance();
             calender.setTimeInMillis(time);
             mTextDueDate.setText(mDateFormat.format(calender.getTime()));
-        }else{
+        } else {
             mTextDueDate.setText(getString(R.string.lbl_not_set));
         }
         mResetStartDate.setEnabled(getCurrentTaskItem().mStartTime != 0);

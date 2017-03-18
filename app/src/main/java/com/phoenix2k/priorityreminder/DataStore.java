@@ -39,6 +39,13 @@ public class DataStore {
     private ArrayList<Object> mUpdates = new ArrayList<>();
     private SortType mSortType = Index;
     private int mCurrentProjectIndex = 0;
+    private ArrayList<Integer> mIconResourceIdList = new ArrayList<>();
+
+    public enum SortType {
+        Index,
+        Alphabetic,
+        Chronological
+    };
 
     public int getCurrentProjectIndex() {
         return mCurrentProjectIndex;
@@ -48,13 +55,17 @@ public class DataStore {
         this.mCurrentProjectIndex = mProjectPosition;
     }
 
-    public enum SortType {
-        Index,
-        Alphabetic,
-        Chronological
+    public int getIconResId(int position){
+     return mIconResourceIdList.get(position);
     }
 
-    ;
+    public ArrayList<Integer> getIconResourceIdList() {
+        return mIconResourceIdList;
+    }
+
+    public void setIconResourceIdList(ArrayList<Integer> mIconResourceIdList) {
+        this.mIconResourceIdList = mIconResourceIdList;
+    }
 
     public static DataStore getInstance() {
         if (mInstance == null) {

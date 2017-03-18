@@ -1,6 +1,7 @@
 package com.phoenix2k.priorityreminder;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -14,6 +15,8 @@ import com.phoenix2k.priorityreminder.task.SearchFileTask;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 import com.phoenix2k.priorityreminder.utils.StaticDataProvider;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -148,8 +151,24 @@ public class SignInActivity extends BasicCommunicationActivity {
     private void onSetupValidationComplete() {
         //initialize id generator
         IDGenerator.init();
+        loadIconsInDataStore();
         Intent intent = new Intent(this, DashboardActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void loadIconsInDataStore() {
+        ArrayList<Integer> list = new ArrayList<>();
+        TypedArray ar = getResources().obtainTypedArray(R.array.icon_name_array);
+        int len = ar.length();
+        for (int i = 0; i < len; i++) {
+            String resname = ar.getString(i);
+            String iconName = resname.replace("128.png", "");
+            int resID = getResources().getIdentifier(iconName, "drawable",
+                    getPackageName());
+            list.add(resID);
+        }
+        DataStore.getInstance().setIconResourceIdList(list);
+        ar.recycle();
     }
 }

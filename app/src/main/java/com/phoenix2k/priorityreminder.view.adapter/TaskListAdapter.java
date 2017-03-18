@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
@@ -110,6 +111,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         holder.mViewParent.setBackgroundColor(ContextCompat.getColor(holder.mViewParent.getContext(), item.mUpdatedOn != -1 ? R.color.color_more_translucent_white : R.color.color_transparent));
         holder.mTextName.setText(title);
         holder.mTextName.setTag(item);
+        holder.mIconView.setImageResource(DataStore.getInstance().getIconResId(item.mIcon));
+        holder.mIconView.setVisibility(item.mIcon == 0 ? View.GONE : View.VISIBLE);
     }
 
     public TaskItem getItemAt(int position) {
@@ -164,11 +167,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
     public class TaskItemHolder extends RecyclerView.ViewHolder {
         public View mViewParent;
         public TextView mTextName;
+        public ImageView mIconView;
 
         public TaskItemHolder(View itemView) {
             super(itemView);
             mViewParent = itemView.findViewById(R.id.lyt_root);
             mTextName = (TextView) itemView.findViewById(R.id.name);
+            mIconView = (ImageView) itemView.findViewById(R.id.icon);
         }
     }
 
