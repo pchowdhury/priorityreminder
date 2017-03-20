@@ -4,8 +4,11 @@ import android.content.Context;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.BatchClearValuesRequest;
+import com.google.api.services.sheets.v4.model.BatchClearValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
+import com.google.api.services.sheets.v4.model.ClearValuesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
@@ -79,6 +82,19 @@ public abstract class SpreadsheetTask extends BasicTask {
 
             BatchUpdateValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchUpdate(sheetId, oRequest).execute();
             return response.getTotalUpdatedRows() >= 0;
+        } catch (Exception e) {
+            setLastError(e);
+            LogUtils.printException(e);
+        }
+        return false;
+    }
+
+    public boolean clearMultipleItemsSheet(ArrayList<String> ranges, String sheetId) {
+        try {
+            BatchClearValuesRequest oRequest = new BatchClearValuesRequest();
+            oRequest.setRanges(ranges);
+            BatchClearValuesResponse response = ((Sheets) getService()).spreadsheets().values().batchClear(sheetId, oRequest).execute();
+            return response.getClearedRanges().size() >= 0;
         } catch (Exception e) {
             setLastError(e);
             LogUtils.printException(e);

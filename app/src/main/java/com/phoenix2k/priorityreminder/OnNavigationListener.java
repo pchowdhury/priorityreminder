@@ -23,4 +23,5 @@ public interface OnNavigationListener {
      boolean onProjectSelected(@NonNull Project item, boolean closeSlider);
      void onAddNewProject();
     void onUpdateCurrentProject();
+    void onDeleteProject();
 }

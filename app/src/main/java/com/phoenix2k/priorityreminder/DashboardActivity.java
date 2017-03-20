@@ -287,6 +287,12 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     @Override
+    public void onDeleteProject() {
+       DataStore.getInstance().deleteProject();
+        SyncManager.getInstance().startSync(this, getUserCredentials());
+    }
+
+    @Override
     public void onGoogleServiceAvailibilityError(int statusCode) {
 
     }

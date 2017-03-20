@@ -328,6 +328,8 @@ public class AddTaskFragment extends Fragment {
     @OnClick(R.id.imgDelete)
     public void onClickDelete(View v) {
         KeyboardUtils.hideKeyboard(getActivity());
+        DataStore.getInstance().deleteTask(getCurrentTaskItem());
+        mUpdateListener.onTaskUpdated();
     }
 
 

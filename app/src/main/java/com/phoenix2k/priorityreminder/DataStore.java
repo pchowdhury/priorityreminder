@@ -45,7 +45,9 @@ public class DataStore {
         Index,
         Alphabetic,
         Chronological
-    };
+    }
+
+    ;
 
     public int getCurrentProjectIndex() {
         return mCurrentProjectIndex;
@@ -55,8 +57,8 @@ public class DataStore {
         this.mCurrentProjectIndex = mProjectPosition;
     }
 
-    public int getIconResId(int position){
-     return mIconResourceIdList.get(position);
+    public int getIconResId(int position) {
+        return mIconResourceIdList.get(position);
     }
 
     public ArrayList<Integer> getIconResourceIdList() {
@@ -147,6 +149,7 @@ public class DataStore {
         this.mTasks = mTasks;
         ArrayList<TaskItem> values = new ArrayList<>(mTasks);
         for (Project project : getProjects()) {
+            project.removeAllTasks();
             project.addfromTaskList(values);
         }
         for (Project project : getProjects()) {
@@ -159,6 +162,103 @@ public class DataStore {
             ArrayList<TaskItem> list = project.getTaskListForQuadrant(q);
             Collections.sort(list, mSortCompartor.get(index.ordinal()));
         }
+    }
+
+
+    public void deleteProject() {
+        Project project = getCurrentProject();
+        //set the new index of all projects of the quadrant
+        ArrayList<Project> sortedProjects = new ArrayList<>(mProjects);
+        Collections.sort(sortedProjects, new Comparator<Project>() {
+            @Override
+            public int compare(Project o1, Project o2) {
+                return new Integer(o1.mIndex).compareTo(new Integer(o2.mIndex));
+            }
+        });
+
+        int startIndex = project.mIndex;
+        if (startIndex < sortedProjects.size()) {
+            for (int i = startIndex + 1; i < sortedProjects.size(); i++) {
+                sortedProjects.get(i).mIndex = sortedProjects.get(i).mIndex - 1;
+                addToUpdate(sortedProjects.get(i));
+            }
+        }
+
+        //remove the item
+        int indexToBeRemoved = Integer.valueOf(project.mPosition) - 1;
+        mProjects.remove(indexToBeRemoved);
+        //reassign the position to all the tasks
+        for (int i = indexToBeRemoved; i < mProjects.size(); i++) {
+            Project currentProject = mProjects.get(i);
+            currentProject.mPosition = (i + 1) + "";
+            addToUpdate(currentProject);
+        }
+        Project deletePlacehOlder = Project.newBlankProject();
+        deletePlacehOlder.mPosition = (mProjects.size() + 1) + "";
+        addToUpdate(deletePlacehOlder);
+        int deletedItemCount = 0;
+        int firstItemIndex = -1;
+        //Delete all tasks inside project
+        for (int i = 0; i < mTasks.size(); i++) {
+            TaskItem item = mTasks.get(i);
+            if (item.mProjectId.equalsIgnoreCase(project.mId)) {
+                if (firstItemIndex == -1) {
+                    firstItemIndex = i;
+                }
+                mTasks.remove(item);
+                i--;
+                deletedItemCount++;
+            }
+        }
+
+        //reposition all tasks
+        for (int i = firstItemIndex; (i > -1 && i < mTasks.size()); i++) {
+            TaskItem item = mTasks.get(i);
+            item.mPosition = i + 1 + "";
+            addToUpdate(item);
+        }
+
+        //clear number of rows reduced
+        for (int i = 1; i <= deletedItemCount; i++) {
+            int deletePosition = mTasks.size() + i;
+            TaskItem item = TaskItem.newBlankTaskItem();
+            item.mPosition = deletePosition + "";
+            addToUpdate(item);
+        }
+        setTasks(mTasks);
+        if (mCurrentProjectIndex >= mProjects.size()) {
+            mCurrentProjectIndex--;
+            if (mCurrentProjectIndex < 0) {
+                mCurrentProjectIndex = 0;
+            }
+        }
+    }
+
+    public void deleteTask(TaskItem item) {
+        Project project = mProjectsMap.get(item.mProjectId);
+        //set the new index of all items of the quadrant
+        ArrayList<TaskItem> taskList = project.getTaskListForQuadrant(item.mQuadrantType);
+        int startIndex = item.mIndex;
+        if (startIndex < taskList.size()) {
+            for (int i = startIndex + 1; i < taskList.size(); i++) {
+                taskList.get(i).mIndex = taskList.get(i).mIndex - 1;
+                addToUpdate(taskList.get(i));
+            }
+        }
+
+        //remove the item
+        int indexToBeRemoved = Integer.valueOf(item.mPosition) - 1;
+        mTasks.remove(indexToBeRemoved);
+        //reassign the position to all the tasks
+        for (int i = indexToBeRemoved; i < mTasks.size(); i++) {
+            TaskItem taskItem = mTasks.get(i);
+            taskItem.mPosition = (i + 1) + "";
+            addToUpdate(taskItem);
+        }
+        TaskItem deletePlacehOlder = TaskItem.newBlankTaskItem();
+        deletePlacehOlder.mPosition = (mTasks.size() + 1) + "";
+        addToUpdate(deletePlacehOlder);
+        setTasks(mTasks);
     }
 
     public int getLastTaskPosition() {
@@ -361,25 +461,8 @@ public class DataStore {
         mUpdates.clear();
     }
 
-    public void clearUpdatedProjects() {
-        for (int i = 0; i < mUpdates.size(); i++) {
-            Object item = mUpdates.get(i);
-            if (item instanceof Project) {
-                mUpdates.remove(item);
-                i--;
-            }
-        }
-    }
-
-
-    public void clearUpdatedTaskItems() {
-        for (int i = 0; i < mUpdates.size(); i++) {
-            Object item = mUpdates.get(i);
-            if (item instanceof TaskItem) {
-                mUpdates.remove(item);
-                i--;
-            }
-        }
+    public void clearUpdatedItems(ArrayList items) {
+        mUpdates.removeAll(items);
     }
 
     ArrayList<Comparator<TaskItem>> mSortCompartor = new ArrayList() {{

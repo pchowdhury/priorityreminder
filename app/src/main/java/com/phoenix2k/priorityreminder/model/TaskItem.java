@@ -78,6 +78,12 @@ public class TaskItem {
         return item;
     }
 
+    public static TaskItem newBlankTaskItem() {
+        TaskItem item = new TaskItem();
+        item.mId = null;
+        return item;
+    }
+
 
     public static TaskItem getTaskItemFrom(List<Object> values) {
         if (values != null) {
@@ -183,8 +189,8 @@ public class TaskItem {
             json.put(Column.QUARTER.name(), mQuadrantType.ordinal());
             json.put(Column.DESCRIPTION.name(), mDescription);
             json.put(Column.ICON.name(), mIcon);
-            json.put(Column.STARTS_ON.name(), mStartTime+"");
-            json.put(Column.DUE_ON.name(), mDueTime+"");
+            json.put(Column.STARTS_ON.name(), mStartTime + "");
+            json.put(Column.DUE_ON.name(), mDueTime + "");
             json.put(Column.REPEAT.name(), mRepeatType.ordinal());
             json.put(Column.CREATED_ON.name(), mCreatedOn);
             json.put(Column.UPDATED_ON.name(), mUpdatedOn);
@@ -222,10 +228,10 @@ public class TaskItem {
                 taskItem.mIcon = json.getInt(Column.ICON.name());
             }
             if (json.has(Column.STARTS_ON.name())) {
-                taskItem.mStartTime =json.getLong(Column.STARTS_ON.name());
+                taskItem.mStartTime = json.getLong(Column.STARTS_ON.name());
             }
             if (json.has(Column.DUE_ON.name())) {
-                taskItem.mDueTime =json.getLong(Column.DUE_ON.name());
+                taskItem.mDueTime = json.getLong(Column.DUE_ON.name());
             }
             if (json.has(Column.REPEAT.name())) {
                 taskItem.mRepeatType = RepeatType.values()[json.getInt(Column.REPEAT.name())];

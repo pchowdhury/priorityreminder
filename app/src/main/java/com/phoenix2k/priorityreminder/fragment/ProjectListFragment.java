@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
@@ -44,6 +45,7 @@ public class ProjectListFragment extends BasicFragment {
     TextView mProgressTextView;
     private OnNavigationListener mOnNavigationListener;
     private ProjectsAdapter mAdapter;
+    private boolean mEditMode;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -127,6 +129,8 @@ public class ProjectListFragment extends BasicFragment {
             @Override
             public boolean onItemLongClicked(RecyclerView recyclerView, int position, View v) {
                 selectProject(position, false);
+                setEditMode(true);
+                mAdapter.notifyDataSetChanged();
                 if (mOnNavigationListener != null) {
                     mOnNavigationListener.onUpdateCurrentProject();
                 }
@@ -164,7 +168,15 @@ public class ProjectListFragment extends BasicFragment {
         }
     }
 
-    private static class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {
+    public boolean isEditMode() {
+        return mEditMode;
+    }
+
+    public void setEditMode(boolean mEditMode) {
+        this.mEditMode = mEditMode;
+    }
+
+    private class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {
         Context mContext;
         int mSelectedIndex = 0;
 
@@ -191,7 +203,7 @@ public class ProjectListFragment extends BasicFragment {
         public void onBindViewHolder(ProjectViewHolder projectViewHolder, int i) {
             Project project = DataStore.getInstance().getProjects().get(i);
             projectViewHolder.mNameTxt.setText(project.mTitle);
-
+            projectViewHolder.mImageView.setOnClickListener(mOnClickListener);
             if (i == mSelectedIndex) {
                 projectViewHolder.mLytRoot.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
                 projectViewHolder.mNameTxt.setTextColor(Color.WHITE);
@@ -199,25 +211,39 @@ public class ProjectListFragment extends BasicFragment {
                 projectViewHolder.mLytRoot.setBackgroundColor(Color.TRANSPARENT);
                 projectViewHolder.mNameTxt.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
             }
+            projectViewHolder.mImageView.setVisibility(isEditMode() && DataStore.getInstance().getCurrentProject() == DataStore.getInstance().getProjects().get(i) ? View.VISIBLE : View.INVISIBLE);
         }
 
         @Override
         public int getItemCount() {
             return DataStore.getInstance().getProjects().size();
         }
+
+        View.OnClickListener mOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnNavigationListener != null) {
+                    mOnNavigationListener.onDeleteProject();
+                }
+                setEditMode(false);
+                loadView();
+            }
+        };
     }
 
-    public static class ProjectViewHolder extends RecyclerView.ViewHolder {
+    public class ProjectViewHolder extends RecyclerView.ViewHolder {
 
         private final View mLytRoot;
 
         private final TextView mNameTxt;
 
+        private final ImageView mImageView;
 
         public ProjectViewHolder(View itemView) {
             super(itemView);
             mLytRoot = itemView.findViewById(R.id.lyt_root);
             mNameTxt = (TextView) itemView.findViewById(R.id.name);
+            mImageView = (ImageView) itemView.findViewById(R.id.delete);
         }
     }
 

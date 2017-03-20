@@ -40,48 +40,80 @@ public class SyncTask extends SpreadsheetTask {
     public Object getDataFromApi() {
         ArrayList<String> projectRanges = new ArrayList<>();
         ArrayList<String> taskRanges = new ArrayList<>();
+        ArrayList<String> projectClearRanges = new ArrayList<>();
+        ArrayList<String> taskClearRanges = new ArrayList<>();
         List<List<List<Object>>> projectData = new ArrayList<>();
         List<List<List<Object>>> taskData = new ArrayList<>();
-
-        for(Object obj : DataStore.getInstance().getUpdates()){
-            if(obj instanceof TaskItem){
-                final TaskItem taskItem = (TaskItem) obj;
-                int len = TaskItem.Column.values().length;
-                char ch = (char) (64 + len);
-                String range = "A" + taskItem.mPosition + ":" + ch;
-                taskRanges.add(range);
-                List<List<Object>> itemData =  TaskItem.getTaskItemWriteback(taskItem);
-                taskData.add(itemData);
-            }else{
+        ArrayList<Project> projectsToBeUpdated = new ArrayList<>();
+        ArrayList<TaskItem> tasksToBeUpdated = new ArrayList<>();
+        ArrayList<Project> projectsToBeCleared = new ArrayList<>();
+        ArrayList<TaskItem> tasksToBeCleared = new ArrayList<>();
+        for (Object obj : DataStore.getInstance().getUpdates()) {
+            if (obj instanceof Project) {
                 final Project project = (Project) obj;
                 int len = Project.Column.values().length;
                 char ch = (char) (64 + len);
                 String range = "A" + project.mPosition + ":" + ch;
-                projectRanges.add(range);
-                List<List<Object>> itemData =  Project.getProjectWriteback(project);
-                projectData.add(itemData);
+                if (project.mId == null) {
+                    projectsToBeCleared.add(project);
+                    projectClearRanges.add(range);
+                } else {
+                    projectsToBeUpdated.add(project);
+                    projectRanges.add(range);
+                    List<List<Object>> itemData = Project.getProjectWriteback(project);
+                    projectData.add(itemData);
+                }
+            } else {
+                final TaskItem taskItem = (TaskItem) obj;
+                int len = TaskItem.Column.values().length;
+                char ch = (char) (64 + len);
+                String range = "A" + taskItem.mPosition + ":" + ch;
+                if (taskItem.mId == null) {
+                    tasksToBeCleared.add(taskItem);
+                    taskClearRanges.add(range);
+                } else {
+                    tasksToBeUpdated.add(taskItem);
+                    taskRanges.add(range);
+                    List<List<Object>> itemData = TaskItem.getTaskItemWriteback(taskItem);
+                    taskData.add(itemData);
+                }
             }
         }
 
         Boolean isUpdatedProject = true;
         Boolean isUpdatedTasks = true;
-        if(projectRanges.size()>0) {
-             isUpdatedProject = updateMultipleItemsSheet(projectRanges, projectData, getProjectSpreadsheetId());
-            if(isUpdatedProject){
-                DataStore.getInstance().clearUpdatedProjects();
+        Boolean isClearProject = true;
+        Boolean isClearTaskItem = true;
+        if (projectRanges.size() > 0) {
+            isUpdatedProject = updateMultipleItemsSheet(projectRanges, projectData, getProjectSpreadsheetId());
+            if (isUpdatedProject) {
+                DataStore.getInstance().clearUpdatedItems(projectsToBeUpdated);
             }
         }
-        if(taskRanges.size()>0) {
-            isUpdatedTasks = updateMultipleItemsSheet(taskRanges, taskData, getDataSpreadsheetId());
-            if(isUpdatedTasks){
-                DataStore.getInstance().clearUpdatedTaskItems();
+        if (projectClearRanges.size() > 0) {
+            isClearProject = clearMultipleItemsSheet(projectClearRanges, getProjectSpreadsheetId());
+            if (isClearProject) {
+                DataStore.getInstance().clearUpdatedItems(projectsToBeUpdated);
             }
         }
 
-        if (!isUpdatedTasks || !isUpdatedTasks) {
+        if (taskRanges.size() > 0) {
+            isUpdatedTasks = updateMultipleItemsSheet(taskRanges, taskData, getDataSpreadsheetId());
+            if (isUpdatedTasks) {
+                DataStore.getInstance().clearUpdatedItems(tasksToBeUpdated);
+            }
+        }
+        if (taskClearRanges.size() > 0) {
+            isClearTaskItem = clearMultipleItemsSheet(taskClearRanges, getDataSpreadsheetId());
+            if (isClearTaskItem) {
+                DataStore.getInstance().clearUpdatedItems(tasksToBeCleared);
+            }
+        }
+
+        if (!isUpdatedTasks || !isUpdatedTasks || !isClearProject || !isClearTaskItem) {
             onDisplayInfo("Could not push updates");
         }
-        return (isUpdatedTasks && isUpdatedTasks);
+        return (isUpdatedTasks && isUpdatedTasks && isClearProject && isClearTaskItem);
     }
 
 }

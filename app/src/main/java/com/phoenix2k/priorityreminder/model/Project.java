@@ -91,6 +91,12 @@ public class Project {
         return project;
     }
 
+    public static Project newBlankProject() {
+        Project project = new Project();
+        project.mId = null;
+        return project;
+    }
+
     public void copyTo(Project project) {
         project.mId = mId;
         project.mPosition = mPosition;
@@ -191,6 +197,12 @@ public class Project {
                 i--;
             }
         }
+    }
+
+    public void removeAllTasks(){
+       for(TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()){
+           mQuadrants.get(quadrantType).clear();
+       }
     }
 
     public ArrayList<TaskItem> getTaskListForQuadrant(TaskItem.QuadrantType type) {
