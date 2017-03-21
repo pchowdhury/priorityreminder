@@ -1,19 +1,20 @@
 package com.phoenix2k.priorityreminder.view;
 
-import android.content.ClipData;
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.utils.LogUtils;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import butterknife.BindView;
@@ -25,7 +26,7 @@ import butterknife.ButterKnife;
 
 public class DraggableListView extends LinearLayout {
     @BindView(R.id.txtTitle)
-    TextView txtTitle;
+    TextView mTxtTitle;
     @BindView(R.id.listView)
     RecyclerView mListView;
     @BindView(R.id.lytSelector)
@@ -34,6 +35,7 @@ public class DraggableListView extends LinearLayout {
     View lytHeaderTopDivider;
     @BindView(R.id.lytLeftDivider)
     View lytLeftDivider;
+    private QuadrantListener mQuadrantListener;
 
     public DraggableListView(Context context) {
         super(context);
@@ -54,6 +56,64 @@ public class DraggableListView extends LinearLayout {
         inflate(getContext(), R.layout.draggable_list_view, this);
         ButterKnife.bind(this);
         mListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        final GestureDetectorCompat gDetector = new GestureDetectorCompat(getContext(), new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                return false;
+            }
+        });
+        gDetector.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                LogUtils.logI("DoubleTap", "DoubleTap");
+                if (getQuadrantListener() != null) {
+                    getQuadrantListener().onDoubleTapQuadrant(DraggableListView.this);
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent e) {
+                return false;
+            }
+        });
+
+        mTxtTitle.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gDetector.onTouchEvent(event);
+            }
+        });
     }
 
     public void showTopDivider(boolean show) {
@@ -65,11 +125,11 @@ public class DraggableListView extends LinearLayout {
     }
 
     public void setHeader(String header) {
-        txtTitle.setText(header);
+        mTxtTitle.setText(header);
     }
 
     public void setHeaderColor(int color) {
-        txtTitle.setBackgroundColor(color);
+        mTxtTitle.setBackgroundColor(color);
     }
 
     public void setAdapter(TaskListAdapter adapter) {
@@ -77,6 +137,18 @@ public class DraggableListView extends LinearLayout {
     }
 
     public TaskItem getTaskItemPlaceholder() {
-        return ((TaskListAdapter)mListView.getAdapter()).getTaskItemPlaceholder();
+        return ((TaskListAdapter) mListView.getAdapter()).getTaskItemPlaceholder();
+    }
+
+    public QuadrantListener getQuadrantListener() {
+        return mQuadrantListener;
+    }
+
+    public void setQuadrantListener(QuadrantListener mQuadrantListener) {
+        this.mQuadrantListener = mQuadrantListener;
+    }
+
+    public interface QuadrantListener {
+        void onDoubleTapQuadrant(View v);
     }
 }

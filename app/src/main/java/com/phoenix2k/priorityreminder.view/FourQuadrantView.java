@@ -20,17 +20,19 @@ import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.phoenix2k.priorityreminder.R.id.imgAnchor;
+
 /**
  * Created by Pushpan on 08/02/17.
  */
 
-public class FourQuadrantView extends FrameLayout implements View.OnTouchListener {
+public class FourQuadrantView extends FrameLayout implements View.OnTouchListener, DraggableListView.QuadrantListener {
 
     @BindView(R.id.lyt_slider_left)
     View mSliderLeftView;
     @BindView(R.id.lyt_slider_right)
     View mSliderRightView;
-    @BindView(R.id.imgAnchor)
+    @BindView(imgAnchor)
     View mImgAnchor;
 
     private GestureDetector mGestureDetector;
@@ -44,6 +46,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
     private float mLastY = 0f;
     private boolean mDragEnabled = false;
     private boolean mShouldSave = false;
+    private boolean mDoubleTapLock;
 
     public FourQuadrantView(Context context) {
         super(context);
@@ -73,6 +76,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         int[] listViewResID = {R.id.listQuad1, R.id.listQuad2, R.id.listQuad3, R.id.listQuad4};
         for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
             mQuadrant[type.ordinal()] = (DraggableListView) findViewById(listViewResID[type.ordinal()]);
+            mQuadrant[type.ordinal()].setQuadrantListener(this);
 //            mQuadrant[type.ordinal()].setOnDragListener(DataStore.getInstance().getDragListener());
             mTaskListAdapter[type.ordinal()] = new TaskListAdapter(getContext(),
                     mQuadrant[type.ordinal()].mListView, type);
@@ -189,7 +193,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         }, 100);
     }
 
-    public void loadView(){
+    public void loadView() {
         Project project = DataStore.getInstance().getCurrentProject();
         if (project != null) {
             for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
@@ -301,6 +305,40 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         }
     }
 
+    public boolean isDoubleTapLock() {
+        return mDoubleTapLock;
+    }
+
+    @Override
+    public void onDoubleTapQuadrant(View v) {
+        mDoubleTapLock = !mDoubleTapLock;
+        if (isDoubleTapLock()) {
+            switch (v.getId()) {
+                case R.id.listQuad1:
+                    mAnchorX = getWidth() - mImgAnchor.getWidth() / 3;
+                    mAnchorY = getHeight() - mImgAnchor.getHeight() / 3;
+                    break;
+                case R.id.listQuad2:
+                    mAnchorX = mImgAnchor.getWidth() / 3;
+                    mAnchorY = getHeight() - mImgAnchor.getHeight() / 3;
+                    break;
+                case R.id.listQuad3:
+                    mAnchorX = getWidth() - mImgAnchor.getWidth() / 3;
+                    mAnchorY = mImgAnchor.getHeight() / 3;
+
+                    break;
+                case R.id.listQuad4:
+                    mAnchorX = mImgAnchor.getWidth() / 3;
+                    mAnchorY = mImgAnchor.getHeight() / 3;
+                    break;
+            }
+        } else {
+            mAnchorX = getWidth() / 2;
+            mAnchorY = getHeight() / 2;
+        }
+        adjustPosition();
+    }
+
     class QuadrantGestureDetector extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -331,7 +369,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            return false;//checkForExpandList(e);
+            return true;
         }
 
         @Override
@@ -341,5 +379,35 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         }
 
     }
+
+//    public void checkForExpandList() {
+//        mDoubleTapLock = !mDoubleTapLock;
+//        if (isDoubleTapLock()) {
+//            switch (v.getId()) {
+//                case R.id.listQuad1:
+//                    anchorX = getWidth() - imgAnchor.getWidth() / 3;
+//                    anchorY = getHeight() - imgAnchor.getHeight() / 3;
+//                    break;
+//                case R.id.listQuad2:
+//                    anchorX = imgAnchor.getWidth() / 3;
+//                    anchorY = getHeight() - imgAnchor.getHeight() / 3;
+//                    break;
+//                case R.id.listQuad3:
+//                    anchorX = getWidth() - imgAnchor.getWidth() / 3;
+//                    anchorY = imgAnchor.getHeight() / 3;
+//
+//                    break;
+//                case R.id.listQuad4:
+//                    anchorX = imgAnchor.getWidth() / 3;
+//                    anchorY = imgAnchor.getHeight() / 3;
+//                    break;
+//            }
+//        } else {
+//            anchorX = getWidth() / 2;
+//            anchorY = getHeight() / 2;
+//        }
+//        adjustPosition();
+//    }
+
 
 }
