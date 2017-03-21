@@ -27,7 +27,6 @@ import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
-import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
