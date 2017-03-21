@@ -76,6 +76,12 @@ public class DataStore {
         return mInstance;
     }
 
+    public static void deInit(){
+        mInstance.mProjects.clear();
+        mInstance.mTasks.clear();
+        mInstance = null;
+    }
+
     public void setProjects(ArrayList<Project> projects) {
         this.mProjects = projects;
         mProjectsMap.clear();
@@ -167,7 +173,7 @@ public class DataStore {
 
     public void deleteProject() {
         Project project = getCurrentProject();
-        //set the new index of all projects of the quadrant
+        //set the new index of all projects
         ArrayList<Project> sortedProjects = new ArrayList<>(mProjects);
         Collections.sort(sortedProjects, new Comparator<Project>() {
             @Override
@@ -225,6 +231,7 @@ public class DataStore {
             item.mPosition = deletePosition + "";
             addToUpdate(item);
         }
+        setProjects(mProjects);
         setTasks(mTasks);
         if (mCurrentProjectIndex >= mProjects.size()) {
             mCurrentProjectIndex--;

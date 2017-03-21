@@ -252,6 +252,10 @@ public class AddProjectFragment extends Fragment {
         }
     }
 
+    public void onDeleteCurrentProject(){
+        mEditBackup = null;
+    }
+
     private boolean isExpanded() {
         return mLytAddProject.getVisibility() == View.GONE;
     }

@@ -118,7 +118,10 @@ public class ProjectListFragment extends BasicFragment {
 
     @Override
     public void loadView() {
+        mListView.setAdapter(null);
+        mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new ProjectsAdapter(getActivity());
+        mListView.setAdapter(mAdapter);
         RecyclerItemClickSupport.addTo(mListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -137,9 +140,13 @@ public class ProjectListFragment extends BasicFragment {
                 return false;
             }
         });
-        mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mListView.setAdapter(mAdapter);
-        selectProject(DataStore.getInstance().getCurrentProjectIndex(), true);
+        mListView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                selectProject(DataStore.getInstance().getCurrentProjectIndex(), true);
+            }
+        },100);
+
     }
 
     private void selectProject(int position, boolean closeDrawer) {
@@ -187,8 +194,13 @@ public class ProjectListFragment extends BasicFragment {
         public void setSelected(int position) {
             int previousItem = mSelectedIndex;
             mSelectedIndex = position;
-            notifyItemChanged(previousItem);
-            notifyItemChanged(position);
+            notifyDataSetChanged();
+//            if (previousItem < getItemCount()) {
+//                notifyItemChanged(previousItem);
+//            }
+//            if (position < getItemCount()) {
+//                notifyItemChanged(position);
+//            }
         }
 
         @Override

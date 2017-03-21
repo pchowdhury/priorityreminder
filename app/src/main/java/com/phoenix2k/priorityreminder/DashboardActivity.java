@@ -177,6 +177,7 @@ public class DashboardActivity extends BasicCommunicationActivity
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 IDGenerator.deInit();
+                DataStore.deInit();
                 finish();
             }
         });
@@ -288,8 +289,12 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public void onDeleteProject() {
-       DataStore.getInstance().deleteProject();
+        DataStore.getInstance().deleteProject();
         SyncManager.getInstance().startSync(this, getUserCredentials());
+        AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+        if (fragment != null) {
+            fragment.onDeleteCurrentProject();
+        }
     }
 
     @Override
