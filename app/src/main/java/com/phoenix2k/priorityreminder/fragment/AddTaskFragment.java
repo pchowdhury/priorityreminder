@@ -120,7 +120,7 @@ public class AddTaskFragment extends Fragment {
             mProjectTitle.setText(project.mTitle);
             TaskItem taskItem;
             Long taskId = getTaskId();
-            if (taskId != null) {
+            if (taskId != null && taskId != -1) {
                 taskItem = DataStore.getInstance().getTaskItemWithId(taskId);
                 mTaskIndexBackup = taskItem.mIndex;
                 mTaskQuadrantBackup = taskItem.mQuadrantType;
@@ -259,7 +259,7 @@ public class AddTaskFragment extends Fragment {
         Project project = DataStore.getInstance().getCurrentProject();
         TaskItem item = DataStore.getInstance().getCurrentTaskItem();
         if (project != null && item != null) {
-            if (getTaskId() != null && (item.mQuadrantType == mTaskQuadrantBackup)) {//editing
+            if (getTaskId() != null && getTaskId() != -1 && (item.mQuadrantType == mTaskQuadrantBackup)) {//editing
                 item.mIndex = mTaskIndexBackup;
             } else {//new task
                 item.mIndex = project.getTaskListForQuadrant(item.mQuadrantType).size();
@@ -304,7 +304,7 @@ public class AddTaskFragment extends Fragment {
         KeyboardUtils.hideKeyboard(getActivity());
         TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
         SyncManager.getInstance().addToUpdates(updatedItem);
-        if (getTaskId() != null) {//edited
+        if (getTaskId() != null && getTaskId() != -1) {//edited
             if (updatedItem.mQuadrantType != mTaskQuadrantBackup) {
                 //quadrant is changed so need to delete from the quadrant
                 Project project = DataStore.getInstance().getCurrentProject();

@@ -229,7 +229,6 @@ public class TaskItem extends PREntity{
 
     public static ContentValues getTaskItemContentValues(TaskItem taskItem) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(Column.ID.name(), taskItem.mId);
         contentValues.put(Column.PROJECT_ID.name(), taskItem.mProjectId);
         contentValues.put(Column.TITLE.name(), taskItem.mTitle);
         contentValues.put(Column.ITEM_INDEX.name(), taskItem.mIndex);
@@ -247,6 +246,7 @@ public class TaskItem extends PREntity{
     public static TaskItem readTaskItemFromCursor(Cursor cursor) {
         TaskItem item = new TaskItem();
         item.mId = cursor.getLong(cursor.getColumnIndex(Column.ID.name()));
+        item.mProjectId = cursor.getLong(cursor.getColumnIndex(Column.PROJECT_ID.name()));
         item.mTitle = cursor.getString(cursor.getColumnIndex(Column.TITLE.name()));
         item.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ITEM_INDEX.name()));
         item.mDescription = cursor.getString(cursor.getColumnIndex(Column.DESCRIPTION.name()));

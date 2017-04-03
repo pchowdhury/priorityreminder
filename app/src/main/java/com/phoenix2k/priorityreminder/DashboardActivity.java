@@ -35,8 +35,6 @@ import com.phoenix2k.priorityreminder.view.DraggableListView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +55,7 @@ public class DashboardActivity extends BasicCommunicationActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openTaskDetails(null);
+                openTaskDetails(Long.valueOf(-1));
             }
         });
 
