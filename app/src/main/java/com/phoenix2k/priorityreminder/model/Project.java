@@ -1,13 +1,13 @@
 package com.phoenix2k.priorityreminder.model;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
 
-import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
-import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,13 +20,13 @@ import java.util.List;
  * Created by Pushpan on 06/02/17.
  */
 
-public class Project {
+public class Project extends PREntity{
+    public static final String TAG = "Project";
 
     public enum Column {
         ID,
-        POSITION,
         TITLE,
-        INDEX,
+        ITEM_INDEX,
         TYPE,
         Q1_TITLE,
         Q2_TITLE,
@@ -46,16 +46,10 @@ public class Project {
         State
     }
 
-    public String mId;
-    public String mPosition;
-    public String mTitle;
-    public int mIndex;
     public HashMap<TaskItem.QuadrantType, String> mTitleQuadrants = new HashMap<>();
     public HashMap<TaskItem.QuadrantType, Integer> mColorQuadrants = new HashMap<>();
     public ProjectType mProjectType = ProjectType.Simple;
     public Point mCenterInPercent = new Point();
-    public long mCreatedOn;
-    public long mUpdatedOn;
 
     private HashMap<TaskItem.QuadrantType, ArrayList<TaskItem>> mQuadrants = new HashMap<>();
 
@@ -68,13 +62,8 @@ public class Project {
 
     public static Project newProject(Context context) {
         Project project = new Project();
-        project.mId = IDGenerator.generateUniqueId() + "";
-        project.mPosition = DataStore.getInstance().getLastProjectPosition() + 1 + "";
-        project.mTitle = "";
-        project.mIndex = 0;
+        project.mTitle = "Demo";
         project.mProjectType = ProjectType.Simple;
-        project.mCreatedOn = IDGenerator.generateUniqueId();
-        project.mUpdatedOn = project.mCreatedOn;
         project.mCenterInPercent.x = project.mCenterInPercent.y = 50;
         project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, context.getString(R.string.lbl_title_quadrant1));
         project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, context.getString(R.string.lbl_title_quadrant2));
@@ -98,13 +87,8 @@ public class Project {
     }
 
     public void copyTo(Project project) {
-        project.mId = mId;
-        project.mPosition = mPosition;
-        project.mTitle = mTitle;
-        project.mIndex = mIndex;
+        super.copyTo(project);
         project.mProjectType = mProjectType;
-        project.mCreatedOn = mCreatedOn;
-        project.mUpdatedOn = mCreatedOn;
         project.mCenterInPercent.x = mCenterInPercent.x;
         project.mCenterInPercent.y = mCenterInPercent.y;
         project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, mTitleQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
@@ -128,15 +112,12 @@ public class Project {
                 String value = (String) values.get(i);
                 switch (Column.values()[i]) {
                     case ID:
-                        project.mId = value;
-                        break;
-                    case POSITION:
-                        project.mPosition = value;
+                        project.mId = Long.valueOf(value);
                         break;
                     case TITLE:
                         project.mTitle = value;
                         break;
-                    case INDEX:
+                    case ITEM_INDEX:
                         project.mIndex = DataUtils.parseIntValue(value);
                         break;
                     case TYPE:
@@ -191,7 +172,7 @@ public class Project {
     public void addfromTaskList(ArrayList<TaskItem> list) {
         for (int i = 0; i < list.size(); i++) {
             TaskItem item = list.get(i);
-            if (item.mProjectId.equalsIgnoreCase(mId)) {
+            if (item.mProjectId.equals(mId)) {
                 mQuadrants.get(item.mQuadrantType).add(item);
                 list.remove(item);
                 i--;
@@ -199,10 +180,18 @@ public class Project {
         }
     }
 
-    public void removeAllTasks(){
-       for(TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()){
-           mQuadrants.get(quadrantType).clear();
-       }
+    public void removeAllTasks() {
+        for (TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()) {
+            mQuadrants.get(quadrantType).clear();
+        }
+    }
+
+    public ArrayList<TaskItem> getAllTasks() {
+        ArrayList<TaskItem> tasks = new ArrayList<>();
+        for (TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()) {
+            tasks.addAll(mQuadrants.get(quadrantType));
+        }
+        return tasks;
     }
 
     public ArrayList<TaskItem> getTaskListForQuadrant(TaskItem.QuadrantType type) {
@@ -213,7 +202,6 @@ public class Project {
         List<List<Object>> values = new ArrayList<>();
         ArrayList<Object> projectValues = new ArrayList() {{
             add(project.mId + "");
-            add(project.mPosition + "");
             add(project.mTitle + "");
             add(project.mIndex + "");
             add(project.mProjectType.ordinal() + "");
@@ -237,7 +225,6 @@ public class Project {
     public String toString() {
         return
                 "{\nId:" + mId +
-                        "\nmPosition:" + mPosition +
                         "\nmTitle:" + mTitle +
                         "\nmIndex:" + mIndex +
                         "\nmProjectType:" + mProjectType.name() +
@@ -254,9 +241,8 @@ public class Project {
         JSONObject json = new JSONObject();
         try {
             json.put(Column.ID.name(), mId);
-            json.put(Column.POSITION.name(), mPosition);
             json.put(Column.TITLE.name(), mTitle);
-            json.put(Column.INDEX.name(), mIndex);
+            json.put(Column.ITEM_INDEX.name(), mIndex);
             json.put(Column.TYPE.name(), mProjectType.ordinal());
             json.put(Column.Q1_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
             json.put(Column.Q2_COLOR.name(), mColorQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
@@ -279,16 +265,13 @@ public class Project {
         Project project = new Project();
         try {
             if (json.has(Project.Column.ID.name())) {
-                project.mId = json.getString(Project.Column.ID.name());
-            }
-            if (json.has(Project.Column.POSITION.name())) {
-                project.mPosition = json.getString(Project.Column.POSITION.name());
+                project.mId = json.getLong(Project.Column.ID.name());
             }
             if (json.has(Project.Column.TITLE.name())) {
                 project.mTitle = json.getString(Project.Column.TITLE.name());
             }
-            if (json.has(Project.Column.INDEX.name())) {
-                project.mIndex = json.getInt(Project.Column.INDEX.name());
+            if (json.has(Project.Column.ITEM_INDEX.name())) {
+                project.mIndex = json.getInt(Project.Column.ITEM_INDEX.name());
             }
             if (json.has(Column.TYPE.name())) {
                 project.mProjectType = ProjectType.values()[json.getInt(Column.TYPE.name())];
@@ -333,5 +316,56 @@ public class Project {
             e.printStackTrace();
         }
         return project;
+    }
+
+    public static ContentValues getProjectContentValues(Project project) {
+        ContentValues contentValues = new ContentValues();
+//        contentValues.put(Project.Column.ID.name(), project.mId);
+        contentValues.put(Project.Column.TITLE.name(), project.mTitle);
+        contentValues.put(Project.Column.ITEM_INDEX.name(), project.mIndex);
+        contentValues.put(Project.Column.TYPE.name(), project.mProjectType.ordinal());
+        contentValues.put(Project.Column.Q1_TITLE.name(), project.mTitleQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING));
+        contentValues.put(Project.Column.Q2_TITLE.name(), project.mTitleQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE));
+        contentValues.put(Project.Column.Q3_TITLE.name(), project.mTitleQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS));
+        contentValues.put(Project.Column.Q4_TITLE.name(), project.mTitleQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED));
+        contentValues.put(Project.Column.Q1_COLOR.name(), project.mColorQuadrants.get(TaskItem.QuadrantType.Q1_OR_UPCOMING) + "");
+        contentValues.put(Project.Column.Q2_COLOR.name(), project.mColorQuadrants.get(TaskItem.QuadrantType.Q2_OR_DUE) + "");
+        contentValues.put(Project.Column.Q3_COLOR.name(), project.mColorQuadrants.get(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS) + "");
+        contentValues.put(Project.Column.Q4_COLOR.name(), project.mColorQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED) + "");
+        contentValues.put(Project.Column.CENTER_IN_PERCENT.name(), project.mCenterInPercent.x + "," + project.mCenterInPercent.y);
+        contentValues.put(Project.Column.CREATED_ON.name(), project.mCreatedOn);
+        contentValues.put(Project.Column.UPDATED_ON.name(), project.mUpdatedOn);
+        return contentValues;
+    }
+
+    public static Project readProjectFromCursor(Cursor cursor) {
+        Project project = new Project();
+        project.mId = cursor.getLong(cursor.getColumnIndex(Column.ID.name()));
+        project.mTitle = cursor.getString(cursor.getColumnIndex(Column.TITLE.name()));
+        project.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ID.name()));
+        project.mProjectType = ProjectType.values()[cursor.getInt(cursor.getColumnIndex(Column.TYPE.name()))];
+        project.mCreatedOn = cursor.getLong(cursor.getColumnIndex(Column.CREATED_ON.name()));
+        project.mUpdatedOn = cursor.getLong(cursor.getColumnIndex(Column.UPDATED_ON.name()));
+
+        String centre = cursor.getString(cursor.getColumnIndex(Project.Column.CENTER_IN_PERCENT.name()));
+        String[] points = centre.split(",");
+        project.mCenterInPercent.x = DataUtils.parseIntValue(points[0]);
+        project.mCenterInPercent.y = DataUtils.parseIntValue(points[1]);
+
+        project.mCenterInPercent.x = project.mCenterInPercent.y = 50;
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, cursor.getString(cursor.getColumnIndex(Column.Q1_TITLE.name())));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, cursor.getString(cursor.getColumnIndex(Column.Q2_TITLE.name())));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, cursor.getString(cursor.getColumnIndex(Column.Q3_TITLE.name())));
+        project.mTitleQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, cursor.getString(cursor.getColumnIndex(Column.Q4_TITLE.name())));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, cursor.getInt(cursor.getColumnIndex(Column.Q1_COLOR.name())));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, cursor.getInt(cursor.getColumnIndex(Column.Q2_COLOR.name())));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, cursor.getInt(cursor.getColumnIndex(Column.Q3_COLOR.name())));
+        project.mColorQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, cursor.getInt(cursor.getColumnIndex(Column.Q4_COLOR.name())));
+        project.mQuadrants.put(TaskItem.QuadrantType.Q1_OR_UPCOMING, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, new ArrayList<TaskItem>());
+        project.mQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, new ArrayList<TaskItem>());
+        return project;
+
     }
 }

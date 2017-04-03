@@ -53,7 +53,8 @@ public class SyncTask extends SpreadsheetTask {
                 final Project project = (Project) obj;
                 int len = Project.Column.values().length;
                 char ch = (char) (64 + len);
-                String range = "A" + project.mPosition + ":" + ch;
+//                String range = "A" + project.mPosition + ":" + ch;
+                String range = "A" + ":" + ch;
                 if (project.mId == null) {
                     projectsToBeCleared.add(project);
                     projectClearRanges.add(range);
@@ -67,7 +68,8 @@ public class SyncTask extends SpreadsheetTask {
                 final TaskItem taskItem = (TaskItem) obj;
                 int len = TaskItem.Column.values().length;
                 char ch = (char) (64 + len);
-                String range = "A" + taskItem.mPosition + ":" + ch;
+//                String range = "A" + taskItem.mPosition + ":" + ch;
+                String range = "A" + ":" + ch;
                 if (taskItem.mId == null) {
                     tasksToBeCleared.add(taskItem);
                     taskClearRanges.add(range);

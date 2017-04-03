@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,11 +28,13 @@ import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.store.SQLDataStore;
 import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -94,8 +97,7 @@ public class DashboardActivity extends BasicCommunicationActivity
 //                        v.setBackgroundColor(getListColor());
                         v.setBackgroundColor(color);
                         DataStore.getInstance().moveTaskItem(draggedTtem, draggedOverItem);
-                        reloadDashboard(true);
-                        SyncManager.getInstance().startSync(DashboardActivity.this, getUserCredentials());
+                        reloadDashboard();
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
                         v.setBackgroundColor(color);
@@ -104,7 +106,8 @@ public class DashboardActivity extends BasicCommunicationActivity
                 return false;
             }
         };
-
+        SQLDataStore.init(this);
+        loadIconsInDataStore();
         DataStore.getInstance().setDragListener(listener);
         validateInitialization();
     }
@@ -113,33 +116,34 @@ public class DashboardActivity extends BasicCommunicationActivity
      * Wait till the IDGenerator is initialized
      */
     private void validateInitialization() {
-        showProgress(true);
-        final Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (IDGenerator.isInitialized()) {
-                    timer.cancel();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            finishInitialization();
-                        }
-                    });
-                } else {
-                    if (IDGenerator.hasError()) {
-                        timer.cancel();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showProgress(false);
-                                showFatalErrorDialog();
-                            }
-                        });
-                    }
-                }
-            }
-        }, 0, 500);
+        finishInitialization();
+//        showProgress(true);
+//        final Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (IDGenerator.isInitialized()) {
+//                    timer.cancel();
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            finishInitialization();
+//                        }
+//                    });
+//                } else {
+//                    if (IDGenerator.hasError()) {
+//                        timer.cancel();
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                showProgress(false);
+//                                showFatalErrorDialog();
+//                            }
+//                        });
+//                    }
+//                }
+//            }
+//        }, 0, 500);
     }
 
     private void showFatalErrorDialog() {
@@ -250,6 +254,7 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public boolean onProjectSelected(Project project, boolean closeSlider) {
+        cancelProjectEdit();
         DataStore.getInstance().setCurrentProject(project);
         if (getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG) == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -260,8 +265,7 @@ public class DashboardActivity extends BasicCommunicationActivity
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
         }
-        cancelProjectEdit();
-        reloadDashboard(false);
+        reloadDashboard();
         return true;
     }
 
@@ -289,7 +293,7 @@ public class DashboardActivity extends BasicCommunicationActivity
     @Override
     public void onDeleteProject() {
         DataStore.getInstance().deleteProject();
-        SyncManager.getInstance().startSync(this, getUserCredentials());
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
         AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
         if (fragment != null) {
             fragment.onDeleteCurrentProject();
@@ -323,9 +327,9 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public void onNewProjectAdded() {
-        SyncManager.getInstance().startSync(this, getUserCredentials());
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
         reloadProjectList();
-        reloadDashboard(false);
+        reloadDashboard();
     }
 
     @Override
@@ -342,19 +346,23 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     @Override
     public void onTaskUpdated() {
-        SyncManager.getInstance().startSync(this, getUserCredentials());
-        reloadDashboard(true);
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
+        reloadDashboard();
         onSelectBack();
     }
 
-    private void reloadDashboard(boolean refreshOnly) {
+    @Override
+    public void onCancelEdit() {
+        ProjectListFragment fragment = (ProjectListFragment) getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG);
+        if (fragment != null) {
+            fragment.setEditMode(false);
+        }
+    }
+
+    private void reloadDashboard() {
         FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
         if (fragment != null) {
-            if (refreshOnly) {
                 fragment.loadView();
-            } else {
-                fragment.loadData();
-            }
         }
     }
 
@@ -380,7 +388,7 @@ public class DashboardActivity extends BasicCommunicationActivity
 
     }
 
-    private void openTaskDetails(String id) {
+    private void openTaskDetails(Long id) {
         AddTaskFragment fragment = AddTaskFragment.getInstance(id);
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }
@@ -390,8 +398,8 @@ public class DashboardActivity extends BasicCommunicationActivity
         public void onReceive(Context context, Intent intent) {
             DataStore.getInstance().validateTaskStatus();
             DataStore.getInstance().setUpNotifications();
-            SyncManager.getInstance().startSync(DashboardActivity.this, getUserCredentials());
-            reloadDashboard(true);
+            SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
+            reloadDashboard();
         }
     };
 
@@ -407,5 +415,20 @@ public class DashboardActivity extends BasicCommunicationActivity
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mNotificationBroadcastReceiver);
+    }
+
+    private void loadIconsInDataStore() {
+        ArrayList<Integer> list = new ArrayList<>();
+        TypedArray ar = getResources().obtainTypedArray(R.array.icon_name_array);
+        int len = ar.length();
+        for (int i = 0; i < len; i++) {
+            String resname = ar.getString(i);
+            String iconName = resname.replace("128.png", "");
+            int resID = getResources().getIdentifier(iconName, "drawable",
+                    getPackageName());
+            list.add(resID);
+        }
+        DataStore.getInstance().setIconResourceIdList(list);
+        ar.recycle();
     }
 }

@@ -1,12 +1,15 @@
 package com.phoenix2k.priorityreminder;
 
+import android.content.Context;
 import android.view.View;
 
 import com.phoenix2k.priorityreminder.manager.PRNotificationManager;
+import com.phoenix2k.priorityreminder.model.PREntity;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.receiver.AlarmReceiver;
+import com.phoenix2k.priorityreminder.store.SQLDataStore;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
@@ -35,7 +38,7 @@ public class DataStore {
     private Project mCurrentProject;
     private TaskItem mCurrentTaskItem;
     private View.OnDragListener mDragListener;
-    private HashMap<String, Project> mProjectsMap = new HashMap<>();
+    private HashMap<Long, Project> mProjectsMap = new HashMap<>();
     private ArrayList<Object> mUpdates = new ArrayList<>();
     private SortType mSortType = Index;
     private int mCurrentProjectIndex = 0;
@@ -76,7 +79,7 @@ public class DataStore {
         return mInstance;
     }
 
-    public static void deInit(){
+    public static void deInit() {
         mInstance.mProjects.clear();
         mInstance.mTasks.clear();
         mInstance = null;
@@ -98,7 +101,6 @@ public class DataStore {
         mNewProject = project;
         if (mNewProject != null) {
             mNewProject.mIndex = getLastProjectIndex() + 1;
-            mNewProject.mPosition = getLastProjectPosition() + 1 + "";
         }
     }
 
@@ -108,20 +110,20 @@ public class DataStore {
 
     public void confirmSaveProject() {
         if (mNewProject != null) {
-            getProjects().add(mNewProject);
             setCurrentProject(mNewProject);
             mNewProject = null;
-            mCurrentProjectIndex = mProjects.size() - 1;
         }
-    }
-
-    public int getLastProjectPosition() {
-        return mProjects.size();
+        addToUpdate(getCurrentProject());
+        SQLDataStore.getInstance().updateItems(mUpdates);
+        setProjects(SQLDataStore.getInstance().getAllProjects());
+        mCurrentProjectIndex = mProjects.size() - 1;
     }
 
     public int getLastProjectIndex() {
-        if (mProjects.size() > 0) {
-            return mProjects.get(mProjects.size() - 1).mIndex;
+        ArrayList<Project> projects = new ArrayList<>(mProjects);
+        Collections.sort(projects, mSortCompartor.get(SortType.Index.ordinal()));
+        if (projects.size() > 0) {
+            return projects.get(projects.size() - 1).mIndex;
         } else {
             return -1;
         }
@@ -151,8 +153,8 @@ public class DataStore {
         return mTasks;
     }
 
-    public void setTasks(ArrayList<TaskItem> mTasks) {
-        this.mTasks = mTasks;
+    public void setTasks(ArrayList<TaskItem> tasks) {
+        this.mTasks = tasks;
         ArrayList<TaskItem> values = new ArrayList<>(mTasks);
         for (Project project : getProjects()) {
             project.removeAllTasks();
@@ -175,12 +177,7 @@ public class DataStore {
         Project project = getCurrentProject();
         //set the new index of all projects
         ArrayList<Project> sortedProjects = new ArrayList<>(mProjects);
-        Collections.sort(sortedProjects, new Comparator<Project>() {
-            @Override
-            public int compare(Project o1, Project o2) {
-                return new Integer(o1.mIndex).compareTo(new Integer(o2.mIndex));
-            }
-        });
+        Collections.sort(sortedProjects, mSortCompartor.get(SortType.Index.ordinal()));
 
         int startIndex = project.mIndex;
         if (startIndex < sortedProjects.size()) {
@@ -189,46 +186,16 @@ public class DataStore {
                 addToUpdate(sortedProjects.get(i));
             }
         }
-
         //remove the item
-        int indexToBeRemoved = Integer.valueOf(project.mPosition) - 1;
-        mProjects.remove(indexToBeRemoved);
-        //reassign the position to all the tasks
-        for (int i = indexToBeRemoved; i < mProjects.size(); i++) {
-            Project currentProject = mProjects.get(i);
-            currentProject.mPosition = (i + 1) + "";
-            addToUpdate(currentProject);
-        }
-        Project deletePlacehOlder = Project.newBlankProject();
-        deletePlacehOlder.mPosition = (mProjects.size() + 1) + "";
-        addToUpdate(deletePlacehOlder);
-        int deletedItemCount = 0;
-        int firstItemIndex = -1;
+        mProjects.remove(project);
+        project.mMarkDeleted = true;
+        addToUpdate(project);
         //Delete all tasks inside project
-        for (int i = 0; i < mTasks.size(); i++) {
-            TaskItem item = mTasks.get(i);
-            if (item.mProjectId.equalsIgnoreCase(project.mId)) {
-                if (firstItemIndex == -1) {
-                    firstItemIndex = i;
-                }
-                mTasks.remove(item);
-                i--;
-                deletedItemCount++;
-            }
-        }
-
-        //reposition all tasks
-        for (int i = firstItemIndex; (i > -1 && i < mTasks.size()); i++) {
-            TaskItem item = mTasks.get(i);
-            item.mPosition = i + 1 + "";
-            addToUpdate(item);
-        }
-
-        //clear number of rows reduced
-        for (int i = 1; i <= deletedItemCount; i++) {
-            int deletePosition = mTasks.size() + i;
-            TaskItem item = TaskItem.newBlankTaskItem();
-            item.mPosition = deletePosition + "";
+        ArrayList<TaskItem> tasksTobeDeleted = project.getAllTasks();
+        for (int i = 0; i < tasksTobeDeleted.size(); i++) {
+            TaskItem item = tasksTobeDeleted.get(i);
+            mTasks.remove(item);
+            item.mMarkDeleted = true;
             addToUpdate(item);
         }
         setProjects(mProjects);
@@ -252,19 +219,10 @@ public class DataStore {
                 addToUpdate(taskList.get(i));
             }
         }
-
         //remove the item
-        int indexToBeRemoved = Integer.valueOf(item.mPosition) - 1;
-        mTasks.remove(indexToBeRemoved);
-        //reassign the position to all the tasks
-        for (int i = indexToBeRemoved; i < mTasks.size(); i++) {
-            TaskItem taskItem = mTasks.get(i);
-            taskItem.mPosition = (i + 1) + "";
-            addToUpdate(taskItem);
-        }
-        TaskItem deletePlacehOlder = TaskItem.newBlankTaskItem();
-        deletePlacehOlder.mPosition = (mTasks.size() + 1) + "";
-        addToUpdate(deletePlacehOlder);
+        mTasks.remove(item);
+        item.mMarkDeleted = true;
+        addToUpdate(item);
         setTasks(mTasks);
     }
 
@@ -318,7 +276,7 @@ public class DataStore {
     }
 
 
-    public TaskItem getTaskItemWithId(String taskId) {
+    public TaskItem getTaskItemWithId(Long taskId) {
         for (TaskItem.QuadrantType quadrantType : TaskItem.QuadrantType.values()) {
             ArrayList<TaskItem> items = mCurrentProject.getTaskListForQuadrant(quadrantType);
             for (TaskItem task : items) {
@@ -396,6 +354,7 @@ public class DataStore {
                 Collections.sort(taskList, mSortCompartor.get(mSortType.ordinal()));
             }
         }
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
     }
 
     /**
@@ -472,26 +431,34 @@ public class DataStore {
         mUpdates.removeAll(items);
     }
 
-    ArrayList<Comparator<TaskItem>> mSortCompartor = new ArrayList() {{
-        add(new Comparator<TaskItem>() {
+    ArrayList<Comparator<PREntity>> mSortCompartor = new ArrayList() {{
+        add(new Comparator<PREntity>() {
             @Override
-            public int compare(TaskItem o1, TaskItem o2) {
+            public int compare(PREntity o1, PREntity o2) {
                 return new Integer(o1.mIndex).compareTo(new Integer(o2.mIndex));
             }
         });
-        add(new Comparator<TaskItem>() {
+        add(new Comparator<PREntity>() {
             @Override
-            public int compare(TaskItem o1, TaskItem o2) {
+            public int compare(PREntity o1, PREntity o2) {
                 return new Integer(o1.mTitle).compareTo(new Integer(o2.mTitle));
             }
         });
-        add(new Comparator<TaskItem>() {
+        add(new Comparator<PREntity>() {
             @Override
-            public int compare(TaskItem o1, TaskItem o2) {
-                return new Integer(o1.mId).compareTo(new Integer(o2.mId));
+            public int compare(PREntity o1, PREntity o2) {
+                return Long.valueOf(o1.mId).compareTo(Long.valueOf(o2.mId));
             }
         });
     }};
 
-
+    public boolean validateFirstProject(Context context) {
+        if (mProjects.size() == 0) {
+            Project project = Project.newProject(context);
+            setNewProject(project);
+            confirmSaveProject();
+            return true;
+        }
+        return false;
+    }
 }

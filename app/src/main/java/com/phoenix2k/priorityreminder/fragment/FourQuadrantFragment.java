@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.view.FourQuadrantView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
@@ -42,21 +41,6 @@ public class FourQuadrantFragment extends BasicFragment {
     @Override
     public int getViewResource() {
         return R.layout.fragment_four_quadrant;
-    }
-
-    @Override
-    public void loadData() {
-        mQuadrantView.loadData();
-    }
-
-
-    @Override
-    public void onProgress(boolean show, String msg) {
-
-    }
-
-    @Override
-    public void onFinishQuery(APIType type, Object result) {
     }
 
     public void loadView() {

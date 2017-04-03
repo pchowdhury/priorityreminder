@@ -24,6 +24,7 @@ import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -56,6 +57,7 @@ public class AddProjectFragment extends Fragment {
 
     @BindViews({R.id.q1_edt_title, R.id.q2_edt_title, R.id.q3_edt_title, R.id.q4_edt_title})
     List<EditText> mQuadrantNameViews;
+    ArrayList<TextWatcher> mTextWatcher = new ArrayList<>();
 
     private UpdateListener mUpdateListener;
     private Project mCurrentProject;
@@ -66,13 +68,9 @@ public class AddProjectFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_add_project, null);
         ButterKnife.bind(this, v);
-        loadData();
+        loadView();
         return v;
     }
-
-    public void loadData() {
-    }
-
 
     public void switchNewProjectToState(Project project, boolean checked) {
         if (project != null) {
@@ -80,8 +78,8 @@ public class AddProjectFragment extends Fragment {
             int[] resId = {R.string.lbl_title_quadrant1, R.string.lbl_title_quadrant2, R.string.lbl_title_quadrant3, R.string.lbl_title_quadrant4};
             int[] resIdState = {R.string.lbl_title_state_quadrant1, R.string.lbl_title_state_quadrant2, R.string.lbl_title_state_quadrant3, R.string.lbl_title_state_quadrant4};
 //            if (checked) {
-                for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
-                    project.mTitleQuadrants.put(type, getContext().getString(checked ? resIdState[type.ordinal()] : resId[type.ordinal()]));
+            for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                project.mTitleQuadrants.put(type, getContext().getString(checked ? resIdState[type.ordinal()] : resId[type.ordinal()]));
 //                }
             }
         }
@@ -97,52 +95,7 @@ public class AddProjectFragment extends Fragment {
                 loadView();
             }
         });
-        mEditTitle.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (getCurrentProject() != null) {
-                    getCurrentProject().mTitle = mEditTitle.getText().toString();
-                }
-                validateAddButton();
-            }
-        });
-
-
-        for (final TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
-            final EditText edt = mQuadrantNameViews.get(type.ordinal());
-            if (getCurrentProject() != null) {
-                edt.setText(getCurrentProject().mTitleQuadrants.get(type));
-            }
-            edt.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (getCurrentProject() != null) {
-                        getCurrentProject().mTitleQuadrants.put(type, edt.getText().toString());
-                    }
-                    validateAddButton();
-                }
-            });
-        }
+        setTextWithoutListener();
         validateAddButton();
     }
 
@@ -168,7 +121,6 @@ public class AddProjectFragment extends Fragment {
     @OnClick(R.id.btn_add)
     public void onClickAdd(View v) {
         KeyboardUtils.hideKeyboard(getActivity());
-        SyncManager.getInstance().addToUpdates(getCurrentProject());
         DataStore.getInstance().confirmSaveProject();
         setCurrentProject(null);
         mUpdateListener.onNewProjectAdded();
@@ -187,6 +139,7 @@ public class AddProjectFragment extends Fragment {
     }
 
     public void collapse() {
+        setCurrentProject(null);
         mBtnAdd.setText(getString(R.string.btn_add));
         mEditTitle.setText("");
         mStatusSwitch.setChecked(false);
@@ -231,7 +184,6 @@ public class AddProjectFragment extends Fragment {
             mEditBackup = new Project();
             DataStore.getInstance().getCurrentProject().copyTo(mEditBackup);
         }
-        mEditTitle.setText(getCurrentProject().mTitle);
         mBtnAdd.setText(getString(isCreateNew ? R.string.btn_add : R.string.btn_update));
         validateAddButton();
         expand();
@@ -249,14 +201,80 @@ public class AddProjectFragment extends Fragment {
             setCurrentProject(null);
             KeyboardUtils.hideKeyboard(getActivity());
             collapse();
+            if (mUpdateListener != null) {
+                mUpdateListener.onCancelEdit();
+            }
         }
     }
 
-    public void onDeleteCurrentProject(){
+    public void onDeleteCurrentProject() {
         mEditBackup = null;
     }
 
     private boolean isExpanded() {
         return mLytAddProject.getVisibility() == View.GONE;
     }
+
+    void setTextWithoutListener() {
+        mEditTitle.removeTextChangedListener(mTitleWatcher);
+        if (getCurrentProject() != null) {
+            mEditTitle.setText(getCurrentProject().mTitle);
+        }
+        mEditTitle.addTextChangedListener(mTitleWatcher);
+
+        boolean isInitialized = mTextWatcher.size() > 0;
+        for (final TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+            final EditText edt = mQuadrantNameViews.get(type.ordinal());
+            TextWatcher watcher;
+            if (isInitialized) {
+                watcher = mTextWatcher.get(type.ordinal());
+                edt.removeTextChangedListener(watcher);
+            } else {
+                watcher = new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (getCurrentProject() != null) {
+                            getCurrentProject().mTitleQuadrants.put(type, edt.getText().toString());
+                        }
+                        validateAddButton();
+                    }
+                };
+                mTextWatcher.add(watcher);
+            }
+            if (getCurrentProject() != null) {
+                edt.setText(getCurrentProject().mTitleQuadrants.get(type));
+            }
+            edt.addTextChangedListener(watcher);
+        }
+    }
+
+    private TextWatcher mTitleWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (getCurrentProject() != null) {
+                getCurrentProject().mTitle = mEditTitle.getText().toString();
+            }
+            validateAddButton();
+        }
+    };
 }

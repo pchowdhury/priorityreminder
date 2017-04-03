@@ -1,8 +1,9 @@
 package com.phoenix2k.priorityreminder.model;
 
-import com.phoenix2k.priorityreminder.DataStore;
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import com.phoenix2k.priorityreminder.utils.DataUtils;
-import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,13 +15,14 @@ import java.util.List;
  * Created by Pushpan on 06/02/17.
  */
 
-public class TaskItem {
+public class TaskItem extends PREntity{
+    public static final String TAG = "TaskItem";
+
     public enum Column {
         ID,
-        POSITION,
         PROJECT_ID,
         TITLE,
-        INDEX,
+        ITEM_INDEX,
         QUARTER,
         DESCRIPTION,
         ICON,
@@ -44,11 +46,7 @@ public class TaskItem {
         Yearly
     }
 
-    public String mId;
-    public String mPosition;
-    public String mProjectId;
-    public String mTitle;
-    public int mIndex;
+    public Long mProjectId;
     public QuadrantType mQuadrantType;
     public String mDescription;
     public int mIcon;
@@ -57,30 +55,20 @@ public class TaskItem {
 
     public RepeatType mRepeatType = RepeatType.None;
 
-    public long mCreatedOn;
-    public long mUpdatedOn;
-
-
     public static TaskItem newTaskItem() {
         TaskItem item = new TaskItem();
-        item.mId = IDGenerator.generateUniqueId() + "";
-        item.mPosition = DataStore.getInstance().getLastTaskPosition() + 1 + "";
-        item.mTitle = "";
-        item.mIndex = 0;
         item.mDescription = "";
         item.mIcon = 0;
         item.mQuadrantType = QuadrantType.Q1_OR_UPCOMING;
         item.mStartTime = 0;
         item.mDueTime = 0;
         item.mRepeatType = RepeatType.None;
-        item.mCreatedOn = IDGenerator.generateUniqueId();
-        item.mUpdatedOn = item.mCreatedOn;
         return item;
     }
 
     public static TaskItem newBlankTaskItem() {
         TaskItem item = new TaskItem();
-        item.mId = null;
+        item.mId = Long.valueOf(-1);
         return item;
     }
 
@@ -92,18 +80,15 @@ public class TaskItem {
                 String value = (String) values.get(i);
                 switch (Column.values()[i]) {
                     case ID:
-                        taskItem.mId = value;
-                        break;
-                    case POSITION:
-                        taskItem.mPosition = value;
+                        taskItem.mId = Long.valueOf(value);
                         break;
                     case PROJECT_ID:
-                        taskItem.mProjectId = value;
+                        taskItem.mProjectId = Long.valueOf(value);
                         break;
                     case TITLE:
                         taskItem.mTitle = value;
                         break;
-                    case INDEX:
+                    case ITEM_INDEX:
                         taskItem.mIndex = DataUtils.parseIntValue(value);
                         break;
                     case QUARTER:
@@ -142,7 +127,6 @@ public class TaskItem {
         List<List<Object>> values = new ArrayList<>();
         ArrayList<Object> taskItemValues = new ArrayList() {{
             add(taskItem.mId + "");
-            add(taskItem.mPosition + "");
             add(taskItem.mProjectId + "");
             add(taskItem.mTitle + "");
             add(taskItem.mIndex + "");
@@ -163,7 +147,6 @@ public class TaskItem {
     public String toString() {
         return
                 "{\nId:" + mId +
-                        "\nmPosition:" + mPosition +
                         "\nmProjectId:" + mProjectId +
                         "\nmTitle:" + mTitle +
                         "\nmQuadrantType:" + mQuadrantType.name() +
@@ -182,10 +165,9 @@ public class TaskItem {
         JSONObject json = new JSONObject();
         try {
             json.put(Column.ID.name(), mId);
-            json.put(Column.POSITION.name(), mPosition);
             json.put(Column.PROJECT_ID.name(), mProjectId);
             json.put(Column.TITLE.name(), mTitle);
-            json.put(Column.INDEX.name(), mIndex);
+            json.put(Column.ITEM_INDEX.name(), mIndex);
             json.put(Column.QUARTER.name(), mQuadrantType.ordinal());
             json.put(Column.DESCRIPTION.name(), mDescription);
             json.put(Column.ICON.name(), mIcon);
@@ -204,19 +186,16 @@ public class TaskItem {
         TaskItem taskItem = new TaskItem();
         try {
             if (json.has(Column.ID.name())) {
-                taskItem.mId = json.getString(Column.ID.name());
-            }
-            if (json.has(Column.POSITION.name())) {
-                taskItem.mPosition = json.getString(Column.POSITION.name());
+                taskItem.mId = json.getLong(Column.ID.name());
             }
             if (json.has(Column.PROJECT_ID.name())) {
-                taskItem.mProjectId = json.getString(Column.PROJECT_ID.name());
+                taskItem.mProjectId = json.getLong(Column.PROJECT_ID.name());
             }
             if (json.has(Column.TITLE.name())) {
                 taskItem.mTitle = json.getString(Column.TITLE.name());
             }
-            if (json.has(Column.INDEX.name())) {
-                taskItem.mIndex = json.getInt(Column.INDEX.name());
+            if (json.has(Column.ITEM_INDEX.name())) {
+                taskItem.mIndex = json.getInt(Column.ITEM_INDEX.name());
             }
             if (json.has(Column.QUARTER.name())) {
                 taskItem.mQuadrantType = QuadrantType.values()[json.getInt(Column.QUARTER.name())];
@@ -247,4 +226,39 @@ public class TaskItem {
         }
         return taskItem;
     }
+
+    public static ContentValues getTaskItemContentValues(TaskItem taskItem) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Column.ID.name(), taskItem.mId);
+        contentValues.put(Column.PROJECT_ID.name(), taskItem.mProjectId);
+        contentValues.put(Column.TITLE.name(), taskItem.mTitle);
+        contentValues.put(Column.ITEM_INDEX.name(), taskItem.mIndex);
+        contentValues.put(Column.QUARTER.name(), taskItem.mQuadrantType.ordinal());
+        contentValues.put(Column.DESCRIPTION.name(), taskItem.mDescription);
+        contentValues.put(Column.ICON.name(), taskItem.mIcon);
+        contentValues.put(Column.STARTS_ON.name(), taskItem.mStartTime);
+        contentValues.put(Column.DUE_ON.name(), taskItem.mDueTime);
+        contentValues.put(Column.REPEAT.name(), taskItem.mRepeatType.ordinal());
+        contentValues.put(Column.CREATED_ON.name(), taskItem.mCreatedOn);
+        contentValues.put(Column.UPDATED_ON.name(), taskItem.mUpdatedOn);
+        return contentValues;
+    }
+
+    public static TaskItem readTaskItemFromCursor(Cursor cursor) {
+        TaskItem item = new TaskItem();
+        item.mId = cursor.getLong(cursor.getColumnIndex(Column.ID.name()));
+        item.mTitle = cursor.getString(cursor.getColumnIndex(Column.TITLE.name()));
+        item.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ITEM_INDEX.name()));
+        item.mDescription = cursor.getString(cursor.getColumnIndex(Column.DESCRIPTION.name()));
+        item.mIcon = cursor.getInt(cursor.getColumnIndex(Column.ICON.name()));
+        item.mQuadrantType = QuadrantType.values()[cursor.getInt(cursor.getColumnIndex(Column.QUARTER.name()))];
+        item.mStartTime = cursor.getLong(cursor.getColumnIndex(Column.STARTS_ON.name()));
+        item.mDueTime = cursor.getLong(cursor.getColumnIndex(Column.DUE_ON.name()));
+        item.mRepeatType = RepeatType.values()[cursor.getInt(cursor.getColumnIndex(Column.REPEAT.name()))];
+        item.mCreatedOn = cursor.getLong(cursor.getColumnIndex(Column.CREATED_ON.name()));
+        item.mUpdatedOn = cursor.getLong(cursor.getColumnIndex(Column.UPDATED_ON.name()));
+        return item;
+    }
+
+
 }

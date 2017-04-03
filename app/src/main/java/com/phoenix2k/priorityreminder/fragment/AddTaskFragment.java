@@ -97,10 +97,10 @@ public class AddTaskFragment extends Fragment {
     private int mPickerType;
     private Calendar mCalender;
 
-    public static AddTaskFragment getInstance(String itemId) {
+    public static AddTaskFragment getInstance(Long itemId) {
         AddTaskFragment fragment = new AddTaskFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(ITEM_ID, itemId);
+        bundle.putLong(ITEM_ID, itemId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -119,7 +119,7 @@ public class AddTaskFragment extends Fragment {
         if (project != null) {
             mProjectTitle.setText(project.mTitle);
             TaskItem taskItem;
-            String taskId = getTaskId();
+            Long taskId = getTaskId();
             if (taskId != null) {
                 taskItem = DataStore.getInstance().getTaskItemWithId(taskId);
                 mTaskIndexBackup = taskItem.mIndex;
@@ -136,10 +136,10 @@ public class AddTaskFragment extends Fragment {
         }
     }
 
-    private String getTaskId() {
+    private Long getTaskId() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            return bundle.getString(ITEM_ID);
+            return bundle.getLong(ITEM_ID);
         }
         return null;
     }

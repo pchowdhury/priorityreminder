@@ -168,6 +168,11 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
     }
 
     public void loadData() {
+
+    }
+
+    public void loadView() {
+
         Project project = DataStore.getInstance().getCurrentProject();
         if (project != null) {
             for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
@@ -191,16 +196,14 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
                 adjustPosition();
             }
         }, 100);
-    }
 
-    public void loadView() {
-        Project project = DataStore.getInstance().getCurrentProject();
-        if (project != null) {
-            for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
-                int index = type.ordinal();
-                mTaskListAdapter[index].notifyDataSetChanged();
-            }
-        }
+//        Project project = DataStore.getInstance().getCurrentProject();
+//        if (project != null) {
+//            for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+//                int index = type.ordinal();
+//                mTaskListAdapter[index].notifyDataSetChanged();
+//            }
+//        }
     }
 
     private void adjustPosition() {

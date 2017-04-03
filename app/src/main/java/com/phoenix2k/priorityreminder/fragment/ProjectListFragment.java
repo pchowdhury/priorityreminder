@@ -17,17 +17,10 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.OnNavigationListener;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.manager.PRNotificationManager;
 import com.phoenix2k.priorityreminder.model.Project;
-import com.phoenix2k.priorityreminder.model.TaskItem;
-import com.phoenix2k.priorityreminder.task.APIType;
-import com.phoenix2k.priorityreminder.task.LoadAllTasks;
-import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.phoenix2k.priorityreminder.store.SQLDataStore;
 
 import butterknife.BindView;
 
@@ -63,61 +56,25 @@ public class ProjectListFragment extends BasicFragment {
         return R.layout.layout_project_list;
     }
 
-    @Override
-    public void loadData() {
-        if (getUserCredentials() != null) {
-            new LoadProjectsTask(getActivity(), getUserCredentials(), this).execute();
-        }
-    }
-
-
-    @Override
-    public void onProgress(boolean show, String msg) {
-        if (show) {
-            mProgressView.setVisibility(View.VISIBLE);
-            mProgressTextView.setText(msg);
-        } else {
-            mProgressView.setVisibility(View.GONE);
-            mProgressTextView.setText("");
-        }
-
-    }
-
-    @Override
-    public void onFinishQuery(APIType type, Object result) {
-        switch (type) {
-            case Sheet_Load_Projects_Metadata:
-                if (result != null) {
-                    List<Project> list = (List<Project>) result;
-                    DataStore.getInstance().setProjects(new ArrayList<>(list));
-                }
-                new LoadAllTasks(getActivity(), getUserCredentials(), this).execute();
-                break;
-            case Sheet_Load_All_Tasks:
-                if (result != null) {
-                    List<TaskItem> list = (List<TaskItem>) result;
-                    DataStore.getInstance().setTasks(new ArrayList<>(list));
-                }
-                PRNotificationManager.init(getActivity().getApplicationContext());
-                DataStore.getInstance().setUpNotifications();
-                validateTasks();
-                break;
-        }
-        loadView();
-    }
-
-
     /**
      * Check all the state tasks for due dates. If any of them is already in due date then change the sate to due quadrant
      * and update by calling sync
      */
     private void validateTasks() {
         DataStore.getInstance().validateTaskStatus();
-        SyncManager.getInstance().startSync(getActivity(), getUserCredentials());
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
     }
 
     @Override
     public void loadView() {
+        DataStore.getInstance().setProjects(SQLDataStore.getInstance().getAllProjects());
+        DataStore.getInstance().validateFirstProject(getActivity());
+        DataStore.getInstance().setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null));
+        PRNotificationManager.init(getActivity().getApplicationContext());
+        DataStore.getInstance().setUpNotifications();
+        validateTasks();
+
+
         mListView.setAdapter(null);
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new ProjectsAdapter(getActivity());
@@ -133,7 +90,6 @@ public class ProjectListFragment extends BasicFragment {
             public boolean onItemLongClicked(RecyclerView recyclerView, int position, View v) {
                 selectProject(position, false);
                 setEditMode(true);
-                mAdapter.notifyDataSetChanged();
                 if (mOnNavigationListener != null) {
                     mOnNavigationListener.onUpdateCurrentProject();
                 }
@@ -145,7 +101,7 @@ public class ProjectListFragment extends BasicFragment {
             public void run() {
                 selectProject(DataStore.getInstance().getCurrentProjectIndex(), true);
             }
-        },100);
+        }, 100);
 
     }
 
@@ -181,6 +137,9 @@ public class ProjectListFragment extends BasicFragment {
 
     public void setEditMode(boolean mEditMode) {
         this.mEditMode = mEditMode;
+        if (mAdapter!=null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     private class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {

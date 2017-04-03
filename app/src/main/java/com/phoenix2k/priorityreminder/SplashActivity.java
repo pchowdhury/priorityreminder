@@ -29,7 +29,7 @@ public class SplashActivity extends Activity {
     }
 
     private void proceedToSignIn() {
-        startActivity(new Intent(this, SignInActivity.class));
+        startActivity(new Intent(this, DashboardActivity.class));
     }
 
 
