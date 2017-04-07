@@ -186,6 +186,7 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
                 mTaskListAdapter[index].setProjectId(project.mId);
                 mTaskListAdapter[index].setTaskList(project.getTaskListForQuadrant(type));
                 mQuadrant[index].setAdapter(mTaskListAdapter[index]);
+                mQuadrant[index].showHover(false);
             }
         }
         postDelayed(new Runnable() {

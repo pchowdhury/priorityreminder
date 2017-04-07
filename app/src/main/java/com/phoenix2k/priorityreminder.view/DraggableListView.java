@@ -2,6 +2,7 @@ package com.phoenix2k.priorityreminder.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.phoenix2k.priorityreminder.DashboardActivity;
+import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
@@ -35,6 +38,9 @@ public class DraggableListView extends LinearLayout {
     View lytHeaderTopDivider;
     @BindView(R.id.lytLeftDivider)
     View lytLeftDivider;
+    @BindView(R.id.lyt_hover)
+    View lytHover;
+
     private QuadrantListener mQuadrantListener;
 
     public DraggableListView(Context context) {
@@ -114,6 +120,7 @@ public class DraggableListView extends LinearLayout {
                 return gDetector.onTouchEvent(event);
             }
         });
+        setOnDragListener(DataStore.getInstance().getDragListener());
     }
 
     public void showTopDivider(boolean show) {
@@ -150,5 +157,10 @@ public class DraggableListView extends LinearLayout {
 
     public interface QuadrantListener {
         void onDoubleTapQuadrant(View v);
+    }
+
+    public void showHover(boolean show) {
+        int color = ContextCompat.getColor(getContext(), show ? R.color.colorPrimary : android.R.color.transparent);
+        lytHover.setBackgroundColor(color);
     }
 }

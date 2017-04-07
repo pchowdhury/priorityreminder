@@ -171,6 +171,8 @@ public abstract class BasicCommunicationActivity extends AppCompatActivity
                         mCredential.setSelectedAccountName(accountName);
                         attemptSignIn();
                     }
+                }else if(resultCode==RESULT_CANCELED){
+                    onError("Authentication not provided");
                 }
                 break;
             case REQUEST_AUTHORIZATION:

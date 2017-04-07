@@ -18,11 +18,13 @@
         android:layout_below="@+id/lytHeaderTopDivider"
         android:background="@color/color_translucent_white"
         android:clickable="true"
+        android:ellipsize="end"
         android:maxLines="1"
         android:padding="5dp"
+        android:scrollHorizontally="true"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold" android:ellipsize="end" android:scrollHorizontally="true"/>
+        android:textStyle="bold" />
 
     <View
         android:layout_width="match_parent"
@@ -31,6 +33,17 @@
         android:background="@drawable/top_shadow"
         android:visibility="invisible" />
 
+    <View
+        android:id="@+id/lyt_hover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/listView"
+        android:layout_alignEnd="@+id/listView"
+        android:layout_alignLeft="@+id/listView"
+        android:layout_alignRight="@+id/listView"
+        android:layout_alignStart="@+id/listView"
+        android:layout_alignTop="@+id/listView" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listView"
         android:layout_width="match_parent"
@@ -38,6 +51,7 @@
         android:layout_below="@+id/txtTitle"
         android:cacheColorHint="@android:color/transparent"
         android:divider="@android:color/transparent" />
+
 
     <View
         android:id="@+id/lytListTopShadow"

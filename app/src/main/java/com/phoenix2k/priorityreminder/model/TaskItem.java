@@ -15,7 +15,7 @@ import java.util.List;
  * Created by Pushpan on 06/02/17.
  */
 
-public class TaskItem extends PREntity{
+public class TaskItem extends PREntity {
     public static final String TAG = "TaskItem";
 
     public enum Column {
@@ -30,7 +30,8 @@ public class TaskItem extends PREntity{
         DUE_ON,
         REPEAT,
         CREATED_ON,
-        UPDATED_ON
+        UPDATED_ON,
+        TRASHED
     }
 
     public enum QuadrantType {
@@ -115,6 +116,9 @@ public class TaskItem extends PREntity{
                     case UPDATED_ON:
                         taskItem.mUpdatedOn = DataUtils.parseLongValue(value);
                         break;
+                    case TRASHED:
+                        taskItem.mTrashed = DataUtils.parseBooleanValue(value);
+                        break;
                 }
             }
             return taskItem;
@@ -138,6 +142,7 @@ public class TaskItem extends PREntity{
             add(taskItem.mRepeatType.ordinal() + "");
             add(taskItem.mCreatedOn + "");
             add(taskItem.mUpdatedOn + "");
+            add(taskItem.mTrashed + "");
         }};
         values.add(taskItemValues);
         return values;
@@ -158,6 +163,7 @@ public class TaskItem extends PREntity{
                         "\nmRepeatType:" + mRepeatType.name() +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
+                        "\nmTrashed:"+mTrashed+
                         "\n}";
     }
 
@@ -176,6 +182,7 @@ public class TaskItem extends PREntity{
             json.put(Column.REPEAT.name(), mRepeatType.ordinal());
             json.put(Column.CREATED_ON.name(), mCreatedOn);
             json.put(Column.UPDATED_ON.name(), mUpdatedOn);
+            json.put(Column.TRASHED.name(), mTrashed);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -221,6 +228,9 @@ public class TaskItem extends PREntity{
             if (json.has(Column.UPDATED_ON.name())) {
                 taskItem.mUpdatedOn = json.getLong(Column.UPDATED_ON.name());
             }
+            if (json.has(Column.TRASHED.name())) {
+                taskItem.mTrashed = json.getBoolean(Column.TRASHED.name());
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -240,6 +250,7 @@ public class TaskItem extends PREntity{
         contentValues.put(Column.REPEAT.name(), taskItem.mRepeatType.ordinal());
         contentValues.put(Column.CREATED_ON.name(), taskItem.mCreatedOn);
         contentValues.put(Column.UPDATED_ON.name(), taskItem.mUpdatedOn);
+        contentValues.put(Column.TRASHED.name(), taskItem.mTrashed ? 1 : 0);
         return contentValues;
     }
 
@@ -257,6 +268,7 @@ public class TaskItem extends PREntity{
         item.mRepeatType = RepeatType.values()[cursor.getInt(cursor.getColumnIndex(Column.REPEAT.name()))];
         item.mCreatedOn = cursor.getLong(cursor.getColumnIndex(Column.CREATED_ON.name()));
         item.mUpdatedOn = cursor.getLong(cursor.getColumnIndex(Column.UPDATED_ON.name()));
+        item.mTrashed = cursor.getInt(cursor.getColumnIndex(Column.TRASHED.name())) == 1;
         return item;
     }
 

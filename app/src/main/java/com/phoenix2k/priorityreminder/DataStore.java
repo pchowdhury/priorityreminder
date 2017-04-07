@@ -14,13 +14,11 @@ import com.phoenix2k.priorityreminder.utils.DataUtils;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
 import static com.phoenix2k.priorityreminder.DataStore.SortType.Index;
-import static java.security.AccessController.getContext;
 
 /**
  * Created by Pushpan on 08/01/17.
@@ -188,14 +186,14 @@ public class DataStore {
         }
         //remove the item
         mProjects.remove(project);
-        project.mMarkDeleted = true;
+        project.mTrashed = true;
         addToUpdate(project);
         //Delete all tasks inside project
         ArrayList<TaskItem> tasksTobeDeleted = project.getAllTasks();
         for (int i = 0; i < tasksTobeDeleted.size(); i++) {
             TaskItem item = tasksTobeDeleted.get(i);
             mTasks.remove(item);
-            item.mMarkDeleted = true;
+            item.mTrashed = true;
             addToUpdate(item);
         }
         setProjects(mProjects);
@@ -221,7 +219,7 @@ public class DataStore {
         }
         //remove the item
         mTasks.remove(item);
-        item.mMarkDeleted = true;
+        item.mTrashed = true;
         addToUpdate(item);
         setTasks(mTasks);
     }
@@ -240,6 +238,8 @@ public class DataStore {
         }
         setCurrentTaskItem(null);
         setUpNotifications();
+        DataStore.getInstance().validateTaskStatus();
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
     }
 
     public void setUpNotifications() {
@@ -461,4 +461,12 @@ public class DataStore {
         }
         return false;
     }
+
+    public void reloadItems(Context context) {
+       setProjects(SQLDataStore.getInstance().getAllProjects());
+       validateFirstProject(context);
+       setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null));
+    }
+
+
 }

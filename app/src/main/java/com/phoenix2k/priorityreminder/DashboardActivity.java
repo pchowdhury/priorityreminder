@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -15,13 +18,13 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
 import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
@@ -29,7 +32,6 @@ import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.store.SQLDataStore;
-import com.phoenix2k.priorityreminder.task.APIType;
 import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.view.DraggableListView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
@@ -39,7 +41,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DashboardActivity extends BasicCommunicationActivity
+public class DashboardActivity extends AppCompatActivity
         implements OnNavigationListener, UpdateListener, TaskListAdapter.OnTaskInteractionListener {
     @BindView(R.id.main_progress)
     public View mMainProress;
@@ -70,22 +72,33 @@ public class DashboardActivity extends BasicCommunicationActivity
             public boolean onDrag(View v, DragEvent event) {
                 TaskItem draggedTtem = (TaskItem) event.getLocalState();
                 TaskItem draggedOverItem;
+                DraggableListView draggableListView = null;
                 if (v instanceof DraggableListView) {
+                    draggableListView = (DraggableListView) v;
                     draggedOverItem = ((DraggableListView) v).getTaskItemPlaceholder();
                 } else {
                     draggedOverItem = TaskListAdapter.getTaskItemFromView(v);
                 }
 
-                int color = ContextCompat.getColor(DashboardActivity.this, draggedOverItem.mUpdatedOn != -1 ? R.color.color_more_translucent_white : R.color.color_transparent);
+                int color = ContextCompat.getColor(DashboardActivity.this, draggedOverItem.mUpdatedOn != -1 ? R.color.color_more_translucent_white : android.R.color.transparent);
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_ENTERED:
-                        v.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.colorPrimary));
+                        if (draggableListView != null) {
+                            draggableListView.showHover(true);
+                        } else {
+                            v.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.colorPrimary));
+                        }
+
 //                        getDraggableListView().autoScrollOnHover(
 //                                CommonViewHolder.getPositionFromView(v));
                         return true;
                     case DragEvent.ACTION_DRAG_EXITED:
 //                        int color = DataStore.getInstance().getQuadrantColorFor(item);
-                        v.setBackgroundColor(color);
+                        if (draggableListView != null) {
+                            draggableListView.showHover(false);
+                        } else {
+                            v.setBackgroundColor(color);
+                        }
                         return true;
 
                     case DragEvent.ACTION_DRAG_STARTED:
@@ -93,12 +106,20 @@ public class DashboardActivity extends BasicCommunicationActivity
 //                        return processDragStarted(event);
                     case DragEvent.ACTION_DROP:
 //                        v.setBackgroundColor(getListColor());
-                        v.setBackgroundColor(color);
+                        if (draggableListView != null) {
+                            draggableListView.showHover(false);
+                        } else {
+                            v.setBackgroundColor(color);
+                        }
                         DataStore.getInstance().moveTaskItem(draggedTtem, draggedOverItem);
                         reloadDashboard();
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        v.setBackgroundColor(color);
+                        if (draggableListView != null) {
+                            draggableListView.showHover(false);
+                        } else {
+                            v.setBackgroundColor(color);
+                        }
                         return true;
                 }
                 return false;
@@ -177,7 +198,7 @@ public class DashboardActivity extends BasicCommunicationActivity
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                IDGenerator.deInit();
+//                IDGenerator.deInit();
                 DataStore.deInit();
                 finish();
             }
@@ -207,10 +228,6 @@ public class DashboardActivity extends BasicCommunicationActivity
         showProgress(false);
     }
 
-    @Override
-    public void onAccountValidationComplete() {
-
-    }
 
     @Override
     public void onBackPressed() {
@@ -243,11 +260,21 @@ public class DashboardActivity extends BasicCommunicationActivity
             return true;
         }
         if (id == R.id.action_sync) {
-            SyncManager.getInstance().startSync(this, getUserCredentials());
+            startSync();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    protected final void applyMenuThemeElements(Menu menu, @ColorInt int tintColor) {
+        for (int i = 0; i < menu.size(); i++) {
+            final Drawable icon = menu.getItem(i)
+                    .getIcon();
+            if (icon != null) {
+                icon.mutate().setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
+            }
+        }
     }
 
     @Override
@@ -299,31 +326,6 @@ public class DashboardActivity extends BasicCommunicationActivity
     }
 
     @Override
-    public void onGoogleServiceAvailibilityError(int statusCode) {
-
-    }
-
-    @Override
-    public void onUserRecoverableAuthorizationError(UserRecoverableAuthIOException error) {
-
-    }
-
-    @Override
-    public void onDisplayInfo(String msg) {
-
-    }
-
-    @Override
-    public void onProgress(boolean show, String msg) {
-
-    }
-
-    @Override
-    public void onFinishQuery(APIType type, Object result) {
-
-    }
-
-    @Override
     public void onNewProjectAdded() {
         SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
         reloadProjectList();
@@ -360,7 +362,7 @@ public class DashboardActivity extends BasicCommunicationActivity
     private void reloadDashboard() {
         FourQuadrantFragment fragment = (FourQuadrantFragment) getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG);
         if (fragment != null) {
-                fragment.loadView();
+            fragment.loadView();
         }
     }
 
@@ -428,5 +430,19 @@ public class DashboardActivity extends BasicCommunicationActivity
         }
         DataStore.getInstance().setIconResourceIdList(list);
         ar.recycle();
+    }
+
+    private void startSync() {
+        Intent syncIntent = new Intent(this, SyncActivity.class);
+        startActivityForResult(syncIntent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_OK) {
+            reloadProjectList();
+            reloadDashboard();
+        }
     }
 }

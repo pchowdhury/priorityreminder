@@ -67,9 +67,7 @@ public class ProjectListFragment extends BasicFragment {
 
     @Override
     public void loadView() {
-        DataStore.getInstance().setProjects(SQLDataStore.getInstance().getAllProjects());
-        DataStore.getInstance().validateFirstProject(getActivity());
-        DataStore.getInstance().setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null));
+        DataStore.getInstance().reloadItems(getActivity());
         PRNotificationManager.init(getActivity().getApplicationContext());
         DataStore.getInstance().setUpNotifications();
         validateTasks();

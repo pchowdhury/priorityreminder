@@ -10,7 +10,7 @@ public class PREntity {
     public int mIndex;
     public long mCreatedOn;
     public long mUpdatedOn;
-    public boolean mMarkDeleted;
+    public boolean mTrashed;
 
     public PREntity() {
         mId = Long.valueOf(-1);
@@ -18,6 +18,7 @@ public class PREntity {
         mIndex = 0;
         mCreatedOn = System.currentTimeMillis();
         mUpdatedOn = mCreatedOn;
+        mTrashed = false;
     }
 
     public void copyTo(PREntity entity) {
@@ -26,6 +27,7 @@ public class PREntity {
         entity.mIndex = mIndex;
         entity.mCreatedOn = mCreatedOn;
         entity.mCreatedOn = mUpdatedOn;
+        entity.mTrashed = mTrashed;
     }
 
 

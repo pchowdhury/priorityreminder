@@ -153,9 +153,9 @@ public class DbHelper extends SQLiteOpenHelper {
                 ids.add(db.insert(table, null, set));
             }
             db.setTransactionSuccessful();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             LogUtils.printException(e);
-        }finally {
+        } finally {
             db.endTransaction();
         }
         return ids;
@@ -170,7 +170,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 db.update(table, set, idName + " = ?", new String[]{ids.get(i) + ""});
             }
             db.setTransactionSuccessful();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             LogUtils.printException(e);
             return false;
         } finally {
@@ -183,14 +183,18 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
         try {
-            for (int i = 0; i < ids.size(); i++) {
-                db.delete(table, idName + " = ?", new String[]{ids.get(i) + ""});
+            if (idName != null) {
+                for (int i = 0; i < ids.size(); i++) {
+                    db.delete(table, idName + " = ?", new String[]{ids.get(i) + ""});
+                }
+            }else{
+                db.delete(table, null, null);
             }
             db.setTransactionSuccessful();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             LogUtils.printException(e);
             return false;
-        }finally {
+        } finally {
             db.endTransaction();
         }
         return true;

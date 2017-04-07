@@ -20,7 +20,7 @@ import java.util.List;
  * Created by Pushpan on 06/02/17.
  */
 
-public class Project extends PREntity{
+public class Project extends PREntity {
     public static final String TAG = "Project";
 
     public enum Column {
@@ -38,7 +38,8 @@ public class Project extends PREntity{
         Q4_COLOR,
         CENTER_IN_PERCENT,
         CREATED_ON,
-        UPDATED_ON
+        UPDATED_ON,
+        TRASHED
     }
 
     public enum ProjectType {
@@ -158,6 +159,9 @@ public class Project extends PREntity{
                     case UPDATED_ON:
                         project.mUpdatedOn = DataUtils.parseLongValue(value);
                         break;
+                    case TRASHED:
+                        project.mTrashed = DataUtils.parseBooleanValue(value);
+                        break;
                 }
             }
             return project;
@@ -216,6 +220,7 @@ public class Project extends PREntity{
             add(project.mCenterInPercent.x + "," + project.mCenterInPercent.y);
             add(project.mCreatedOn + "");
             add(project.mUpdatedOn + "");
+            add(project.mTrashed + "");
         }};
         values.add(projectValues);
         return values;
@@ -234,6 +239,7 @@ public class Project extends PREntity{
                         "\nmColorQ4:" + mColorQuadrants.get(TaskItem.QuadrantType.Q4_OR_COMPLETED) +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
+                        "\nmTrashed:" + mTrashed +
                         "\n}";
     }
 
@@ -255,6 +261,7 @@ public class Project extends PREntity{
             json.put(Column.CENTER_IN_PERCENT.name(), mCenterInPercent.x + "," + mCenterInPercent.y);
             json.put(Column.CREATED_ON.name(), mCreatedOn);
             json.put(Column.UPDATED_ON.name(), mUpdatedOn);
+            json.put(Column.TRASHED.name(), mTrashed);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -312,6 +319,9 @@ public class Project extends PREntity{
             if (json.has(Project.Column.UPDATED_ON.name())) {
                 project.mUpdatedOn = json.getLong(Project.Column.UPDATED_ON.name());
             }
+            if (json.has(Column.TRASHED.name())) {
+                project.mTrashed = json.getBoolean(Column.TRASHED.name());
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -335,6 +345,7 @@ public class Project extends PREntity{
         contentValues.put(Project.Column.CENTER_IN_PERCENT.name(), project.mCenterInPercent.x + "," + project.mCenterInPercent.y);
         contentValues.put(Project.Column.CREATED_ON.name(), project.mCreatedOn);
         contentValues.put(Project.Column.UPDATED_ON.name(), project.mUpdatedOn);
+        contentValues.put(Column.TRASHED.name(), project.mTrashed ? 1 : 0);
         return contentValues;
     }
 
@@ -365,6 +376,7 @@ public class Project extends PREntity{
         project.mQuadrants.put(TaskItem.QuadrantType.Q2_OR_DUE, new ArrayList<TaskItem>());
         project.mQuadrants.put(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS, new ArrayList<TaskItem>());
         project.mQuadrants.put(TaskItem.QuadrantType.Q4_OR_COMPLETED, new ArrayList<TaskItem>());
+        project.mTrashed = cursor.getInt(cursor.getColumnIndex(Column.TRASHED.name())) == 1;
         return project;
 
     }

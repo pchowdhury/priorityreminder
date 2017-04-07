@@ -303,7 +303,7 @@ public class AddTaskFragment extends Fragment {
     public void onClickSave(View v) {
         KeyboardUtils.hideKeyboard(getActivity());
         TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
-        SyncManager.getInstance().addToUpdates(updatedItem);
+        DataStore.getInstance().addToUpdate(updatedItem);
         if (getTaskId() != null && getTaskId() != -1) {//edited
             if (updatedItem.mQuadrantType != mTaskQuadrantBackup) {
                 //quadrant is changed so need to delete from the quadrant

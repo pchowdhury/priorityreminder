@@ -16,9 +16,15 @@ import java.util.List;
  */
 
 public class SyncTask extends SpreadsheetTask {
+    ArrayList<Object> mItems;
 
     public SyncTask(Context context, GoogleAccountCredential credential, TaskListener listener) {
         super(context, credential, listener);
+    }
+
+    public SyncTask updateItems(ArrayList<Object> items) {
+        mItems = items;
+        return this;
     }
 
     @Override
@@ -48,36 +54,50 @@ public class SyncTask extends SpreadsheetTask {
         ArrayList<TaskItem> tasksToBeUpdated = new ArrayList<>();
         ArrayList<Project> projectsToBeCleared = new ArrayList<>();
         ArrayList<TaskItem> tasksToBeCleared = new ArrayList<>();
-        for (Object obj : DataStore.getInstance().getUpdates()) {
-            if (obj instanceof Project) {
-                final Project project = (Project) obj;
-                int len = Project.Column.values().length;
-                char ch = (char) (64 + len);
+        if (mItems != null) {
+            int projectCount = 0;
+            int taskItemCount = 0;
+            int projectClearCount = 0;
+            int taskItemClearCount = 0;
+            for (Object obj : mItems) {
+                if (obj instanceof Project) {
+                    final Project project = (Project) obj;
+                    int len = Project.Column.values().length;
+                    char ch = (char) (64 + len);
 //                String range = "A" + project.mPosition + ":" + ch;
-                String range = "A" + ":" + ch;
-                if (project.mId == null) {
-                    projectsToBeCleared.add(project);
-                    projectClearRanges.add(range);
+                    String range;
+                    if (project.mId == null) {
+                        projectClearCount++;
+                        range = "A" + projectClearCount + ":" + ch;
+                        projectsToBeCleared.add(project);
+                        projectClearRanges.add(range);
+                    } else {
+                        projectCount++;
+                        range = "A" + projectCount + ":" + ch;
+                        projectsToBeUpdated.add(project);
+                        projectRanges.add(range);
+                        List<List<Object>> itemData = Project.getProjectWriteback(project);
+                        projectData.add(itemData);
+                    }
                 } else {
-                    projectsToBeUpdated.add(project);
-                    projectRanges.add(range);
-                    List<List<Object>> itemData = Project.getProjectWriteback(project);
-                    projectData.add(itemData);
-                }
-            } else {
-                final TaskItem taskItem = (TaskItem) obj;
-                int len = TaskItem.Column.values().length;
-                char ch = (char) (64 + len);
+                    final TaskItem taskItem = (TaskItem) obj;
+                    int len = TaskItem.Column.values().length;
+                    char ch = (char) (64 + len);
 //                String range = "A" + taskItem.mPosition + ":" + ch;
-                String range = "A" + ":" + ch;
-                if (taskItem.mId == null) {
-                    tasksToBeCleared.add(taskItem);
-                    taskClearRanges.add(range);
-                } else {
-                    tasksToBeUpdated.add(taskItem);
-                    taskRanges.add(range);
-                    List<List<Object>> itemData = TaskItem.getTaskItemWriteback(taskItem);
-                    taskData.add(itemData);
+                    String range;
+                    if (taskItem.mId == null) {
+                       taskItemClearCount++;
+                        range = "A" + taskItemClearCount + ":" + ch;
+                        tasksToBeCleared.add(taskItem);
+                        taskClearRanges.add(range);
+                    } else {
+                        taskItemCount++;
+                        range = "A" + taskItemCount + ":" + ch;
+                        tasksToBeUpdated.add(taskItem);
+                        taskRanges.add(range);
+                        List<List<Object>> itemData = TaskItem.getTaskItemWriteback(taskItem);
+                        taskData.add(itemData);
+                    }
                 }
             }
         }
@@ -86,12 +106,8 @@ public class SyncTask extends SpreadsheetTask {
         Boolean isUpdatedTasks = true;
         Boolean isClearProject = true;
         Boolean isClearTaskItem = true;
-        if (projectRanges.size() > 0) {
-            isUpdatedProject = updateMultipleItemsSheet(projectRanges, projectData, getProjectSpreadsheetId());
-            if (isUpdatedProject) {
-                DataStore.getInstance().clearUpdatedItems(projectsToBeUpdated);
-            }
-        }
+
+        //Do the clear operatipn 1st
         if (projectClearRanges.size() > 0) {
             isClearProject = clearMultipleItemsSheet(projectClearRanges, getProjectSpreadsheetId());
             if (isClearProject) {
@@ -99,16 +115,23 @@ public class SyncTask extends SpreadsheetTask {
             }
         }
 
-        if (taskRanges.size() > 0) {
-            isUpdatedTasks = updateMultipleItemsSheet(taskRanges, taskData, getDataSpreadsheetId());
-            if (isUpdatedTasks) {
-                DataStore.getInstance().clearUpdatedItems(tasksToBeUpdated);
-            }
-        }
         if (taskClearRanges.size() > 0) {
             isClearTaskItem = clearMultipleItemsSheet(taskClearRanges, getDataSpreadsheetId());
             if (isClearTaskItem) {
                 DataStore.getInstance().clearUpdatedItems(tasksToBeCleared);
+            }
+        }
+
+        if (projectRanges.size() > 0) {
+            isUpdatedProject = updateMultipleItemsSheet(projectRanges, projectData, getProjectSpreadsheetId());
+            if (isUpdatedProject) {
+                DataStore.getInstance().clearUpdatedItems(projectsToBeUpdated);
+            }
+        }
+        if (taskRanges.size() > 0) {
+            isUpdatedTasks = updateMultipleItemsSheet(taskRanges, taskData, getDataSpreadsheetId());
+            if (isUpdatedTasks) {
+                DataStore.getInstance().clearUpdatedItems(tasksToBeUpdated);
             }
         }
 

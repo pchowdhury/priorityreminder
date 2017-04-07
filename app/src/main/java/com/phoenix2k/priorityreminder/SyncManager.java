@@ -10,6 +10,8 @@ import com.phoenix2k.priorityreminder.task.SyncTask;
 import com.phoenix2k.priorityreminder.task.TaskListener;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
+import java.util.ArrayList;
+
 /**
  * Created by Pushpan on 13/02/17.
  */
@@ -17,7 +19,6 @@ import com.phoenix2k.priorityreminder.utils.LogUtils;
 public class SyncManager implements TaskListener {
     private static final String TAG = "SyncManager";
     private static SyncManager mInstance;
-    private Context mContext;
 
     public static SyncManager getInstance() {
         if (mInstance == null) {
@@ -26,14 +27,8 @@ public class SyncManager implements TaskListener {
         return mInstance;
     }
 
-    public void startSync(Context context, GoogleAccountCredential credentials) {
-        new SyncTask(context, credentials, this).execute();
-
-    }
-
-    public SyncManager addToUpdates(Object updatedItem) {
-        DataStore.getInstance().addToUpdate(updatedItem);
-        return this;
+    public void startSync(Context context, GoogleAccountCredential credentials, ArrayList<Object> items) {
+        new SyncTask(context, credentials, this).updateItems(items).execute();
     }
 
     @Override

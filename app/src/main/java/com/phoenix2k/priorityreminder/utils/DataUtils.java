@@ -28,6 +28,15 @@ public class DataUtils {
         return 0;
     }
 
+    public static boolean parseBooleanValue(String value) {
+        try {
+            return Boolean.parseBoolean(value);
+        } catch (Exception e) {
+            LogUtils.printException(e);
+        }
+        return false;
+    }
+
     public static String getColorCode(int color) {
         return String.format("#%06X", (0xFFFFFF & color));
     }

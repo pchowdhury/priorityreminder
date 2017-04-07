@@ -15,5 +15,5 @@ public enum APIType {
     Sheet_Add_Project,
     Sheet_Load_All_Tasks,
     Sheet_Add_Task,
-    Sheet_Push_Updates,
+    Sheet_Push_Updates
 }

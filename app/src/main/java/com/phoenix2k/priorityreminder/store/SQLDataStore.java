@@ -177,25 +177,19 @@ public class SQLDataStore {
         ArrayList<TaskItem> taskItemsAdd = new ArrayList<>();
         ArrayList<Project> projectsUpdate = new ArrayList<>();
         ArrayList<TaskItem> taskItemsUpdate = new ArrayList<>();
-        ArrayList<Project> projectsDeleted = new ArrayList<>();
-        ArrayList<TaskItem> taskItemsDeleted = new ArrayList<>();
         for (Object obj : items) {
             if (obj instanceof Project) {
                 Project project = (Project) obj;
                 if (project.mId == -1) {
                     projectsAdd.add(project);
-                } else if (project.mMarkDeleted) {
-                    projectsDeleted.add(project);
-                } else {
+                }  else {
                     projectsUpdate.add(project);
                 }
             } else if (obj instanceof TaskItem) {
                 TaskItem taskItem = (TaskItem) obj;
                 if (taskItem.mId == -1) {
                     taskItemsAdd.add(taskItem);
-                } else if (taskItem.mMarkDeleted) {
-                    taskItemsDeleted.add(taskItem);
-                } else {
+                }  else {
                     taskItemsUpdate.add(taskItem);
                 }
             }
@@ -209,10 +203,7 @@ public class SQLDataStore {
             updateProjects(projectsUpdate);
             items.removeAll(projectsUpdate);
         }
-        if (projectsDeleted.size() > 0) {
-            deleteProjects(projectsDeleted);
-            items.removeAll(projectsDeleted);
-        }
+
         if (taskItemsAdd.size() > 0) {
             addTaskItems(taskItemsAdd);
             items.removeAll(taskItemsAdd);
@@ -220,10 +211,6 @@ public class SQLDataStore {
         if (taskItemsUpdate.size() > 0) {
             updateTaskItems(taskItemsUpdate);
             items.removeAll(taskItemsUpdate);
-        }
-        if (taskItemsDeleted.size() > 0) {
-            deleteTaskItems(taskItemsDeleted);
-            items.removeAll(taskItemsDeleted);
         }
     }
 
@@ -245,6 +232,14 @@ public class SQLDataStore {
 
     public boolean deleteTaskItems(TaskItem taskItem) {
         return mDbHelper.deleteTaskItem(taskItem.mId) != 0;
+    }
+
+    public boolean deleteAllTaskItems() {
+        return mDbHelper.bulkDeleteItems(TaskItem.TAG, null, null);
+    }
+
+    public boolean deleteAllProjects() {
+        return mDbHelper.bulkDeleteItems(Project.TAG, null, null);
     }
 
     public static void init(Context context) {
