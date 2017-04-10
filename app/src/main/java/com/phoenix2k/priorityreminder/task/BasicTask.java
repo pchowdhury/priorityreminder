@@ -105,7 +105,7 @@ public abstract class BasicTask extends AsyncTask<Void, Void, Object> {
     @Override
     protected void onPreExecute() {
         if (mTaskListener != null) {
-            mTaskListener.onDisplayInfo("");
+            mTaskListener.onStartProcess();
             mTaskListener.onProgress(true, getProgressMessage());
         }
     }

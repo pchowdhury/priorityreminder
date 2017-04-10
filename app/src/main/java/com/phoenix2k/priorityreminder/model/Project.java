@@ -113,7 +113,7 @@ public class Project extends PREntity {
                 String value = (String) values.get(i);
                 switch (Column.values()[i]) {
                     case ID:
-                        project.mId = Long.valueOf(value);
+                        project.mId = value;
                         break;
                     case TITLE:
                         project.mTitle = value;
@@ -272,7 +272,7 @@ public class Project extends PREntity {
         Project project = new Project();
         try {
             if (json.has(Project.Column.ID.name())) {
-                project.mId = json.getLong(Project.Column.ID.name());
+                project.mId = json.getString(Project.Column.ID.name());
             }
             if (json.has(Project.Column.TITLE.name())) {
                 project.mTitle = json.getString(Project.Column.TITLE.name());
@@ -330,7 +330,7 @@ public class Project extends PREntity {
 
     public static ContentValues getProjectContentValues(Project project) {
         ContentValues contentValues = new ContentValues();
-//        contentValues.put(Project.Column.ID.name(), project.mId);
+        contentValues.put(Project.Column.ID.name(), project.mId);
         contentValues.put(Project.Column.TITLE.name(), project.mTitle);
         contentValues.put(Project.Column.ITEM_INDEX.name(), project.mIndex);
         contentValues.put(Project.Column.TYPE.name(), project.mProjectType.ordinal());
@@ -351,7 +351,7 @@ public class Project extends PREntity {
 
     public static Project readProjectFromCursor(Cursor cursor) {
         Project project = new Project();
-        project.mId = cursor.getLong(cursor.getColumnIndex(Column.ID.name()));
+        project.mId = cursor.getString(cursor.getColumnIndex(Column.ID.name()));
         project.mTitle = cursor.getString(cursor.getColumnIndex(Column.TITLE.name()));
         project.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ID.name()));
         project.mProjectType = ProjectType.values()[cursor.getInt(cursor.getColumnIndex(Column.TYPE.name()))];

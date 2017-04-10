@@ -10,6 +10,7 @@ public interface TaskListener extends ErrorCallback{
     void onGoogleServiceAvailibilityError(int statusCode);
     void onUserRecoverableAuthorizationError(UserRecoverableAuthIOException error);
     void onDisplayInfo(String msg);
+    void onStartProcess();
     void onProgress(boolean show, String msg);
     void onFinishQuery(APIType type, Object result);
     GoogleAccountCredential getUserCredentials();

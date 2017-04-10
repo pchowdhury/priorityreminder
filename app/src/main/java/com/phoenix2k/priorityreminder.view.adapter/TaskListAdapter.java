@@ -156,7 +156,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         return mDummyPlaceHolderItem;
     }
 
-    public void setProjectId(Long projectId) {
+    public void setProjectId(String projectId) {
         mDummyPlaceHolderItem.mProjectId = projectId;
     }
 

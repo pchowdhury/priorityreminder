@@ -37,6 +37,8 @@ import com.phoenix2k.priorityreminder.view.DraggableListView;
 import com.phoenix2k.priorityreminder.view.adapter.TaskListAdapter;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +59,7 @@ public class DashboardActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openTaskDetails(Long.valueOf(-1));
+                openTaskDetails(null);
             }
         });
 
@@ -135,34 +137,35 @@ public class DashboardActivity extends AppCompatActivity
      * Wait till the IDGenerator is initialized
      */
     private void validateInitialization() {
-        finishInitialization();
-//        showProgress(true);
-//        final Timer timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (IDGenerator.isInitialized()) {
-//                    timer.cancel();
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            finishInitialization();
-//                        }
-//                    });
-//                } else {
-//                    if (IDGenerator.hasError()) {
-//                        timer.cancel();
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                showProgress(false);
-//                                showFatalErrorDialog();
-//                            }
-//                        });
-//                    }
-//                }
-//            }
-//        }, 0, 500);
+        IDGenerator.init();
+//        finishInitialization();
+        showProgress(true);
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (IDGenerator.isInitialized()) {
+                    timer.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finishInitialization();
+                        }
+                    });
+                } else {
+                    if (IDGenerator.hasError()) {
+                        timer.cancel();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showProgress(false);
+                                showFatalErrorDialog();
+                            }
+                        });
+                    }
+                }
+            }
+        }, 0, 500);
     }
 
     private void showFatalErrorDialog() {
@@ -388,7 +391,7 @@ public class DashboardActivity extends AppCompatActivity
 
     }
 
-    private void openTaskDetails(Long id) {
+    private void openTaskDetails(String id) {
         AddTaskFragment fragment = AddTaskFragment.getInstance(id);
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }

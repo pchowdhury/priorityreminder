@@ -25,7 +25,6 @@ import android.widget.TimePicker;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.Project;
@@ -97,10 +96,10 @@ public class AddTaskFragment extends Fragment {
     private int mPickerType;
     private Calendar mCalender;
 
-    public static AddTaskFragment getInstance(Long itemId) {
+    public static AddTaskFragment getInstance(String itemId) {
         AddTaskFragment fragment = new AddTaskFragment();
         Bundle bundle = new Bundle();
-        bundle.putLong(ITEM_ID, itemId);
+        bundle.putString(ITEM_ID, itemId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -119,8 +118,8 @@ public class AddTaskFragment extends Fragment {
         if (project != null) {
             mProjectTitle.setText(project.mTitle);
             TaskItem taskItem;
-            Long taskId = getTaskId();
-            if (taskId != null && taskId != -1) {
+            String taskId = getTaskId();
+            if (taskId != null) {
                 taskItem = DataStore.getInstance().getTaskItemWithId(taskId);
                 mTaskIndexBackup = taskItem.mIndex;
                 mTaskQuadrantBackup = taskItem.mQuadrantType;
@@ -136,10 +135,10 @@ public class AddTaskFragment extends Fragment {
         }
     }
 
-    private Long getTaskId() {
+    private String getTaskId() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            return bundle.getLong(ITEM_ID);
+            return bundle.getString(ITEM_ID);
         }
         return null;
     }
@@ -259,7 +258,7 @@ public class AddTaskFragment extends Fragment {
         Project project = DataStore.getInstance().getCurrentProject();
         TaskItem item = DataStore.getInstance().getCurrentTaskItem();
         if (project != null && item != null) {
-            if (getTaskId() != null && getTaskId() != -1 && (item.mQuadrantType == mTaskQuadrantBackup)) {//editing
+            if (getTaskId() != null && (item.mQuadrantType == mTaskQuadrantBackup)) {//editing
                 item.mIndex = mTaskIndexBackup;
             } else {//new task
                 item.mIndex = project.getTaskListForQuadrant(item.mQuadrantType).size();
@@ -304,7 +303,7 @@ public class AddTaskFragment extends Fragment {
         KeyboardUtils.hideKeyboard(getActivity());
         TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
         DataStore.getInstance().addToUpdate(updatedItem);
-        if (getTaskId() != null && getTaskId() != -1) {//edited
+        if (getTaskId() != null) {//edited
             if (updatedItem.mQuadrantType != mTaskQuadrantBackup) {
                 //quadrant is changed so need to delete from the quadrant
                 Project project = DataStore.getInstance().getCurrentProject();

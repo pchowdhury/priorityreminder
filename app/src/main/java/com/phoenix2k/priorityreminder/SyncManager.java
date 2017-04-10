@@ -19,12 +19,25 @@ import java.util.ArrayList;
 public class SyncManager implements TaskListener {
     private static final String TAG = "SyncManager";
     private static SyncManager mInstance;
+    private ArrayList<SyncListener> mListeners = new ArrayList<>();
 
     public static SyncManager getInstance() {
         if (mInstance == null) {
             mInstance = new SyncManager();
         }
         return mInstance;
+    }
+
+    public void startListening(SyncListener listener) {
+        if (listener != null && !mListeners.contains(listener)) {
+            mListeners.add(listener);
+        }
+    }
+
+    public void stopListening(SyncListener listener) {
+        if (listener != null && mListeners.contains(listener)) {
+            mListeners.remove(listener);
+        }
     }
 
     public void startSync(Context context, GoogleAccountCredential credentials, ArrayList<Object> items) {
@@ -43,7 +56,16 @@ public class SyncManager implements TaskListener {
 
     @Override
     public void onDisplayInfo(String msg) {
+        for(SyncListener listener : mListeners){
+            listener.onSyncCompleteFailed(msg);
+        }
+    }
 
+    @Override
+    public void onStartProcess() {
+        for(SyncListener listener : mListeners){
+            listener.onSyncStart();
+        }
     }
 
     @Override
@@ -55,7 +77,18 @@ public class SyncManager implements TaskListener {
     public void onFinishQuery(APIType type, Object result) {
         switch (type) {
             case Sheet_Push_Updates:
-                LogUtils.logI(TAG, "Successfully updated");
+                if (result != null) {
+                    boolean isUpdated = (Boolean) result;
+                    if (isUpdated) {
+                        for(SyncListener listener : mListeners){
+                            listener.onSyncCompleteWithSucess();
+                        }
+                    } else {
+                        onDisplayInfo("Couldn't finish Sync");
+                    }
+                } else {
+                    onDisplayInfo("Error Syncing");
+                }
                 break;
         }
     }
@@ -68,5 +101,14 @@ public class SyncManager implements TaskListener {
     @Override
     public void onError(String err) {
         LogUtils.logI(TAG, err);
+    }
+
+    public interface SyncListener {
+
+        void onSyncStart();
+
+        void onSyncCompleteWithSucess();
+
+        void onSyncCompleteFailed(String errorMsg);
     }
 }

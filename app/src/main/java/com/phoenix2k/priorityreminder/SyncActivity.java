@@ -30,7 +30,7 @@ import butterknife.ButterKnife;
  * Created by Pushpan on 05/02/17.
  */
 
-public class SyncActivity extends BasicCommunicationActivity {
+public class SyncActivity extends BasicCommunicationActivity implements SyncManager.SyncListener {
     private static final String TAG = "SignInActivity";
     private static final boolean ENABLE_CACHE = false;
     private static final boolean GENERATE_CACHE = false;
@@ -50,6 +50,7 @@ public class SyncActivity extends BasicCommunicationActivity {
         setContentView(R.layout.activity_signin);
         ButterKnife.bind(this);
         setUpCache();
+        SyncManager.getInstance().startListening(this);
         attemptSignIn();
     }
 
@@ -79,8 +80,13 @@ public class SyncActivity extends BasicCommunicationActivity {
     }
 
     @Override
+    public void onStartProcess() {
+
+    }
+
+    @Override
     public void onProgress(boolean show, String message) {
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -159,10 +165,12 @@ public class SyncActivity extends BasicCommunicationActivity {
             case Sheet_Load_Projects_Metadata:
                 if (result != null) {
                     mRemoteProjects = (ArrayList<Project>) result;
-                    new LoadAllTasks(this, getUserCredentials(), this);
+                    new LoadAllTasks(this, getUserCredentials(), this).execute();
                 } else {
-                    LogUtils.logI(TAG, "Error loading projects");
-                    onDisplayInfo("Error loading projects");
+                    LogUtils.logI(TAG, "No projects");
+                    mRemoteProjects = null;
+                    mRemoteTasks = null;
+                    mergeWithRemote(mRemoteProjects, mRemoteTasks);
                 }
                 break;
             case Sheet_Load_All_Tasks:
@@ -170,22 +178,9 @@ public class SyncActivity extends BasicCommunicationActivity {
                     mRemoteTasks = (ArrayList<TaskItem>) result;
                     mergeWithRemote(mRemoteProjects, mRemoteTasks);
                 } else {
-                    LogUtils.logI(TAG, "Error loading projects");
-                    onDisplayInfo("Error loading projects");
-                }
-                break;
-            case Sheet_Push_Updates:
-                if (result != null) {
-                    boolean isUpdated = (Boolean) result;
-                    if (isUpdated) {
-                        onSyncComplete();
-                    } else {
-                        LogUtils.logI(TAG, "Couldn't finish Sync");
-                        onDisplayInfo("Couldn't finish Sync");
-                    }
-                } else {
-                    LogUtils.logI(TAG, "Error Syncing");
-                    onDisplayInfo("Error Syncing");
+                    LogUtils.logI(TAG, "No TaskItem found");
+                    mRemoteTasks = null;
+                    mergeWithRemote(mRemoteProjects, mRemoteTasks);
                 }
                 break;
         }
@@ -211,10 +206,10 @@ public class SyncActivity extends BasicCommunicationActivity {
 //        };
 
 
-        if (remoteProjects != null) {
+        if (remoteProjects == null) {
             remoteProjects = new ArrayList<>();
         }
-        if (remoteTasks != null) {
+        if (remoteTasks == null) {
             remoteTasks = new ArrayList<>();
         }
 
@@ -225,10 +220,10 @@ public class SyncActivity extends BasicCommunicationActivity {
         ArrayList<Project> localProjects = SQLDataStore.getInstance().getAllProjects();
         ArrayList<TaskItem> localTasks = SQLDataStore.getInstance().getTaskItems(null, null, null);
 
-        if (localProjects != null) {
+        if (localProjects == null) {
             localProjects = new ArrayList<>();
         }
-        if (localTasks != null) {
+        if (localTasks == null) {
             localTasks = new ArrayList<>();
         }
 
@@ -247,14 +242,15 @@ public class SyncActivity extends BasicCommunicationActivity {
         ArrayList<TaskItem> mergedTaskItems = new ArrayList<>();
 
         //STEP 3a: Compare Projects
-
+        boolean hasLocalUpdateSinceLastSync = false;
         while (remoteProjects.size() > 0) {
             Project remoteProject = remoteProjects.get(0);
             Project localProject = localProjectMap.get(remoteProject.mId + "");
             if (localProject != null) {
                 //project is common, keep the latest project and reject the old
-                if (localProject.mUpdatedOn >= remoteProject.mUpdatedOn) {
+                if (localProject.mUpdatedOn > remoteProject.mUpdatedOn) {
                     mergedProjects.add(localProject);
+                    hasLocalUpdateSinceLastSync = true;
                 } else {
                     mergedProjects.add(remoteProject);
                 }
@@ -271,7 +267,9 @@ public class SyncActivity extends BasicCommunicationActivity {
         if (localProjects.size() > 0) {
             mergedProjects.addAll(localProjects);
             localProjects.clear();
+            hasLocalUpdateSinceLastSync = true;
         }
+
 
         //STEP 3b: Compare taskItem
 
@@ -282,6 +280,7 @@ public class SyncActivity extends BasicCommunicationActivity {
                 //task is common, keep the latest project and reject the old
                 if (localTaskItem.mUpdatedOn >= remoteTaskItem.mUpdatedOn) {
                     mergedTaskItems.add(localTaskItem);
+                    hasLocalUpdateSinceLastSync = true;
                 } else {
                     mergedTaskItems.add(remoteTaskItem);
                 }
@@ -298,6 +297,13 @@ public class SyncActivity extends BasicCommunicationActivity {
         if (localTasks.size() > 0) {
             mergedTaskItems.addAll(localTasks);
             localTasks.clear();
+            hasLocalUpdateSinceLastSync = true;
+        }
+
+        if(!hasLocalUpdateSinceLastSync){
+            LogUtils.logD(TAG, "Already up to date");
+            onSyncComplete();
+            return;
         }
 
         ArrayList<Object> mergedItems = new ArrayList<>();
@@ -317,21 +323,27 @@ public class SyncActivity extends BasicCommunicationActivity {
             mergedItems.add(clearProject);
         }
 
+        //replace the Projects
+        if (remoteProjectCount > 0) {
+            SQLDataStore.getInstance().deleteAllProjects();
+            SQLDataStore.getInstance().addProjects(mergedProjects);
+        }
+        //replace the TaskItems
+        if (remoteTaskItemCount > 0) {
+            SQLDataStore.getInstance().deleteAllTaskItems();
+            SQLDataStore.getInstance().addTaskItems(mergedTaskItems);
+        }
 
-        SQLDataStore.getInstance().deleteAllProjects();
-        SQLDataStore.getInstance().deleteAllTaskItems();
-        SQLDataStore.getInstance().addProjects(mergedProjects);
-        SQLDataStore.getInstance().addTaskItems(mergedTaskItems);
         SyncManager.getInstance().startSync(this, getUserCredentials(), mergedItems);
     }
 
     private void onSetupValidationComplete() {
-        new LoadProjectsTask(this, getUserCredentials(), this);
+        new LoadProjectsTask(this, getUserCredentials(), this).execute();
     }
 
 
     private void onSyncComplete() {
-        Toast.makeText(this, "Project synced", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Syncing completed successfully", Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
     }
@@ -339,5 +351,27 @@ public class SyncActivity extends BasicCommunicationActivity {
     private void onSyncFailed() {
         setResult(RESULT_CANCELED);
         finish();
+    }
+
+    @Override
+    public void onSyncStart() {
+
+    }
+
+    @Override
+    public void onSyncCompleteWithSucess() {
+        onSyncComplete();
+    }
+
+    @Override
+    public void onSyncCompleteFailed(String errorMsg) {
+            onDisplayInfo("Couldn't finish Sync");
+            onSyncFailed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        SyncManager.getInstance().stopListening(this);
+        super.onDestroy();
     }
 }

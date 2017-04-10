@@ -54,7 +54,7 @@ public class DbHelper extends SQLiteOpenHelper {
             Project.Column col = Project.Column.values()[i];
             String colStr = col.name();
             if (i == 0) {
-                colStr += " INTEGER PRIMARY KEY";
+                colStr += " TEXT";
             } else {
                 colStr = ", " + colStr + " TEXT";
             }
@@ -70,7 +70,7 @@ public class DbHelper extends SQLiteOpenHelper {
             TaskItem.Column col = TaskItem.Column.values()[i];
             String colStr = col.name();
             if (i == 0) {
-                colStr += " INTEGER PRIMARY KEY";
+                colStr += " TEXT";
             } else {
                 colStr = ", " + colStr + " TEXT";
             }
@@ -89,7 +89,6 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Long id = db.insert(Project.TAG, null, Project.getProjectContentValues(project));
         if (id != -1) {
-            project.mId = id;
             return true;
         }
         return false;
@@ -99,7 +98,6 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long id = db.insert(TaskItem.TAG, null, TaskItem.getTaskItemContentValues(taskItem));
         if (id != -1) {
-            taskItem.mId = id;
             return true;
         } else {
             return false;
@@ -120,28 +118,28 @@ public class DbHelper extends SQLiteOpenHelper {
 
     protected boolean updateProject(Project project) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int rows = db.update(Project.TAG, Project.getProjectContentValues(project), Project.Column.ID + " = ? ", new String[]{Long.toString(project.mId)});
+        int rows = db.update(Project.TAG, Project.getProjectContentValues(project), Project.Column.ID + " = ? ", new String[]{project.mId});
         return (rows != -1);
     }
 
     protected boolean updateTaskItem(TaskItem taskItem) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int rows = db.update(Project.TAG, TaskItem.getTaskItemContentValues(taskItem), TaskItem.Column.ID + " = ? ", new String[]{Long.toString(taskItem.mId)});
+        int rows = db.update(Project.TAG, TaskItem.getTaskItemContentValues(taskItem), TaskItem.Column.ID + " = ? ", new String[]{taskItem.mId});
         return (rows != -1);
     }
 
-    protected Integer deleteProject(long id) {
+    protected Integer deleteProject(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(Project.TAG,
                 Project.Column.ID.name() + " = ? ",
-                new String[]{Long.toString(id)});
+                new String[]{id});
     }
 
-    protected Integer deleteTaskItem(long id) {
+    protected Integer deleteTaskItem(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TaskItem.TAG,
                 TaskItem.Column.ID.name() + " = ? ",
-                new String[]{Long.toString(id)});
+                new String[]{id});
     }
 
     protected ArrayList<Long> bulkInsertValues(String table, List<ContentValues> list) {
@@ -167,7 +165,7 @@ public class DbHelper extends SQLiteOpenHelper {
         try {
             for (int i = 0; i < list.size(); i++) {
                 ContentValues set = list.get(i);
-                db.update(table, set, idName + " = ?", new String[]{ids.get(i) + ""});
+                db.update(table, set, idName + " = ?", new String[]{ids.get(i)});
             }
             db.setTransactionSuccessful();
         } catch (SQLException e) {
@@ -185,7 +183,7 @@ public class DbHelper extends SQLiteOpenHelper {
         try {
             if (idName != null) {
                 for (int i = 0; i < ids.size(); i++) {
-                    db.delete(table, idName + " = ?", new String[]{ids.get(i) + ""});
+                    db.delete(table, idName + " = ?", new String[]{ids.get(i)});
                 }
             }else{
                 db.delete(table, null, null);

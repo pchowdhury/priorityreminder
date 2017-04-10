@@ -7,6 +7,7 @@ import android.database.Cursor;
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.utils.IDGenerator;
 
 import java.util.ArrayList;
 
@@ -131,7 +132,6 @@ public class SQLDataStore {
         ArrayList<Long> ids = mDbHelper.bulkInsertValues(Project.TAG, list);
         for (int i = 0; i < projects.size(); i++) {
             Project project = projects.get(i);
-            project.mId = ids.get(i);
             projects.remove(project);
         }
     }
@@ -144,7 +144,7 @@ public class SQLDataStore {
         ArrayList<Long> ids = mDbHelper.bulkInsertValues(TaskItem.TAG, list);
         for (int i = 0; i < taskItems.size(); i++) {
             TaskItem taskItem = taskItems.get(i);
-            taskItem.mId = ids.get(i);
+            taskItems.remove(taskItem);
         }
     }
 
@@ -180,18 +180,20 @@ public class SQLDataStore {
         for (Object obj : items) {
             if (obj instanceof Project) {
                 Project project = (Project) obj;
-                if (project.mId == -1) {
+                if (project.mUpdatedOn == -1) {
                     projectsAdd.add(project);
                 }  else {
                     projectsUpdate.add(project);
                 }
+                project.mUpdatedOn= IDGenerator.getCurrentTimeStamp();
             } else if (obj instanceof TaskItem) {
                 TaskItem taskItem = (TaskItem) obj;
-                if (taskItem.mId == -1) {
+                if (taskItem.mUpdatedOn == -1) {
                     taskItemsAdd.add(taskItem);
                 }  else {
                     taskItemsUpdate.add(taskItem);
                 }
+                taskItem.mUpdatedOn= IDGenerator.getCurrentTimeStamp();
             }
         }
 

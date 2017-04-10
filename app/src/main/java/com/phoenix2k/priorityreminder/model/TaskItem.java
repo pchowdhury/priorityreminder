@@ -47,7 +47,7 @@ public class TaskItem extends PREntity {
         Yearly
     }
 
-    public Long mProjectId;
+    public String mProjectId;
     public QuadrantType mQuadrantType;
     public String mDescription;
     public int mIcon;
@@ -69,7 +69,6 @@ public class TaskItem extends PREntity {
 
     public static TaskItem newBlankTaskItem() {
         TaskItem item = new TaskItem();
-        item.mId = Long.valueOf(-1);
         return item;
     }
 
@@ -81,10 +80,10 @@ public class TaskItem extends PREntity {
                 String value = (String) values.get(i);
                 switch (Column.values()[i]) {
                     case ID:
-                        taskItem.mId = Long.valueOf(value);
+                        taskItem.mId = value;
                         break;
                     case PROJECT_ID:
-                        taskItem.mProjectId = Long.valueOf(value);
+                        taskItem.mProjectId = value;
                         break;
                     case TITLE:
                         taskItem.mTitle = value;
@@ -163,7 +162,7 @@ public class TaskItem extends PREntity {
                         "\nmRepeatType:" + mRepeatType.name() +
                         "\nmCreatedOn:" + mCreatedOn +
                         "\nmUpdatedOn:" + mUpdatedOn +
-                        "\nmTrashed:"+mTrashed+
+                        "\nmTrashed:" + mTrashed +
                         "\n}";
     }
 
@@ -193,10 +192,10 @@ public class TaskItem extends PREntity {
         TaskItem taskItem = new TaskItem();
         try {
             if (json.has(Column.ID.name())) {
-                taskItem.mId = json.getLong(Column.ID.name());
+                taskItem.mId = json.getString(Column.ID.name());
             }
             if (json.has(Column.PROJECT_ID.name())) {
-                taskItem.mProjectId = json.getLong(Column.PROJECT_ID.name());
+                taskItem.mProjectId = json.getString(Column.PROJECT_ID.name());
             }
             if (json.has(Column.TITLE.name())) {
                 taskItem.mTitle = json.getString(Column.TITLE.name());
@@ -239,6 +238,7 @@ public class TaskItem extends PREntity {
 
     public static ContentValues getTaskItemContentValues(TaskItem taskItem) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(Column.ID.name(), taskItem.mId);
         contentValues.put(Column.PROJECT_ID.name(), taskItem.mProjectId);
         contentValues.put(Column.TITLE.name(), taskItem.mTitle);
         contentValues.put(Column.ITEM_INDEX.name(), taskItem.mIndex);
@@ -256,8 +256,8 @@ public class TaskItem extends PREntity {
 
     public static TaskItem readTaskItemFromCursor(Cursor cursor) {
         TaskItem item = new TaskItem();
-        item.mId = cursor.getLong(cursor.getColumnIndex(Column.ID.name()));
-        item.mProjectId = cursor.getLong(cursor.getColumnIndex(Column.PROJECT_ID.name()));
+        item.mId = cursor.getString(cursor.getColumnIndex(Column.ID.name()));
+        item.mProjectId = cursor.getString(cursor.getColumnIndex(Column.PROJECT_ID.name()));
         item.mTitle = cursor.getString(cursor.getColumnIndex(Column.TITLE.name()));
         item.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ITEM_INDEX.name()));
         item.mDescription = cursor.getString(cursor.getColumnIndex(Column.DESCRIPTION.name()));

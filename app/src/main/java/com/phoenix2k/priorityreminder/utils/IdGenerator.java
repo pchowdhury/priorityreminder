@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 /**
  * Created by Pushpan on 06/02/17.
@@ -21,17 +22,21 @@ public class IDGenerator {
     private boolean mInitialized = false;
     String mError;
 
-//    public static int generateUniqueId() {
-//        UUID idOne = UUID.randomUUID();
-//        String str = "" + idOne;
-//        int uid = str.hashCode();
-//        String filterStr = "" + uid;
-//        str = filterStr.replaceAll("-", "");
-//        return Integer.parseInt(str);
+    public static String generateUniqueId() {
+        UUID idOne = UUID.randomUUID();
+        String str = "" + idOne;
+        int uid = str.hashCode();
+        String filterStr = "" + uid;
+        str = filterStr.replaceAll("-", "");
+        return Long.parseLong(str) + "";
+    }
+
+
+//    public static long generateUniqueId() {
+//        return mInstance.mCurrentMillis;
 //    }
 
-
-    public static long generateUniqueId() {
+    public static long getCurrentTimeStamp() {
         return mInstance.mCurrentMillis;
     }
 
@@ -55,7 +60,7 @@ public class IDGenerator {
                     } else {
                         mInstance.mError = "No Date";
                     }
-                    LogUtils.logI("Date", dateStr);
+                    LogUtils.logI("Date", "Current time is" + dateStr);
                     //Tue, 07 Feb 2017 17:42:57 GMT
                     SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
                     final Date date = format.parse(dateStr);
