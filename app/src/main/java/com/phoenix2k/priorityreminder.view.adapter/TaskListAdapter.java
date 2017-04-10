@@ -64,6 +64,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
                     if (!mActionTaken && !mDragging && maxMovement > mContext.getResources().getDimension(R.dimen.drag_threshold) && diffX > diffY) {
                         mDragging = true;
                         TaskItem task = getTaskItemFromView(v);
+                        if (task.mUpdatedOn == -1) {
+                            return true;
+                        }
                         ClipData data = ClipData.newPlainText("clipData", task.toString() + "");
                         View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -194,8 +197,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
             int[] location = new int[2];
             mRecyclerView.getLocationOnScreen(location);
             View v = mRecyclerView.findChildViewUnder(e.getRawX() - location[0], e.getRawY() - location[1]);
-            if (mOnTaskInteractionListener != null) {
-                mOnTaskInteractionListener.onClickTaskItem((getTaskItemFromView(v)));
+            TaskItem item = getTaskItemFromView(v);
+            if (mOnTaskInteractionListener != null && item.mUpdatedOn != -1) {
+                mOnTaskInteractionListener.onClickTaskItem((item));
             }
             mActionTaken = true;
             return false;

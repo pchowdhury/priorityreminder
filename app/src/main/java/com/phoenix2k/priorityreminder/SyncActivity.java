@@ -86,7 +86,9 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
 
     @Override
     public void onProgress(boolean show, String message) {
-        mProgressView.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        if (show) {
+            mProgressView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -96,11 +98,9 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (result != null) {
                     PreferenceHelper.setAppFolderId(this, result.toString());
                     LogUtils.logI(TAG, "Folder Id =" + result.toString());
-                    onDisplayInfo("Folder Id =" + result.toString());
                     new SearchFileTask(this, getUserCredentials(), this, APIType.Drive_Search_Project_File).execute();
                 } else {
                     LogUtils.logI(TAG, "Folder Id not found");
-                    onDisplayInfo("Folder Id not found");
                     new CreateAppFolderTask(this, getUserCredentials(), this).execute();
                 }
                 break;
@@ -108,7 +108,6 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (result != null) {
                     PreferenceHelper.setAppFolderId(this, result.toString());
                     LogUtils.logI(TAG, "Folder Id created =" + result.toString());
-                    onDisplayInfo("Folder Id created =" + result.toString());
                     new SearchFileTask(this, getUserCredentials(), this, APIType.Drive_Search_Project_File).execute();
                 } else {
                     LogUtils.logI(TAG, "Folder couldn't be created");
@@ -119,11 +118,9 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (result != null) {
                     PreferenceHelper.setProjectFileId(this, result.toString());
                     LogUtils.logI(TAG, "Project File Id =" + result.toString());
-                    onDisplayInfo("project File Id =" + result.toString());
                     new SearchFileTask(this, getUserCredentials(), this, APIType.Drive_Search_Data_File).execute();
                 } else {
                     LogUtils.logI(TAG, "Project File Id not found");
-                    onDisplayInfo("Project File Id not found");
                     new CreateFileTask(APIType.Drive_Project_File_Create, this, getUserCredentials(), this).execute();
                 }
                 break;
@@ -131,9 +128,7 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (result != null) {
                     PreferenceHelper.setProjectFileId(this, result.toString());
                     LogUtils.logI(TAG, "Project File Id created =" + result.toString());
-                    onDisplayInfo("Project File Id created =" + result.toString());
                     new SearchFileTask(this, getUserCredentials(), this, APIType.Drive_Search_Data_File).execute();
-//                    new CreateFileTask(APIType.Drive_Data_File_Create, this, getUserCredentials(), this).execute();
                 } else {
                     LogUtils.logI(TAG, "Project file couldn't be created");
                     onDisplayInfo("Project file couldn't be created");
@@ -143,11 +138,9 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (result != null) {
                     PreferenceHelper.setDataFileId(this, result.toString());
                     LogUtils.logI(TAG, "Data File Id =" + result.toString());
-                    onDisplayInfo("Data File Id =" + result.toString());
                     onSetupValidationComplete();
                 } else {
                     LogUtils.logI(TAG, "Data File Id not found");
-                    onDisplayInfo("Data File Id not found");
                     new CreateFileTask(APIType.Drive_Data_File_Create, this, getUserCredentials(), this).execute();
                 }
                 break;
@@ -155,7 +148,6 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (result != null) {
                     PreferenceHelper.setDataFileId(this, result.toString());
                     LogUtils.logI(TAG, "Data File Id created =" + result.toString());
-                    onDisplayInfo("Data File Id created =" + result.toString());
                     onSetupValidationComplete();
                 } else {
                     LogUtils.logI(TAG, "Data file couldn't be created");
@@ -188,23 +180,6 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
 
 
     public void mergeWithRemote(ArrayList<Project> remoteProjects, ArrayList<TaskItem> remoteTasks) {
-
-        //STEP 1: get latest updated tiem for both
-
-//        Comparator<Project> projectComparator = new Comparator<Project>() {
-//            @Override
-//            public int compare(Project p1, Project p2) {
-//                return Long.valueOf(p1.mUpdatedOn).compareTo(Long.valueOf(p2.mUpdatedOn));
-//            }
-//        };
-//
-//        Comparator<TaskItem> taskItemComparator = new Comparator<TaskItem>() {
-//            @Override
-//            public int compare(TaskItem p1, TaskItem p2) {
-//                return Long.valueOf(p1.mUpdatedOn).compareTo(Long.valueOf(p2.mUpdatedOn));
-//            }
-//        };
-
 
         if (remoteProjects == null) {
             remoteProjects = new ArrayList<>();
@@ -300,7 +275,7 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
             hasLocalUpdateSinceLastSync = true;
         }
 
-        if(!hasLocalUpdateSinceLastSync){
+        if (!hasLocalUpdateSinceLastSync) {
             LogUtils.logD(TAG, "Already up to date");
             onSyncComplete();
             return;
@@ -334,7 +309,12 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
             SQLDataStore.getInstance().addTaskItems(mergedTaskItems);
         }
 
-        SyncManager.getInstance().startSync(this, getUserCredentials(), mergedItems);
+        if (mergedItems.size() > 0) {
+            SyncManager.getInstance().startSync(this, getUserCredentials(), mergedItems);
+        }else{
+            LogUtils.logD(TAG, "Already up to date");
+            onSyncComplete();
+        }
     }
 
     private void onSetupValidationComplete() {
@@ -365,8 +345,8 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
 
     @Override
     public void onSyncCompleteFailed(String errorMsg) {
-            onDisplayInfo("Couldn't finish Sync");
-            onSyncFailed();
+        onDisplayInfo("Couldn't finish Sync");
+        onSyncFailed();
     }
 
     @Override
