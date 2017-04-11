@@ -7,12 +7,12 @@
         android:orderInCategory="101"
         android:title="@string/action_sync"
         android:actionViewClass="android.widget.ImageButton"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="collapseActionView" />
     <item
         android:id="@+id/action_logout"
         android:icon="@drawable/power"
         android:orderInCategory="102"
         android:title="@string/action_logout"
         android:actionViewClass="android.widget.ImageButton"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="collapseActionView" />
 </menu>

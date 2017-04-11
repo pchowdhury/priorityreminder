@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -16,14 +18,17 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.DragEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
@@ -47,6 +52,12 @@ public class DashboardActivity extends AppCompatActivity
         implements OnNavigationListener, UpdateListener, TaskListAdapter.OnTaskInteractionListener {
     @BindView(R.id.main_progress)
     public View mMainProress;
+    @BindView(R.id.drawer_layout)
+    public DrawerLayout mDrawer;
+
+
+    public TextView mProjectTitleText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +65,10 @@ public class DashboardActivity extends AppCompatActivity
         setContentView(R.layout.activity_dashboard);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setPadding(0, 0, 0, 0);
+        toolbar.setContentInsetsAbsolute(0, 0);
         setSupportActionBar(toolbar);
+        applyCustomActionbarSettings(getSupportActionBar());
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,11 +77,11 @@ public class DashboardActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.setDrawerListener(toggle);
+//        toggle.syncState();
 
         View.OnDragListener listener = new View.OnDragListener() {
             @Override
@@ -131,6 +145,48 @@ public class DashboardActivity extends AppCompatActivity
         loadIconsInDataStore();
         DataStore.getInstance().setDragListener(listener);
         validateInitialization();
+    }
+
+
+    public void applyCustomActionbarSettings(ActionBar supportActionBar) {
+        if (supportActionBar != null) {
+            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+            supportActionBar.setLogo(null);
+            supportActionBar.setIcon(null);
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setDisplayShowCustomEnabled(true);
+            supportActionBar.setDisplayShowHomeEnabled(false);
+            supportActionBar.setDisplayHomeAsUpEnabled(false);
+            final View customActionBarView = inflater.inflate(
+                    R.layout.custom_action_bar, null);
+            ImageView actionBarLogo = (ImageView) customActionBarView.findViewById(R.id.actionBarLogo);
+            actionBarLogo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+                        mDrawer.closeDrawer(GravityCompat.START);
+                    } else {
+                        mDrawer.openDrawer(GravityCompat.START);
+                    }
+                }
+            });
+            mProjectTitleText = (TextView) customActionBarView.findViewById(R.id.project_name);
+            TextView projectVersionTitleText = (TextView) customActionBarView.findViewById(R.id.action_bar_app_version);
+            PackageInfo pInfo;
+            String version = " v";
+            try {
+                pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                version += pInfo.versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            projectVersionTitleText.setText(getString(R.string.app_name) + version);
+            supportActionBar.setCustomView(customActionBarView);
+            ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
+                    ActionBar.LayoutParams.MATCH_PARENT);
+            layoutParams.height = (int) getResources().getDimension(R.dimen.dashboard_action_bar_height);
+            supportActionBar.setCustomView(customActionBarView, layoutParams);
+        }
     }
 
     /**
@@ -234,9 +290,8 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
         } else {
             showLogoutConfirmationDialog();
         }
@@ -280,18 +335,25 @@ public class DashboardActivity extends AppCompatActivity
         }
     }
 
+    void updateTitle() {
+        Project project = DataStore.getInstance().getCurrentProject();
+        if (project != null) {
+            mProjectTitleText.setText(project.mTitle);
+        }
+    }
+
     @Override
     public boolean onProjectSelected(Project project, boolean closeSlider) {
         cancelProjectEdit();
         DataStore.getInstance().setCurrentProject(project);
+        updateTitle();
         if (getSupportFragmentManager().findFragmentByTag(FourQuadrantFragment.TAG) == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_dashboard, new FourQuadrantFragment(), FourQuadrantFragment.TAG).commit();
         }
         if (closeSlider) {
             // Handle navigation view item clicks here.
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+            mDrawer.closeDrawer(GravityCompat.START);
         }
         reloadDashboard();
         return true;
@@ -306,8 +368,7 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onAddNewProject() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mDrawer.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -316,6 +377,7 @@ public class DashboardActivity extends AppCompatActivity
         if (fragment != null) {
             fragment.openToEdit(false);
         }
+        updateTitle();
     }
 
     @Override

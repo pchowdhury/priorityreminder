@@ -72,7 +72,7 @@ public class ProjectListFragment extends BasicFragment {
         DataStore.getInstance().setUpNotifications();
         validateTasks();
 
-
+        setEditMode(false);
         mListView.setAdapter(null);
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new ProjectsAdapter(getActivity());
@@ -135,8 +135,10 @@ public class ProjectListFragment extends BasicFragment {
 
     public void setEditMode(boolean mEditMode) {
         this.mEditMode = mEditMode;
-        if (mAdapter!=null) {
-            mAdapter.notifyDataSetChanged();
+        if (mAdapter != null) {
+            if (DataStore.getInstance().getCurrentProjectIndex() >= 0) {
+                mAdapter.notifyItemChanged(DataStore.getInstance().getCurrentProjectIndex());
+            }
         }
     }
 
