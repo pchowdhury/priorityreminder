@@ -106,7 +106,7 @@ public class DataStore {
         return mNewProject;
     }
 
-    public void confirmSaveProject() {
+    public Project confirmSaveProject() {
         if (mNewProject != null) {
             setCurrentProject(mNewProject);
             mNewProject = null;
@@ -114,7 +114,8 @@ public class DataStore {
         addToUpdate(getCurrentProject());
         SQLDataStore.getInstance().updateItems(mUpdates);
         setProjects(SQLDataStore.getInstance().getProjects(false));
-        mCurrentProjectIndex = mProjects.size() - 1;
+        mCurrentProjectIndex = getCurrentProject().mIndex;
+        return getCurrentProject();
     }
 
     public int getLastProjectIndex() {
@@ -171,7 +172,7 @@ public class DataStore {
     }
 
 
-    public void deleteProject() {
+    public Project deleteProject() {
         Project project = getCurrentProject();
         //set the new index of all projects
         ArrayList<Project> sortedProjects = new ArrayList<>(mProjects);
@@ -205,9 +206,10 @@ public class DataStore {
             }
         }
         SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
+        return project;
     }
 
-    public void deleteTask(TaskItem item) {
+    public TaskItem deleteTask(TaskItem item) {
         Project project = mProjectsMap.get(item.mProjectId);
         //set the new index of all items of the quadrant
         ArrayList<TaskItem> taskList = project.getTaskListForQuadrant(item.mQuadrantType);
@@ -224,6 +226,7 @@ public class DataStore {
         addToUpdate(item);
         setTasks(mTasks);
         SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
+        return item;
     }
 
     public int getLastTaskPosition() {

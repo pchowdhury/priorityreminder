@@ -15,6 +15,8 @@
     <string name="progress_updating_task">Updating task...</string>
     <string name="progress_updating">Updating ...</string>
     <string name="progress_getting_ready">Getting ready ...</string>
+    <string name="progress_syncing">Syncing projects....</string>
+
 
     <string name="dialog_lbl_fatal_error_recoverable">Failed to initialize. Please check your internet connection and retry.</string>
     <string name="dialog_title_fatal_error_recoverable">Error</string>
@@ -24,6 +26,7 @@
 
 
     <string name="add_project_title">Add Project</string>
+    <string name="edit_project_title">Edit Project</string>
     <string name="add_task_title">Add Task</string>
     <string name="lbl_project_title">Add Title</string>
     <string name="btn_add_project"> + Add Project</string>

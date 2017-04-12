@@ -353,7 +353,7 @@ public class Project extends PREntity {
         Project project = new Project();
         project.mId = cursor.getString(cursor.getColumnIndex(Column.ID.name()));
         project.mTitle = cursor.getString(cursor.getColumnIndex(Column.TITLE.name()));
-        project.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ID.name()));
+        project.mIndex = cursor.getInt(cursor.getColumnIndex(Column.ITEM_INDEX.name()));
         project.mProjectType = ProjectType.values()[cursor.getInt(cursor.getColumnIndex(Column.TYPE.name()))];
         project.mCreatedOn = cursor.getLong(cursor.getColumnIndex(Column.CREATED_ON.name()));
         project.mUpdatedOn = cursor.getLong(cursor.getColumnIndex(Column.UPDATED_ON.name()));

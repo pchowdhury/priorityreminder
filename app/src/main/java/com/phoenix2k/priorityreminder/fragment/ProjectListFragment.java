@@ -57,22 +57,10 @@ public class ProjectListFragment extends BasicFragment {
         return R.layout.layout_project_list;
     }
 
-    /**
-     * Check all the state tasks for due dates. If any of them is already in due date then change the sate to due quadrant
-     * and update by calling sync
-     */
-    private void validateTasks() {
-        DataStore.getInstance().validateTaskStatus();
-        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
-    }
+
 
     @Override
     public void loadView() {
-        DataStore.getInstance().reloadItems(getActivity());
-        PRNotificationManager.init(getActivity().getApplicationContext());
-        DataStore.getInstance().setUpNotifications();
-        validateTasks();
-
         setEditMode(false);
         mListView.setAdapter(null);
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -135,12 +123,12 @@ public class ProjectListFragment extends BasicFragment {
     }
 
     public void setEditMode(boolean mEditMode) {
-        this.mEditMode = mEditMode && isTablet();
-        if (mAdapter != null) {
-            if (DataStore.getInstance().getCurrentProjectIndex() >= 0) {
-                mAdapter.notifyItemChanged(DataStore.getInstance().getCurrentProjectIndex());
-            }
-        }
+//        this.mEditMode = mEditMode && isTablet();
+//        if (mAdapter != null) {
+//            if (DataStore.getInstance().getCurrentProjectIndex() >= 0) {
+//                mAdapter.notifyItemChanged(DataStore.getInstance().getCurrentProjectIndex());
+//            }
+//        }
     }
 
     public boolean isTablet() {
@@ -183,7 +171,7 @@ public class ProjectListFragment extends BasicFragment {
         public void onBindViewHolder(ProjectViewHolder projectViewHolder, int i) {
             Project project = DataStore.getInstance().getProjects().get(i);
             projectViewHolder.mNameTxt.setText(project.mTitle);
-            projectViewHolder.mImageView.setOnClickListener(mOnClickListener);
+//            projectViewHolder.mImageView.setOnClickListener(mOnClickListener);
             if (i == mSelectedIndex) {
                 projectViewHolder.mLytRoot.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
                 projectViewHolder.mNameTxt.setTextColor(Color.WHITE);
@@ -199,16 +187,16 @@ public class ProjectListFragment extends BasicFragment {
             return DataStore.getInstance().getProjects().size();
         }
 
-        View.OnClickListener mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnNavigationListener != null) {
-                    mOnNavigationListener.onDeleteProject();
-                }
-                setEditMode(false);
-                loadView();
-            }
-        };
+//        View.OnClickListener mOnClickListener = new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mOnNavigationListener != null) {
+//                    mOnNavigationListener.onDeleteProject();
+//                }
+//                setEditMode(false);
+//                loadView();
+//            }
+//        };
     }
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder {

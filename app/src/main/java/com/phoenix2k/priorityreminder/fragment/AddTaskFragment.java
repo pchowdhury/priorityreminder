@@ -28,6 +28,7 @@ import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
 import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
+import com.phoenix2k.priorityreminder.model.PREntity;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.store.SQLDataStore;
@@ -50,6 +51,7 @@ import static android.view.View.GONE;
 public class AddTaskFragment extends Fragment {
     public static final String TAG = "AddTaskFragment";
     public static final String ITEM_ID = "com.phoenix2k.priorityreminder.AddTaskFragment.ITEM_ID";
+    public static final String IS_POP_OVER = "com.phoenix2k.priorityreminder.AddTaskFragment.IS_POP_OVER";
     SimpleDateFormat mDateFormat = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
     private static final int START_DATE_PICKER = 0;
     private static final int DUE_DATE_PICKER = 1;
@@ -105,10 +107,11 @@ public class AddTaskFragment extends Fragment {
     private Calendar mCalender;
     private boolean mPopOver = true;
 
-    public static AddTaskFragment getInstance(String itemId) {
+    public static AddTaskFragment getInstance(String itemId, boolean isPopOver) {
         AddTaskFragment fragment = new AddTaskFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ITEM_ID, itemId);
+        bundle.putBoolean(IS_POP_OVER, isPopOver);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -118,12 +121,14 @@ public class AddTaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_task, null);
         ButterKnife.bind(this, v);
+        if (getArguments() != null) {
+            mPopOver = getArguments().getBoolean(IS_POP_OVER, true);
+        }
         loadData();
-        if(!isPopOver()){
-          RelativeLayout.LayoutParams params =  new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        if (!isPopOver()) {
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
             mMainView.setLayoutParams(params);
             mLaytTop.setVisibility(GONE);
-//            mLaytBottom.setVisibility(GONE);
         }
         return v;
     }
@@ -313,7 +318,7 @@ public class AddTaskFragment extends Fragment {
         mImgSave.setEnabled(enable);
     }
 
-    public void onSaveOrUpdate(){
+    public void onSaveOrUpdate() {
         KeyboardUtils.hideKeyboard(getActivity());
         TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
         DataStore.getInstance().addToUpdate(updatedItem);
@@ -330,18 +335,17 @@ public class AddTaskFragment extends Fragment {
         } else {
             DataStore.getInstance().confirmSaveTaskItem(true);
         }
-        mUpdateListener.onTaskUpdated();
+        mUpdateListener.onItemUpdated(updatedItem);
     }
 
-    public void onCancelAddOrEditTask(){
+    public void onCancelAddOrEditTask() {
         KeyboardUtils.hideKeyboard(getActivity());
-        mUpdateListener.onSelectBack();
+        mUpdateListener.onCancelEdit(getCurrentTaskItem());
     }
 
-    public void onDeleteTask(){
+    public void onDeleteTask() {
         KeyboardUtils.hideKeyboard(getActivity());
-        DataStore.getInstance().deleteTask(getCurrentTaskItem());
-        mUpdateListener.onTaskUpdated();
+        mUpdateListener.onItemUpdated(DataStore.getInstance().deleteTask(getCurrentTaskItem()));
     }
 
     @OnClick(R.id.imgSave)
@@ -356,7 +360,7 @@ public class AddTaskFragment extends Fragment {
 
     @OnClick(R.id.imgDelete)
     public void onClickDelete(View v) {
-      onDeleteTask();
+        onDeleteTask();
     }
 
 
@@ -459,10 +463,6 @@ public class AddTaskFragment extends Fragment {
 
     public boolean isPopOver() {
         return mPopOver;
-    }
-
-    public void setPopOver(boolean mPopOver) {
-        this.mPopOver = mPopOver;
     }
 
     public class SpinnerAdapter extends BaseAdapter {

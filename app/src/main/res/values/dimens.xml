@@ -12,4 +12,7 @@
     <dimen name="item_general_margin">5dp</dimen>
     <dimen name="dashboard_action_bar_height">48dp</dimen>
     <dimen name="back_image_padding">20dp</dimen>
+
+    <dimen name="sync_dialog_width">300dp</dimen>
+    <dimen name="sync_dialog_height">150dp</dimen>
 </resources>

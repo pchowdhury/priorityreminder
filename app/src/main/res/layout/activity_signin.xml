@@ -14,8 +14,8 @@
   limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="400dp"
-    android:layout_height="200dp"
+    android:layout_width="@dimen/sync_dialog_width"
+    android:layout_height="@dimen/sync_dialog_height"
     android:orientation="vertical">
 
     <TextView
@@ -25,7 +25,7 @@
         android:layout_above="@+id/progress"
         android:layout_marginBottom="10dp"
         android:gravity="center_horizontal"
-        android:text="Syncing projects...." />
+        android:text="@string/progress_syncing" />
 
     <ProgressBar
         android:id="@+id/progress"

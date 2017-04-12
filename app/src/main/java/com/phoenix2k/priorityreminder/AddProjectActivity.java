@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
-import com.phoenix2k.priorityreminder.store.SQLDataStore;
+import com.phoenix2k.priorityreminder.model.PREntity;
 
 import butterknife.ButterKnife;
 
@@ -44,10 +44,7 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
         FragmentTransaction ft;
         if (getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG) == null) {
             ft = getSupportFragmentManager().beginTransaction();
-            Bundle bundle = new Bundle();
-            bundle.putBoolean(AddProjectFragment.INTENT_VALUE_IS_NEW, getIntent().getBooleanExtra(AddProjectFragment.INTENT_VALUE_IS_NEW, true));
-            Fragment fragment = new AddProjectFragment();
-            fragment.setArguments(bundle);
+            Fragment fragment =  AddProjectFragment.getInstance(getIntent().getBooleanExtra(AddProjectFragment.VALUE_IS_NEW, true), getIntent().getBooleanExtra(AddProjectFragment.IS_POP_OVER, true));
             ft.replace(R.id.lyt_content, fragment, AddProjectFragment.TAG).commit();
         }
     }
@@ -108,7 +105,7 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
     }
 
     boolean isNewProject(){
-       return getIntent().getBooleanExtra(AddProjectFragment.INTENT_VALUE_IS_NEW, true);
+       return getIntent().getBooleanExtra(AddProjectFragment.VALUE_IS_NEW, true);
     }
 
     @Override
@@ -138,9 +135,14 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
     }
 
     @Override
-    public void onNewProjectAdded() {
+    public void onNewItemAdded(PREntity item) {
         setResult(RESULT_OK);
         finish();
+    }
+
+    @Override
+    public void onDeleteItem(PREntity item) {
+
     }
 
     @Override
@@ -149,18 +151,18 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
     }
 
     @Override
-    public void onTaskUpdated() {
+    public void onItemUpdated(PREntity item) {
 
     }
 
     @Override
-    public void onCancelEdit() {
+    public void onCancelEdit(PREntity item) {
         setResult(RESULT_CANCELED);
         finish();
     }
 
     public void onDeleteProject() {
-        DataStore.getInstance().deleteProject();
+        onDeleteItem(DataStore.getInstance().deleteProject());
         setResult(RESULT_OK);
         finish();
     }

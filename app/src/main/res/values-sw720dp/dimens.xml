@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="sync_dialog_width">400dp</dimen>
+    <dimen name="sync_dialog_height">200dp</dimen>
+
+</resources>

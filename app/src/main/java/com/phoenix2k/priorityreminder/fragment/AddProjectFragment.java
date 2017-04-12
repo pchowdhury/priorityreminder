@@ -13,12 +13,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.DataStore;
 import com.phoenix2k.priorityreminder.R;
-import com.phoenix2k.priorityreminder.SyncManager;
 import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
@@ -32,15 +32,24 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static android.view.View.GONE;
+
 /**
  * Created by Pushpan on 06/02/17.
  */
 
 public class AddProjectFragment extends Fragment {
     public static final String TAG = "AddProjectFragment";
-    public static final String INTENT_VALUE_IS_NEW = "INTENT_VALUE_IS_NEW";
-    @BindView(R.id.btn_add_project)
-    View mLytAddProject;
+    public static final String VALUE_IS_NEW = "com.phoenix2k.priorityreminder.AddProjectFragment.VALUE_IS_NEW";
+    public static final String IS_POP_OVER = "com.phoenix2k.priorityreminder.AddProjectFragment.IS_POP_OVER";
+    @BindView(R.id.lytMain)
+    View mLytMain;
+    @BindView(R.id.lytTop)
+    View mLytTop;
+    @BindView(R.id.txtTitle)
+    TextView mTitleText;
+    @BindView(R.id.imgDelete)
+    View mImgDelete;
     @BindView(R.id.lyt_add_details)
     View mLytAddDetails;
     @BindView(R.id.edt_title)
@@ -63,21 +72,40 @@ public class AddProjectFragment extends Fragment {
     private UpdateListener mUpdateListener;
     private Project mCurrentProject;
     private Project mEditBackup;
+    private boolean mPopOver;
+
+    public static AddProjectFragment getInstance(boolean isCreateNew, boolean isPopOver) {
+        AddProjectFragment fragment = new AddProjectFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(VALUE_IS_NEW, isCreateNew);
+        bundle.putBoolean(IS_POP_OVER, isPopOver);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_add_project, null);
         ButterKnife.bind(this, v);
-        loadView();
         boolean isNew = true;
         if (getArguments() != null) {
-            isNew = getArguments().getBoolean(INTENT_VALUE_IS_NEW, true);
+            isNew = getArguments().getBoolean(VALUE_IS_NEW, true);
+            mPopOver = getArguments().getBoolean(IS_POP_OVER, true);
         }
-//        if (type == TYPE_ADD) {
-            openToEdit(isNew);
-//        }
+        configureLayout();
+        loadView();
+        openToEdit(isNew);
         return v;
+    }
+
+    private void configureLayout() {
+        if (!isPopOver()) {
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+            mLytMain.setLayoutParams(params);
+            mLytTop.setVisibility(GONE);
+        }
+
     }
 
     public void switchNewProjectToState(Project project, boolean checked) {
@@ -131,33 +159,35 @@ public class AddProjectFragment extends Fragment {
         onSaveOrUpdate();
     }
 
-    @OnClick(R.id.btn_add_project)
-    public void onClickLayoutAdd(View v) {
-        openToEdit(true);
+    @OnClick(R.id.imgDelete)
+    public void onClickDelete(View v) {
+        deleteProject();
     }
 
-    public void onSaveOrUpdate(){
+    public void deleteProject() {
+        mEditBackup = null;
+        mUpdateListener.onDeleteItem(DataStore.getInstance().deleteProject());
+    }
+
+    public void onSaveOrUpdate() {
         KeyboardUtils.hideKeyboard(getActivity());
-        DataStore.getInstance().confirmSaveProject();
         setCurrentProject(null);
-        mUpdateListener.onNewProjectAdded();
-        collapse();
+        mUpdateListener.onNewItemAdded(DataStore.getInstance().confirmSaveProject());
+//        collapse();
     }
 
-    public void expand() {
-        mLytAddDetails.setVisibility(View.VISIBLE);
-        mLytAddProject.setVisibility(View.GONE);
-        loadView();
-    }
-
-    public void collapse() {
-        setCurrentProject(null);
-        mBtnAdd.setText(getString(R.string.btn_add));
-        mEditTitle.setText("");
-        mStatusSwitch.setChecked(false);
-        mLytAddDetails.setVisibility(View.GONE);
-        mLytAddProject.setVisibility(View.VISIBLE);
-    }
+//    public void expand() {
+//        mLytAddDetails.setVisibility(View.VISIBLE);
+//        loadView();
+//    }
+//
+//    public void collapse() {
+//        setCurrentProject(null);
+//        mBtnAdd.setText(getString(R.string.btn_add));
+//        mEditTitle.setText("");
+//        mStatusSwitch.setChecked(false);
+//        mLytAddDetails.setVisibility(View.GONE);
+//    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -189,42 +219,36 @@ public class AddProjectFragment extends Fragment {
 
     public void openToEdit(boolean isCreateNew) {
         if (isCreateNew) {
+            mImgDelete.setVisibility(GONE);
+            mTitleText.setText(getString(R.string.add_project_title));
             DataStore.getInstance().setNewProject(Project.newProject(getContext()));
             setCurrentProject(DataStore.getInstance().getNewProject());
         } else {
+            mImgDelete.setVisibility(View.VISIBLE);
+            mTitleText.setText(getString(R.string.edit_project_title));
             setCurrentProject(DataStore.getInstance().getCurrentProject());
             mEditBackup = new Project();
             DataStore.getInstance().getCurrentProject().copyTo(mEditBackup);
         }
         mBtnAdd.setText(getString(isCreateNew ? R.string.btn_add : R.string.btn_update));
         validateAddButton();
-        expand();
+        loadView();
     }
 
     public void cancelEdit() {
-        if (isExpanded()) {
-            //if editing project
-            if (DataStore.getInstance().getNewProject() == null) {
-                if (mEditBackup != null) {
-                    mEditBackup.copyTo(DataStore.getInstance().getCurrentProject());
-                    mEditBackup = null;
-                }
-            }
-            setCurrentProject(null);
-            KeyboardUtils.hideKeyboard(getActivity());
-            collapse();
-            if (mUpdateListener != null) {
-                mUpdateListener.onCancelEdit();
+        //if editing project
+        if (DataStore.getInstance().getNewProject() == null) {
+            if (mEditBackup != null) {
+                mEditBackup.copyTo(DataStore.getInstance().getCurrentProject());
+                mEditBackup = null;
             }
         }
-    }
-
-    public void onDeleteCurrentProject() {
-        mEditBackup = null;
-    }
-
-    private boolean isExpanded() {
-        return mLytAddProject.getVisibility() == View.GONE;
+        setCurrentProject(null);
+        KeyboardUtils.hideKeyboard(getActivity());
+//        collapse();
+        if (mUpdateListener != null) {
+            mUpdateListener.onCancelEdit(DataStore.getInstance().getCurrentProject());
+        }
     }
 
     void setTextWithoutListener() {
@@ -289,4 +313,8 @@ public class AddProjectFragment extends Fragment {
             validateAddButton();
         }
     };
+
+    public boolean isPopOver() {
+        return mPopOver;
+    }
 }

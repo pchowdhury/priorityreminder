@@ -34,6 +34,8 @@ import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
 import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
 import com.phoenix2k.priorityreminder.fragment.ProjectListFragment;
+import com.phoenix2k.priorityreminder.manager.PRNotificationManager;
+import com.phoenix2k.priorityreminder.model.PREntity;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.store.SQLDataStore;
@@ -47,6 +49,7 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class DashboardActivity extends AppCompatActivity
         implements OnNavigationListener, UpdateListener, TaskListAdapter.OnTaskInteractionListener {
@@ -59,7 +62,9 @@ public class DashboardActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     public DrawerLayout mDrawer;
     public TextView mProjectTitleText;
-    private View mAddProjectButton;
+    @BindView(R.id.btn_add_project)
+    public View mAddProjectButton;
+    boolean mTablet;
 
 
     @Override
@@ -73,18 +78,8 @@ public class DashboardActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         applyCustomActionbarSettings(getSupportActionBar());
 
-        /**
-         * required on mobile
-         */
-        mAddProjectButton = findViewById(R.id.btn_add_project);
-        if (mAddProjectButton != null) {
-            mAddProjectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openAddProjectActivity(true);
-                }
-            });
-        }
+        //find out whether tablet or not
+        mTablet = findViewById(R.id.placeholder_for_tablet) != null;
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -95,7 +90,6 @@ public class DashboardActivity extends AppCompatActivity
             }
         });
 
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 //        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
 //                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 //        drawer.setDrawerListener(toggle);
@@ -165,8 +159,18 @@ public class DashboardActivity extends AppCompatActivity
         validateInitialization();
     }
 
+    @OnClick(R.id.btn_add_project)
+    public void onClickAddProject(View v) {
+        mDrawer.closeDrawer(GravityCompat.START);
+        if (isTablet()) {
+            openAddProjectWindow(true);
+        } else {
+            openAddProjectActivity(true);
+        }
+    }
+
     boolean isTablet() {
-        return mAddProjectButton == null;
+        return mTablet;
     }
 
     public void applyCustomActionbarSettings(ActionBar supportActionBar) {
@@ -296,18 +300,13 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void finishInitialization() {
+        reloadData();
         FragmentTransaction ft;
         if (getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG) == null) {
             ft = getSupportFragmentManager().beginTransaction();
             ProjectListFragment fragment = new ProjectListFragment();
             fragment.setTablet(isTablet());
             ft.replace(R.id.project_list_container, fragment, ProjectListFragment.TAG).commit();
-        }
-        if (isTablet()) {
-            if (getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG) == null) {
-                ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
-            }
         }
         showProgress(false);
     }
@@ -392,17 +391,10 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAddNewProject() {
-        mDrawer.closeDrawer(GravityCompat.START);
-    }
-
-    @Override
     public void onUpdateCurrentProject() {
+        mDrawer.closeDrawer(GravityCompat.START);
         if (isTablet()) {
-            AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
-            if (fragment != null) {
-                fragment.openToEdit(false);
-            }
+            openAddProjectWindow(false);
         } else {
             openAddProjectActivity(false);
         }
@@ -410,16 +402,15 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDeleteProject() {
-        DataStore.getInstance().deleteProject();
-        AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
-        if (fragment != null) {
-            fragment.onDeleteCurrentProject();
-        }
+    public void onDeleteItem(PREntity item) {
+        reloadData();
+        reloadProjectList();
+        reloadDashboard();
     }
 
     @Override
-    public void onNewProjectAdded() {
+    public void onNewItemAdded(PREntity item) {
+        reloadData();
         reloadProjectList();
         reloadDashboard();
     }
@@ -437,17 +428,39 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     @Override
-    public void onTaskUpdated() {
+    public void onItemUpdated(PREntity item) {
         reloadDashboard();
         onSelectBack();
     }
 
     @Override
-    public void onCancelEdit() {
-        ProjectListFragment fragment = (ProjectListFragment) getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG);
-        if (fragment != null) {
-            fragment.setEditMode(false);
+    public void onCancelEdit(PREntity item) {
+        AddProjectFragment projectfragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+        if (projectfragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(projectfragment).commit();
+
         }
+        AddTaskFragment taskFragment = (AddTaskFragment) getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG);
+        if (taskFragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(taskFragment).commit();
+
+        }
+    }
+
+    public void reloadData() {
+        DataStore.getInstance().reloadItems(this);
+        PRNotificationManager.init(getApplicationContext());
+        DataStore.getInstance().setUpNotifications();
+        validateTasks();
+    }
+
+    /**
+     * Check all the state tasks for due dates. If any of them is already in due date then change the sate to due quadrant
+     * and update by calling sync
+     */
+    private void validateTasks() {
+        DataStore.getInstance().validateTaskStatus();
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
     }
 
     private void reloadDashboard() {
@@ -481,8 +494,7 @@ public class DashboardActivity extends AppCompatActivity
 
     private void openTaskDetails(String id) {
         if (isTablet()) {
-            AddTaskFragment fragment = AddTaskFragment.getInstance(id);
-            getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+            openAddTaskWindow(id);
         } else {
             openAddTaskActivity(id);
         }
@@ -537,6 +549,7 @@ public class DashboardActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+            reloadData();
             reloadProjectList();
             reloadDashboard();
         }
@@ -545,13 +558,26 @@ public class DashboardActivity extends AppCompatActivity
     void openAddProjectActivity(boolean isCreateNew) {
         mDrawer.closeDrawer(GravityCompat.START);
         Intent addIntent = new Intent(DashboardActivity.this, AddProjectActivity.class);
-        addIntent.putExtra(AddProjectFragment.INTENT_VALUE_IS_NEW, isCreateNew);
+        addIntent.putExtra(AddProjectFragment.VALUE_IS_NEW, isCreateNew);
+        addIntent.putExtra(AddProjectFragment.IS_POP_OVER, isTablet());
         startActivityForResult(addIntent, REQUEST_ADD_PROJECT);
+    }
+
+    private void openAddProjectWindow(boolean isCreateNew) {
+        AddProjectFragment fragment = AddProjectFragment.getInstance(isCreateNew, isTablet());
+        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddProjectFragment.TAG).commit();
     }
 
     void openAddTaskActivity(String id) {
         Intent addIntent = new Intent(this, AddTaskActivity.class);
         addIntent.putExtra(AddTaskFragment.ITEM_ID, id);
+        addIntent.putExtra(AddTaskFragment.IS_POP_OVER, isTablet());
         startActivityForResult(addIntent, REQUEST_ADD_TASK);
     }
+
+    void openAddTaskWindow(String id) {
+        AddTaskFragment fragment = AddTaskFragment.getInstance(id, isTablet());
+        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+    }
+
 }

@@ -7,7 +7,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,10 +18,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
-import com.phoenix2k.priorityreminder.fragment.FourQuadrantFragment;
-import com.phoenix2k.priorityreminder.store.SQLDataStore;
+import com.phoenix2k.priorityreminder.model.PREntity;
 
 import butterknife.ButterKnife;
 
@@ -46,11 +43,7 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
         FragmentTransaction ft;
         if (getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG) == null) {
             ft = getSupportFragmentManager().beginTransaction();
-//            Bundle bundle = new Bundle();
-//            bundle.putInt(AddTaskFragment.INTENT_VALUE_TYPE, getIntent().getIntExtra(AddProjectFragment.INTENT_VALUE_TYPE, AddProjectFragment.TYPE_ADD));
-//            bundle.putBoolean(AddProjectFragment.INTENT_VALUE_IS_NEW, getIntent().getBooleanExtra(AddProjectFragment.INTENT_VALUE_IS_NEW, true));
-            AddTaskFragment fragment = AddTaskFragment.getInstance(getIntent().getStringExtra(AddTaskFragment.ITEM_ID));
-            fragment.setPopOver(false);
+            AddTaskFragment fragment = AddTaskFragment.getInstance(getIntent().getStringExtra(AddTaskFragment.ITEM_ID), getIntent().getBooleanExtra(AddTaskFragment.IS_POP_OVER, true));
             ft.replace(R.id.lyt_content, fragment, AddTaskFragment.TAG).commit();
         }
     }
@@ -147,8 +140,13 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
     }
 
     @Override
-    public void onNewProjectAdded() {
+    public void onNewItemAdded(PREntity item) {
         finishSuccessfully();
+    }
+
+    @Override
+    public void onDeleteItem(PREntity item) {
+
     }
 
     @Override
@@ -158,7 +156,7 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
     }
 
     @Override
-    public void onTaskUpdated() {
+    public void onItemUpdated(PREntity item) {
         finishSuccessfully();
     }
 
@@ -173,7 +171,7 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
     }
 
     @Override
-    public void onCancelEdit() {
+    public void onCancelEdit(PREntity item) {
         finishOnCancelled();
     }
 }
