@@ -30,7 +30,12 @@
         <activity
             android:name=".DashboardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity
+            android:name=".AddProjectActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AddTaskActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <receiver
             android:name="com.phoenix2k.priorityreminder.receiver.AlarmReceiver"
             android:enabled="true" >

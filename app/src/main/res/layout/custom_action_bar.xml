@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/colorPrimary"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/actionBarLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/showprojects"
-        android:tint="@android:color/white" />
-
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/lyt_action_bar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="?attr/colorPrimary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/actionBarLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/showprojects"
+            android:tint="@android:color/white" />
+
 
         <TextView
             android:id="@+id/project_name"
@@ -29,16 +33,14 @@
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/action_bar_app_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/project_name"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_vertical"
-            android:textColor="@color/color_icon_selecter"
-            android:textSize="10sp" />
+    </LinearLayout>
 
-    </RelativeLayout>
-
-</LinearLayout>
+    <TextView
+        android:id="@+id/action_bar_app_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/lyt_action_bar"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/color_icon_selecter"
+        android:textSize="10sp" />
+</RelativeLayout>

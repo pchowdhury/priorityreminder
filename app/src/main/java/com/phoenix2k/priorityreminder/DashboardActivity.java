@@ -50,13 +50,16 @@ import butterknife.ButterKnife;
 
 public class DashboardActivity extends AppCompatActivity
         implements OnNavigationListener, UpdateListener, TaskListAdapter.OnTaskInteractionListener {
+    public static final int REQUEST_ADD_PROJECT = 100;
+    public static final int REQUEST_ADD_TASK = 101;
+    public static final int REQUEST_SYNC = 102;
+
     @BindView(R.id.main_progress)
     public View mMainProress;
     @BindView(R.id.drawer_layout)
     public DrawerLayout mDrawer;
-
-
     public TextView mProjectTitleText;
+    private View mAddProjectButton;
 
 
     @Override
@@ -69,6 +72,21 @@ public class DashboardActivity extends AppCompatActivity
         toolbar.setContentInsetsAbsolute(0, 0);
         setSupportActionBar(toolbar);
         applyCustomActionbarSettings(getSupportActionBar());
+
+        /**
+         * required on mobile
+         */
+        mAddProjectButton = findViewById(R.id.btn_add_project);
+        if (mAddProjectButton != null) {
+            mAddProjectButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openAddProjectActivity(true);
+                }
+            });
+        }
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +165,9 @@ public class DashboardActivity extends AppCompatActivity
         validateInitialization();
     }
 
+    boolean isTablet() {
+        return mAddProjectButton == null;
+    }
 
     public void applyCustomActionbarSettings(ActionBar supportActionBar) {
         if (supportActionBar != null) {
@@ -278,11 +299,15 @@ public class DashboardActivity extends AppCompatActivity
         FragmentTransaction ft;
         if (getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG) == null) {
             ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.project_list_container, new ProjectListFragment(), ProjectListFragment.TAG).commit();
+            ProjectListFragment fragment = new ProjectListFragment();
+            fragment.setTablet(isTablet());
+            ft.replace(R.id.project_list_container, fragment, ProjectListFragment.TAG).commit();
         }
-        if (getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG) == null) {
-            ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+        if (isTablet()) {
+            if (getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG) == null) {
+                ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.add_container, new AddProjectFragment(), AddProjectFragment.TAG).commit();
+            }
         }
         showProgress(false);
     }
@@ -373,9 +398,13 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onUpdateCurrentProject() {
-        AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
-        if (fragment != null) {
-            fragment.openToEdit(false);
+        if (isTablet()) {
+            AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+            if (fragment != null) {
+                fragment.openToEdit(false);
+            }
+        } else {
+            openAddProjectActivity(false);
         }
         updateTitle();
     }
@@ -383,7 +412,6 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     public void onDeleteProject() {
         DataStore.getInstance().deleteProject();
-        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
         AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
         if (fragment != null) {
             fragment.onDeleteCurrentProject();
@@ -392,7 +420,6 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onNewProjectAdded() {
-        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
         reloadProjectList();
         reloadDashboard();
     }
@@ -411,7 +438,6 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onTaskUpdated() {
-        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
         reloadDashboard();
         onSelectBack();
     }
@@ -454,8 +480,13 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void openTaskDetails(String id) {
-        AddTaskFragment fragment = AddTaskFragment.getInstance(id);
-        getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+        if (isTablet()) {
+            AddTaskFragment fragment = AddTaskFragment.getInstance(id);
+            getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
+        } else {
+            openAddTaskActivity(id);
+        }
+
     }
 
     BroadcastReceiver mNotificationBroadcastReceiver = new BroadcastReceiver() {
@@ -499,7 +530,7 @@ public class DashboardActivity extends AppCompatActivity
 
     private void startSync() {
         Intent syncIntent = new Intent(this, SyncActivity.class);
-        startActivityForResult(syncIntent, 0);
+        startActivityForResult(syncIntent, REQUEST_SYNC);
     }
 
     @Override
@@ -509,5 +540,18 @@ public class DashboardActivity extends AppCompatActivity
             reloadProjectList();
             reloadDashboard();
         }
+    }
+
+    void openAddProjectActivity(boolean isCreateNew) {
+        mDrawer.closeDrawer(GravityCompat.START);
+        Intent addIntent = new Intent(DashboardActivity.this, AddProjectActivity.class);
+        addIntent.putExtra(AddProjectFragment.INTENT_VALUE_IS_NEW, isCreateNew);
+        startActivityForResult(addIntent, REQUEST_ADD_PROJECT);
+    }
+
+    void openAddTaskActivity(String id) {
+        Intent addIntent = new Intent(this, AddTaskActivity.class);
+        addIntent.putExtra(AddTaskFragment.ITEM_ID, id);
+        startActivityForResult(addIntent, REQUEST_ADD_TASK);
     }
 }

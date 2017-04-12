@@ -38,6 +38,7 @@ import butterknife.OnClick;
 
 public class AddProjectFragment extends Fragment {
     public static final String TAG = "AddProjectFragment";
+    public static final String INTENT_VALUE_IS_NEW = "INTENT_VALUE_IS_NEW";
     @BindView(R.id.btn_add_project)
     View mLytAddProject;
     @BindView(R.id.lyt_add_details)
@@ -69,6 +70,13 @@ public class AddProjectFragment extends Fragment {
         View v = inflater.inflate(R.layout.layout_add_project, null);
         ButterKnife.bind(this, v);
         loadView();
+        boolean isNew = true;
+        if (getArguments() != null) {
+            isNew = getArguments().getBoolean(INTENT_VALUE_IS_NEW, true);
+        }
+//        if (type == TYPE_ADD) {
+            openToEdit(isNew);
+//        }
         return v;
     }
 
@@ -120,16 +128,20 @@ public class AddProjectFragment extends Fragment {
 
     @OnClick(R.id.btn_add)
     public void onClickAdd(View v) {
-        KeyboardUtils.hideKeyboard(getActivity());
-        DataStore.getInstance().confirmSaveProject();
-        setCurrentProject(null);
-        mUpdateListener.onNewProjectAdded();
-        collapse();
+        onSaveOrUpdate();
     }
 
     @OnClick(R.id.btn_add_project)
     public void onClickLayoutAdd(View v) {
         openToEdit(true);
+    }
+
+    public void onSaveOrUpdate(){
+        KeyboardUtils.hideKeyboard(getActivity());
+        DataStore.getInstance().confirmSaveProject();
+        setCurrentProject(null);
+        mUpdateListener.onNewProjectAdded();
+        collapse();
     }
 
     public void expand() {

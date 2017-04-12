@@ -39,6 +39,7 @@ public class ProjectListFragment extends BasicFragment {
     private OnNavigationListener mOnNavigationListener;
     private ProjectsAdapter mAdapter;
     private boolean mEditMode;
+    private boolean mTablet;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -134,12 +135,20 @@ public class ProjectListFragment extends BasicFragment {
     }
 
     public void setEditMode(boolean mEditMode) {
-        this.mEditMode = mEditMode;
+        this.mEditMode = mEditMode && isTablet();
         if (mAdapter != null) {
             if (DataStore.getInstance().getCurrentProjectIndex() >= 0) {
                 mAdapter.notifyItemChanged(DataStore.getInstance().getCurrentProjectIndex());
             }
         }
+    }
+
+    public boolean isTablet() {
+        return mTablet;
+    }
+
+    public void setTablet(boolean mTablet) {
+        this.mTablet = mTablet;
     }
 
     private class ProjectsAdapter extends RecyclerView.Adapter<ProjectViewHolder> {

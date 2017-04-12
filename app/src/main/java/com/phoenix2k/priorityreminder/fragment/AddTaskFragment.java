@@ -19,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -29,6 +30,7 @@ import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.helper.RecyclerItemClickSupport;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.store.SQLDataStore;
 import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
 import com.phoenix2k.priorityreminder.view.adapter.IconListAdapter;
 
@@ -51,6 +53,12 @@ public class AddTaskFragment extends Fragment {
     SimpleDateFormat mDateFormat = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
     private static final int START_DATE_PICKER = 0;
     private static final int DUE_DATE_PICKER = 1;
+    @BindView(R.id.lyt_main)
+    View mMainView;
+    @BindView(R.id.lytTop)
+    View mLaytTop;
+    @BindView(R.id.lytBottom)
+    View mLaytBottom;
     @BindView(R.id.txtProjectTitle)
     TextView mProjectTitle;
     @BindView(R.id.content_view)
@@ -95,6 +103,7 @@ public class AddTaskFragment extends Fragment {
     private TaskItem mCurrentTaskItem;
     private int mPickerType;
     private Calendar mCalender;
+    private boolean mPopOver = true;
 
     public static AddTaskFragment getInstance(String itemId) {
         AddTaskFragment fragment = new AddTaskFragment();
@@ -110,6 +119,12 @@ public class AddTaskFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_add_task, null);
         ButterKnife.bind(this, v);
         loadData();
+        if(!isPopOver()){
+          RelativeLayout.LayoutParams params =  new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+            mMainView.setLayoutParams(params);
+            mLaytTop.setVisibility(GONE);
+//            mLaytBottom.setVisibility(GONE);
+        }
         return v;
     }
 
@@ -298,8 +313,7 @@ public class AddTaskFragment extends Fragment {
         mImgSave.setEnabled(enable);
     }
 
-    @OnClick(R.id.imgSave)
-    public void onClickSave(View v) {
+    public void onSaveOrUpdate(){
         KeyboardUtils.hideKeyboard(getActivity());
         TaskItem updatedItem = DataStore.getInstance().getCurrentTaskItem();
         DataStore.getInstance().addToUpdate(updatedItem);
@@ -311,6 +325,7 @@ public class AddTaskFragment extends Fragment {
                 DataStore.getInstance().confirmSaveTaskItem(false);
             } else {
                 DataStore.getInstance().setUpNotifications();
+                SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
             }
         } else {
             DataStore.getInstance().confirmSaveTaskItem(true);
@@ -318,17 +333,30 @@ public class AddTaskFragment extends Fragment {
         mUpdateListener.onTaskUpdated();
     }
 
-    @OnClick(R.id.imgCancel)
-    public void onClickCancel(View v) {
+    public void onCancelAddOrEditTask(){
         KeyboardUtils.hideKeyboard(getActivity());
         mUpdateListener.onSelectBack();
     }
 
-    @OnClick(R.id.imgDelete)
-    public void onClickDelete(View v) {
+    public void onDeleteTask(){
         KeyboardUtils.hideKeyboard(getActivity());
         DataStore.getInstance().deleteTask(getCurrentTaskItem());
         mUpdateListener.onTaskUpdated();
+    }
+
+    @OnClick(R.id.imgSave)
+    public void onClickSave(View v) {
+        onSaveOrUpdate();
+    }
+
+    @OnClick(R.id.imgCancel)
+    public void onClickCancel(View v) {
+        onCancelAddOrEditTask();
+    }
+
+    @OnClick(R.id.imgDelete)
+    public void onClickDelete(View v) {
+      onDeleteTask();
     }
 
 
@@ -427,6 +455,14 @@ public class AddTaskFragment extends Fragment {
         }
         mResetStartDate.setEnabled(getCurrentTaskItem().mStartTime != 0);
         mResetDueDate.setEnabled(getCurrentTaskItem().mDueTime != 0);
+    }
+
+    public boolean isPopOver() {
+        return mPopOver;
+    }
+
+    public void setPopOver(boolean mPopOver) {
+        this.mPopOver = mPopOver;
     }
 
     public class SpinnerAdapter extends BaseAdapter {

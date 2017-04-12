@@ -38,10 +38,10 @@
                 android:textStyle="bold" />
 
             <ImageView
-                android:id="@+id/imgSave"
+                android:id="@+id/imgDelete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/floppy"
+                android:src="@drawable/undelete_trash"
                 android:visibility="visible" />
         </LinearLayout>
 
@@ -240,11 +240,11 @@
             android:visibility="visible">
 
             <ImageView
-                android:id="@+id/imgDelete"
+                android:id="@+id/imgSave"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/undelete_trash" />
+                android:src="@drawable/floppy" />
 
             <ImageView
                 android:id="@+id/imgCancel"

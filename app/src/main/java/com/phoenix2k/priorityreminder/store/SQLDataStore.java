@@ -23,7 +23,7 @@ public class SQLDataStore {
         this.mDbHelper = new DbHelper(context);
     }
 
-    public ArrayList<Project> getProjects(String[] ids, DataStore.SortType sortType) {
+    private ArrayList<Project> getProjects(String[] ids, DataStore.SortType sortType) {
         StringBuffer query = new StringBuffer("SELECT * FROM " + Project.TAG);
         String orderBy = null;
         if (sortType != null) {
@@ -58,8 +58,9 @@ public class SQLDataStore {
         return projects;
     }
 
-    public ArrayList<TaskItem> getTaskItems(String projectId, TaskItem.QuadrantType quarter, DataStore.SortType sortType) {
-        StringBuffer query = new StringBuffer("SELECT * FROM " + TaskItem.TAG);
+    public ArrayList<TaskItem> getTaskItems(String projectId, TaskItem.QuadrantType quarter, DataStore.SortType sortType, boolean includeTrashedItem) {
+        String trashedquery = includeTrashedItem ? "":" WHERE " + Project.Column.TRASHED.name() + " = 0";
+        StringBuffer query = new StringBuffer("SELECT * FROM " + TaskItem.TAG + trashedquery);
         String orderBy = null;
         if (sortType != null) {
             switch (sortType) {
@@ -91,8 +92,47 @@ public class SQLDataStore {
         return taskItems;
     }
 
-    public ArrayList<Project> getAllProjects() {
-        ArrayList<Project> projects = readProjects(mDbHelper.getQueryResults("SELECT * from " + Project.TAG));
+    public ArrayList<TaskItem> getTrashedTaskItems(String projectId, TaskItem.QuadrantType quarter, DataStore.SortType sortType) {
+        StringBuffer query = new StringBuffer("SELECT * FROM " + TaskItem.TAG + " WHERE " + Project.Column.TRASHED.name() + " = 1");
+        String orderBy = null;
+        if (sortType != null) {
+            switch (sortType) {
+                case Alphabetic:
+                    orderBy = TaskItem.Column.TITLE.name();
+                    break;
+                case Chronological:
+                    orderBy = TaskItem.Column.ID.name();
+                    break;
+                case Index:
+                    orderBy = TaskItem.Column.ITEM_INDEX.name();
+                    break;
+            }
+        }
+        if (projectId != null) {
+            query.append(" WHERE " + TaskItem.Column.PROJECT_ID + " = " + projectId);
+        }
+        if (quarter != null) {
+            if (projectId == null) {
+                query.append(" WHERE ");
+            }
+            query.append("  " + TaskItem.Column.QUARTER + " = " + quarter.ordinal());
+
+        }
+        if (orderBy != null) {
+            query.append(" ORDERBY " + orderBy);
+        }
+        ArrayList<TaskItem> taskItems = readTaskItem(mDbHelper.getQueryResults(query.toString()));
+        return taskItems;
+    }
+
+    public ArrayList<Project> getProjects(boolean includeTrashedItem) {
+        String trashedquery = includeTrashedItem ? "":" WHERE " + Project.Column.TRASHED.name() + " = 0";
+        ArrayList<Project> projects = readProjects(mDbHelper.getQueryResults("SELECT * from " + Project.TAG + trashedquery));
+        return projects;
+    }
+
+    public ArrayList<Project> getTrashedProjects() {
+        ArrayList<Project> projects = readProjects(mDbHelper.getQueryResults("SELECT * from " + Project.TAG + " WHERE " + TaskItem.Column.TRASHED.name() + " = 1"));
         return projects;
     }
 
@@ -182,18 +222,18 @@ public class SQLDataStore {
                 Project project = (Project) obj;
                 if (project.mUpdatedOn == -1) {
                     projectsAdd.add(project);
-                }  else {
+                } else {
                     projectsUpdate.add(project);
                 }
-                project.mUpdatedOn= IDGenerator.getCurrentTimeStamp();
+                project.mUpdatedOn = IDGenerator.getCurrentTimeStamp();
             } else if (obj instanceof TaskItem) {
                 TaskItem taskItem = (TaskItem) obj;
                 if (taskItem.mUpdatedOn == -1) {
                     taskItemsAdd.add(taskItem);
-                }  else {
+                } else {
                     taskItemsUpdate.add(taskItem);
                 }
-                taskItem.mUpdatedOn= IDGenerator.getCurrentTimeStamp();
+                taskItem.mUpdatedOn = IDGenerator.getCurrentTimeStamp();
             }
         }
 

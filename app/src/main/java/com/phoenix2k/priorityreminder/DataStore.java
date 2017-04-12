@@ -11,7 +11,6 @@ import com.phoenix2k.priorityreminder.pref.PreferenceHelper;
 import com.phoenix2k.priorityreminder.receiver.AlarmReceiver;
 import com.phoenix2k.priorityreminder.store.SQLDataStore;
 import com.phoenix2k.priorityreminder.utils.DataUtils;
-import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -114,7 +113,7 @@ public class DataStore {
         }
         addToUpdate(getCurrentProject());
         SQLDataStore.getInstance().updateItems(mUpdates);
-        setProjects(SQLDataStore.getInstance().getAllProjects());
+        setProjects(SQLDataStore.getInstance().getProjects(false));
         mCurrentProjectIndex = mProjects.size() - 1;
     }
 
@@ -205,6 +204,7 @@ public class DataStore {
                 mCurrentProjectIndex = 0;
             }
         }
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
     }
 
     public void deleteTask(TaskItem item) {
@@ -223,6 +223,7 @@ public class DataStore {
         item.mTrashed = true;
         addToUpdate(item);
         setTasks(mTasks);
+        SQLDataStore.getInstance().updateItems(DataStore.getInstance().getUpdates());
     }
 
     public int getLastTaskPosition() {
@@ -464,9 +465,9 @@ public class DataStore {
     }
 
     public void reloadItems(Context context) {
-        setProjects(SQLDataStore.getInstance().getAllProjects());
+        setProjects(SQLDataStore.getInstance().getProjects(false));
         validateFirstProject(context);
-        setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null));
+        setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null, false));
     }
 
 

@@ -192,8 +192,8 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
         int remoteTaskItemCount = remoteTasks.size();
         //assuming remote and local maintains correct time;
 
-        ArrayList<Project> localProjects = SQLDataStore.getInstance().getAllProjects();
-        ArrayList<TaskItem> localTasks = SQLDataStore.getInstance().getTaskItems(null, null, null);
+        ArrayList<Project> localProjects = SQLDataStore.getInstance().getProjects(true);
+        ArrayList<TaskItem> localTasks = SQLDataStore.getInstance().getTaskItems(null, null, null, true);
 
         if (localProjects == null) {
             localProjects = new ArrayList<>();
