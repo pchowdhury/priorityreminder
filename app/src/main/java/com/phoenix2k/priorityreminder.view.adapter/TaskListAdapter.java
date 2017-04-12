@@ -109,6 +109,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         TaskItem item = (position < mTaskList.size()) ? mTaskList.get(position) : mDummyPlaceHolderItem;
         if (position == (mTaskList.size())) {
             mDummyPlaceHolderItem.mIndex = position;
+            holder.mMainView.setOnTouchListener(null);
+        }else{
+            holder.mMainView.setOnTouchListener(mFrameTouchListener);
         }
         String title = item.mTitle;
         holder.mViewParent.setBackgroundColor(ContextCompat.getColor(holder.mViewParent.getContext(), item.mUpdatedOn != -1 ? R.color.color_more_translucent_white : R.color.color_transparent));
@@ -168,12 +171,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
     }
 
     public class TaskItemHolder extends RecyclerView.ViewHolder {
+        public View mMainView;
         public View mViewParent;
         public TextView mTextName;
         public ImageView mIconView;
 
         public TaskItemHolder(View itemView) {
             super(itemView);
+            mMainView = itemView;
             mViewParent = itemView.findViewById(R.id.lyt_root);
             mTextName = (TextView) itemView.findViewById(R.id.name);
             mIconView = (ImageView) itemView.findViewById(R.id.icon);

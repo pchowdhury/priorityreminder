@@ -114,12 +114,14 @@ public class DraggableListView extends LinearLayout {
             }
         });
 
-        mTxtTitle.setOnTouchListener(new OnTouchListener() {
+        OnTouchListener doubleTapHandler = new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return gDetector.onTouchEvent(event);
             }
-        });
+        };
+        mListView.setOnTouchListener(doubleTapHandler);
+        mTxtTitle.setOnTouchListener(doubleTapHandler);
         setOnDragListener(DataStore.getInstance().getDragListener());
     }
 
