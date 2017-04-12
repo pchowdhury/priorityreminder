@@ -169,6 +169,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
     public void setOnTaskInteractionListener(OnTaskInteractionListener mOnTaskInteractionListener) {
         this.mOnTaskInteractionListener = mOnTaskInteractionListener;
     }
+    public OnTaskInteractionListener getOnTaskInteractionListener() {
+        return this.mOnTaskInteractionListener;
+    }
 
     public class TaskItemHolder extends RecyclerView.ViewHolder {
         public View mMainView;
@@ -257,5 +260,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskIt
         void onClickTaskItem(TaskItem task);
 
         void onMaximizeQuadrant(TaskItem task);
+
+        void onClickQuadrant(TaskItem.QuadrantType type);
     }
 }

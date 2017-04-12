@@ -52,6 +52,7 @@ public class AddTaskFragment extends Fragment {
     public static final String TAG = "AddTaskFragment";
     public static final String ITEM_ID = "com.phoenix2k.priorityreminder.AddTaskFragment.ITEM_ID";
     public static final String IS_POP_OVER = "com.phoenix2k.priorityreminder.AddTaskFragment.IS_POP_OVER";
+    public static final String QUADRANT = "com.phoenix2k.priorityreminder.AddTaskFragment.QUADRANT";
     SimpleDateFormat mDateFormat = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z");
     private static final int START_DATE_PICKER = 0;
     private static final int DUE_DATE_PICKER = 1;
@@ -107,11 +108,12 @@ public class AddTaskFragment extends Fragment {
     private Calendar mCalender;
     private boolean mPopOver = true;
 
-    public static AddTaskFragment getInstance(String itemId, boolean isPopOver) {
+    public static AddTaskFragment getInstance(String itemId, boolean isPopOver, TaskItem.QuadrantType type) {
         AddTaskFragment fragment = new AddTaskFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ITEM_ID, itemId);
         bundle.putBoolean(IS_POP_OVER, isPopOver);
+        bundle.putInt(QUADRANT, type.ordinal());
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -157,6 +159,9 @@ public class AddTaskFragment extends Fragment {
             setCurrentProject(DataStore.getInstance().getCurrentProject());
             DataStore.getInstance().setCurrentTaskItem(taskItem);
             setCurrentTaskItem(taskItem);
+            if (getArguments() != null) {
+                getCurrentTaskItem().mQuadrantType = TaskItem.QuadrantType.values()[getArguments().getInt(QUADRANT, 0)];
+            }
             loadView();
         }
     }

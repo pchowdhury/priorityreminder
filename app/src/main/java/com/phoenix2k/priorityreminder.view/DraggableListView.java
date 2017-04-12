@@ -96,6 +96,10 @@ public class DraggableListView extends LinearLayout {
         gDetector.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
+                LogUtils.logI("TapConfirmed", "TapConfirmed");
+                if (getQuadrantListener() != null) {
+                    getQuadrantListener().onTapQuadrant(DraggableListView.this);
+                }
                 return false;
             }
 
@@ -159,6 +163,7 @@ public class DraggableListView extends LinearLayout {
 
     public interface QuadrantListener {
         void onDoubleTapQuadrant(View v);
+        void onTapQuadrant(View v);
     }
 
     public void showHover(boolean show) {

@@ -343,6 +343,24 @@ public class FourQuadrantView extends FrameLayout implements View.OnTouchListene
         adjustPosition();
     }
 
+    @Override
+    public void onTapQuadrant(View v) {
+        switch (v.getId()) {
+            case R.id.listQuad1:
+                mTaskListAdapter[TaskItem.QuadrantType.Q1_OR_UPCOMING.ordinal()].getOnTaskInteractionListener().onClickQuadrant(TaskItem.QuadrantType.Q1_OR_UPCOMING);
+                break;
+            case R.id.listQuad2:
+                mTaskListAdapter[TaskItem.QuadrantType.Q2_OR_DUE.ordinal()].getOnTaskInteractionListener().onClickQuadrant(TaskItem.QuadrantType.Q2_OR_DUE);
+                break;
+            case R.id.listQuad3:
+                mTaskListAdapter[TaskItem.QuadrantType.Q3_OR_IN_PROGRESS.ordinal()].getOnTaskInteractionListener().onClickQuadrant(TaskItem.QuadrantType.Q3_OR_IN_PROGRESS);
+                break;
+            case R.id.listQuad4:
+                mTaskListAdapter[TaskItem.QuadrantType.Q4_OR_COMPLETED.ordinal()].getOnTaskInteractionListener().onClickQuadrant(TaskItem.QuadrantType.Q4_OR_COMPLETED);
+                break;
+        }
+    }
+
     class QuadrantGestureDetector extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

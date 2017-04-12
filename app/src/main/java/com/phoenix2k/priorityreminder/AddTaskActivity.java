@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.phoenix2k.priorityreminder.fragment.AddTaskFragment;
 import com.phoenix2k.priorityreminder.model.PREntity;
+import com.phoenix2k.priorityreminder.model.TaskItem;
 
 import butterknife.ButterKnife;
 
@@ -43,7 +44,7 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
         FragmentTransaction ft;
         if (getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG) == null) {
             ft = getSupportFragmentManager().beginTransaction();
-            AddTaskFragment fragment = AddTaskFragment.getInstance(getIntent().getStringExtra(AddTaskFragment.ITEM_ID), getIntent().getBooleanExtra(AddTaskFragment.IS_POP_OVER, true));
+            AddTaskFragment fragment = AddTaskFragment.getInstance(getIntent().getStringExtra(AddTaskFragment.ITEM_ID), getIntent().getBooleanExtra(AddTaskFragment.IS_POP_OVER, true), TaskItem.QuadrantType.values()[getIntent().getIntExtra(AddTaskFragment.QUADRANT, 0)]);
             ft.replace(R.id.lyt_content, fragment, AddTaskFragment.TAG).commit();
         }
     }
@@ -165,7 +166,7 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
         finish();
     }
 
-    private void finishOnCancelled(){
+    private void finishOnCancelled() {
         setResult(RESULT_CANCELED);
         finish();
     }

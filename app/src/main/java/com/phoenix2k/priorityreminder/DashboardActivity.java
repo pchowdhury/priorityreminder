@@ -317,8 +317,6 @@ public class DashboardActivity extends AppCompatActivity
                 setActionBarEnabled(false);
             }
 
-            showProgress(false);
-
             mActionBarLogo.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -333,6 +331,7 @@ public class DashboardActivity extends AppCompatActivity
                 }
             }, 200);
         }
+        showProgress(false);
     }
 
 
@@ -514,16 +513,23 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onMaximizeQuadrant(TaskItem task) {
+    }
 
+    @Override
+    public void onClickQuadrant(TaskItem.QuadrantType type) {
+        if (isTablet()) {
+            openAddTaskWindow(null, type);
+        } else {
+            openAddTaskActivity(null, type);
+        }
     }
 
     private void openTaskDetails(String id) {
         if (isTablet()) {
-            openAddTaskWindow(id);
+            openAddTaskWindow(id, TaskItem.QuadrantType.Q1_OR_UPCOMING);
         } else {
-            openAddTaskActivity(id);
+            openAddTaskActivity(id, TaskItem.QuadrantType.Q1_OR_UPCOMING);
         }
-
     }
 
     BroadcastReceiver mNotificationBroadcastReceiver = new BroadcastReceiver() {
@@ -594,16 +600,17 @@ public class DashboardActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddProjectFragment.TAG).commit();
     }
 
-    void openAddTaskActivity(String id) {
+    void openAddTaskActivity(String id, TaskItem.QuadrantType type) {
         Intent addIntent = new Intent(this, AddTaskActivity.class);
         addIntent.putExtra(AddTaskFragment.ITEM_ID, id);
         addIntent.putExtra(AddTaskFragment.IS_POP_OVER, isTablet());
+        addIntent.putExtra(AddTaskFragment.QUADRANT, type.ordinal());
         startActivityForResult(addIntent, REQUEST_ADD_TASK);
     }
 
-    void openAddTaskWindow(String id) {
+    void openAddTaskWindow(String id, TaskItem.QuadrantType type) {
         setActionBarEnabled(false);
-        AddTaskFragment fragment = AddTaskFragment.getInstance(id, isTablet());
+        AddTaskFragment fragment = AddTaskFragment.getInstance(id, isTablet(), type);
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }
 

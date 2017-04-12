@@ -21,6 +21,7 @@ import com.phoenix2k.priorityreminder.utils.LogUtils;
 import com.phoenix2k.priorityreminder.utils.StaticDataProvider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import butterknife.BindView;
@@ -245,6 +246,14 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
             hasLocalUpdateSinceLastSync = true;
         }
 
+        HashMap<String, Project> projectMap = new HashMap<>();
+        DataStore.sortedProjectByIndex(mergedProjects);
+        //re-indexing
+        for (int i = 0; i < mergedProjects.size(); i++) {
+            Project project = mergedProjects.get(i);
+            project.mIndex = i;
+            projectMap.put(project.mId, project);
+        }
 
         //STEP 3b: Compare taskItem
 
@@ -256,8 +265,10 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 if (localTaskItem.mUpdatedOn >= remoteTaskItem.mUpdatedOn) {
                     mergedTaskItems.add(localTaskItem);
                     hasLocalUpdateSinceLastSync = true;
+                    projectMap.get(localTaskItem.mProjectId).getTaskListForQuadrant(localTaskItem.mQuadrantType).add(localTaskItem);
                 } else {
                     mergedTaskItems.add(remoteTaskItem);
+                    projectMap.get(remoteTaskItem.mProjectId).getTaskListForQuadrant(remoteTaskItem.mQuadrantType).add(remoteTaskItem);
                 }
                 remoteTasks.remove(remoteTaskItem);
                 localTasks.remove(localTaskItem);
@@ -265,14 +276,31 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
                 //taskItem only present in remote
                 mergedTaskItems.add(remoteTaskItem);
                 remoteTasks.remove(remoteTaskItem);
+                projectMap.get(remoteTaskItem.mProjectId).getTaskListForQuadrant(remoteTaskItem.mQuadrantType).add(remoteTaskItem);
             }
         }
 
         //add remaining local projects
         if (localTasks.size() > 0) {
             mergedTaskItems.addAll(localTasks);
+            for (int i = 0; i < localTasks.size(); i++) {
+                TaskItem item = localTasks.get(i);
+                projectMap.get(item.mProjectId).getTaskListForQuadrant(item.mQuadrantType).add(item);
+            }
             localTasks.clear();
             hasLocalUpdateSinceLastSync = true;
+        }
+
+        //re-indexing tasks
+        for (int i = 0; i < mergedProjects.size(); i++) {
+            Project project = mergedProjects.get(i);
+            for (TaskItem.QuadrantType type : TaskItem.QuadrantType.values()) {
+                ArrayList<TaskItem> items = project.getTaskListForQuadrant(type);
+                DataStore.sortedTaskByIndex(items);
+                for (int j = 0; j < items.size(); j++) {
+                    items.get(j).mIndex = j;
+                }
+            }
         }
 
         if (!hasLocalUpdateSinceLastSync) {
@@ -311,7 +339,7 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
 
         if (mergedItems.size() > 0) {
             SyncManager.getInstance().startSync(this, getUserCredentials(), mergedItems);
-        }else{
+        } else {
             LogUtils.logD(TAG, "Already up to date");
             onSyncComplete();
         }

@@ -473,5 +473,11 @@ public class DataStore {
         setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null, false));
     }
 
+    public static void sortedProjectByIndex(ArrayList<Project> items) {
+        Collections.sort(items, getInstance().mSortCompartor.get(SortType.Index.ordinal()));
+    }
 
+    public static void sortedTaskByIndex(ArrayList<TaskItem> items) {
+        Collections.sort(items, getInstance().mSortCompartor.get(SortType.Index.ordinal()));
+    }
 }
