@@ -17,11 +17,9 @@ public abstract class BasicFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(getViewResource(), null);
+        View v = inflater.inflate(getViewResource(), container, false);
         ButterKnife.bind(getMainFragment(), v);
-        if (savedInstanceState == null) {
-            loadView();
-        }
+        loadView();
         return v;
     }
 

@@ -24,6 +24,11 @@ public class FourQuadrantFragment extends BasicFragment {
     FourQuadrantView mQuadrantView;
     private TaskListAdapter.OnTaskInteractionListener mOnTaskInteractionListener;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Nullable
     @Override
@@ -44,13 +49,15 @@ public class FourQuadrantFragment extends BasicFragment {
     }
 
     public void loadView() {
-       mQuadrantView.loadView();
+        if (mQuadrantView != null) {
+            mQuadrantView.loadView();
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if(activity instanceof TaskListAdapter.OnTaskInteractionListener){
+        if (activity instanceof TaskListAdapter.OnTaskInteractionListener) {
             mOnTaskInteractionListener = (TaskListAdapter.OnTaskInteractionListener) activity;
         }
     }
@@ -58,7 +65,7 @@ public class FourQuadrantFragment extends BasicFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof TaskListAdapter.OnTaskInteractionListener){
+        if (context instanceof TaskListAdapter.OnTaskInteractionListener) {
             mOnTaskInteractionListener = (TaskListAdapter.OnTaskInteractionListener) context;
         }
     }

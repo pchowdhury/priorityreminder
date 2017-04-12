@@ -65,6 +65,7 @@ public class DashboardActivity extends AppCompatActivity
     @BindView(R.id.btn_add_project)
     public View mAddProjectButton;
     boolean mTablet;
+    private ImageView mActionBarLogo;
 
 
     @Override
@@ -81,7 +82,6 @@ public class DashboardActivity extends AppCompatActivity
         //find out whether tablet or not
         mTablet = findViewById(R.id.placeholder_for_tablet) != null;
 
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,11 +89,6 @@ public class DashboardActivity extends AppCompatActivity
                 openTaskDetails(null);
             }
         });
-
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
 
         View.OnDragListener listener = new View.OnDragListener() {
             @Override
@@ -117,11 +112,8 @@ public class DashboardActivity extends AppCompatActivity
                             v.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.colorPrimary));
                         }
 
-//                        getDraggableListView().autoScrollOnHover(
-//                                CommonViewHolder.getPositionFromView(v));
                         return true;
                     case DragEvent.ACTION_DRAG_EXITED:
-//                        int color = DataStore.getInstance().getQuadrantColorFor(item);
                         if (draggableListView != null) {
                             draggableListView.showHover(false);
                         } else {
@@ -131,9 +123,7 @@ public class DashboardActivity extends AppCompatActivity
 
                     case DragEvent.ACTION_DRAG_STARTED:
                         return true;
-//                        return processDragStarted(event);
                     case DragEvent.ACTION_DROP:
-//                        v.setBackgroundColor(getListColor());
                         if (draggableListView != null) {
                             draggableListView.showHover(false);
                         } else {
@@ -153,10 +143,16 @@ public class DashboardActivity extends AppCompatActivity
                 return false;
             }
         };
-        SQLDataStore.init(this);
-        loadIconsInDataStore();
         DataStore.getInstance().setDragListener(listener);
-        validateInitialization();
+        if (savedInstanceState != null) {
+            finishInitialization(true);
+//            reloadProjectList();
+//            reloadDashboard();
+        } else {
+            SQLDataStore.init(this);
+            loadIconsInDataStore();
+            validateInitialization();
+        }
     }
 
     @OnClick(R.id.btn_add_project)
@@ -184,8 +180,8 @@ public class DashboardActivity extends AppCompatActivity
             supportActionBar.setDisplayHomeAsUpEnabled(false);
             final View customActionBarView = inflater.inflate(
                     R.layout.custom_action_bar, null);
-            ImageView actionBarLogo = (ImageView) customActionBarView.findViewById(R.id.actionBarLogo);
-            actionBarLogo.setOnClickListener(new View.OnClickListener() {
+            mActionBarLogo = (ImageView) customActionBarView.findViewById(R.id.actionBarLogo);
+            mActionBarLogo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mDrawer.isDrawerOpen(GravityCompat.START)) {
@@ -230,7 +226,7 @@ public class DashboardActivity extends AppCompatActivity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            finishInitialization();
+                            finishInitialization(false);
                         }
                     });
                 } else {
@@ -282,7 +278,7 @@ public class DashboardActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-//                IDGenerator.deInit();
+                IDGenerator.deInit();
                 DataStore.deInit();
                 finish();
             }
@@ -299,16 +295,44 @@ public class DashboardActivity extends AppCompatActivity
         dialog.show();
     }
 
-    private void finishInitialization() {
+    private void finishInitialization(boolean isResuming) {
         reloadData();
-        FragmentTransaction ft;
-        if (getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG) == null) {
-            ft = getSupportFragmentManager().beginTransaction();
-            ProjectListFragment fragment = new ProjectListFragment();
-            fragment.setTablet(isTablet());
-            ft.replace(R.id.project_list_container, fragment, ProjectListFragment.TAG).commit();
+        if (!isResuming) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ProjectListFragment fragment = (ProjectListFragment) getSupportFragmentManager().findFragmentByTag(ProjectListFragment.TAG);
+            if (fragment == null) {
+                fragment = new ProjectListFragment();
+                fragment.setTablet(isTablet());
+                ft.add(R.id.project_list_container, fragment, ProjectListFragment.TAG).commit();
+            }
         }
-        showProgress(false);
+
+        if (isTablet()) {
+            final AddProjectFragment addProjectFragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+            if (addProjectFragment != null) {
+                setActionBarEnabled(false);
+            }
+            AddTaskFragment addTaskFragment = (AddTaskFragment) getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG);
+            if (addTaskFragment != null) {
+                setActionBarEnabled(false);
+            }
+
+            showProgress(false);
+
+            mActionBarLogo.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (addProjectFragment != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, addProjectFragment, AddProjectFragment.TAG).commit();
+                            }
+                        });
+                    }
+                }
+            }, 200);
+        }
     }
 
 
@@ -417,6 +441,7 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public boolean onSelectBack() {
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         AddTaskFragment fragment = (AddTaskFragment) getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG);
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
@@ -443,8 +468,8 @@ public class DashboardActivity extends AppCompatActivity
         AddTaskFragment taskFragment = (AddTaskFragment) getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG);
         if (taskFragment != null) {
             getSupportFragmentManager().beginTransaction().remove(taskFragment).commit();
-
         }
+        setActionBarEnabled(true);
     }
 
     public void reloadData() {
@@ -553,10 +578,10 @@ public class DashboardActivity extends AppCompatActivity
             reloadProjectList();
             reloadDashboard();
         }
+        setActionBarEnabled(true);
     }
 
     void openAddProjectActivity(boolean isCreateNew) {
-        mDrawer.closeDrawer(GravityCompat.START);
         Intent addIntent = new Intent(DashboardActivity.this, AddProjectActivity.class);
         addIntent.putExtra(AddProjectFragment.VALUE_IS_NEW, isCreateNew);
         addIntent.putExtra(AddProjectFragment.IS_POP_OVER, isTablet());
@@ -564,6 +589,7 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void openAddProjectWindow(boolean isCreateNew) {
+        setActionBarEnabled(false);
         AddProjectFragment fragment = AddProjectFragment.getInstance(isCreateNew, isTablet());
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddProjectFragment.TAG).commit();
     }
@@ -576,8 +602,18 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     void openAddTaskWindow(String id) {
+        setActionBarEnabled(false);
         AddTaskFragment fragment = AddTaskFragment.getInstance(id, isTablet());
         getSupportFragmentManager().beginTransaction().add(R.id.content_dashboard, fragment, AddTaskFragment.TAG).commit();
     }
 
+
+    private void setActionBarEnabled(boolean enabled) {
+        if (enabled) {
+            mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        } else {
+            mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        }
+        mActionBarLogo.setEnabled(enabled);
+    }
 }
