@@ -126,16 +126,17 @@ public class AddProjectFragment extends Fragment {
         }
     }
 
-    private void loadView() {
-        mStatusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (getCurrentProject() != null) {
-                    switchNewProjectToState(getCurrentProject(), isChecked);
-                }
-                loadView();
+    private CompoundButton.OnCheckedChangeListener mSwitchChangedListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (getCurrentProject() != null) {
+                switchNewProjectToState(getCurrentProject(), isChecked);
             }
-        });
+            loadView();
+        }
+    };
+
+    private void loadView() {
         setTextWithoutListener();
         validateAddButton();
     }
@@ -235,7 +236,9 @@ public class AddProjectFragment extends Fragment {
             setCurrentProject(DataStore.getInstance().getCurrentProject());
             mEditBackup = new Project();
             DataStore.getInstance().getCurrentProject().copyTo(mEditBackup);
+            mStatusSwitch.setChecked(DataStore.getInstance().getCurrentProject().mProjectType == Project.ProjectType.State);
         }
+        mStatusSwitch.setOnCheckedChangeListener(mSwitchChangedListener);
         validateAddButton();
         loadView();
     }

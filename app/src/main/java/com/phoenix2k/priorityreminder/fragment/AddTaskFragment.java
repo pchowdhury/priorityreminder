@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -98,6 +99,9 @@ public class AddTaskFragment extends Fragment {
     ImageView mResetDueDate;
     @BindView(R.id.icon_list)
     RecyclerView mIconListView;
+    @BindView(R.id.lyt_icon_list)
+    View mLytIconListView;
+
 
     private UpdateListener mUpdateListener;
     private int mTaskIndexBackup;
@@ -179,7 +183,7 @@ public class AddTaskFragment extends Fragment {
         if (getCurrentTaskItem() != null) {
             mEditTaskTitle.setText(getCurrentTaskItem().mTitle);
             mEditDescription.setText(getCurrentTaskItem().mDescription);
-            mLytBgView.setBackgroundColor(getCurrentProject().mColorQuadrants.get(getCurrentTaskItem().mQuadrantType));
+            mMainView.setBackgroundColor(getCurrentProject().mColorQuadrants.get(getCurrentTaskItem().mQuadrantType));
             mEditTaskTitle.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -263,9 +267,10 @@ public class AddTaskFragment extends Fragment {
     }
 
     private void showIconList(boolean show) {
+        KeyboardUtils.hideKeyboard(getActivity());
         if (show) {
-            mIconListView.setVisibility(View.VISIBLE);
-            mIconListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            mLytIconListView.setVisibility(View.VISIBLE);
+            mIconListView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
             final IconListAdapter iconAdapter = new IconListAdapter();
             mIconListView.setAdapter(iconAdapter);
             RecyclerItemClickSupport.addTo(mIconListView).setOnItemClickListener(new RecyclerItemClickSupport.OnItemClickListener() {
@@ -277,7 +282,7 @@ public class AddTaskFragment extends Fragment {
                 }
             });
         } else {
-            mIconListView.setVisibility(GONE);
+            mLytIconListView.setVisibility(GONE);
         }
     }
 
@@ -402,6 +407,11 @@ public class AddTaskFragment extends Fragment {
     @OnClick(R.id.img_icon)
     public void onClickIcon(View v) {
         showIconList(true);
+    }
+
+    @OnClick(R.id.imgListCancel)
+    public void onClickListCancel(View v) {
+        showIconList(false);
     }
 
     public TaskItem getCurrentTaskItem() {

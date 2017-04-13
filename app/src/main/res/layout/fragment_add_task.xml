@@ -10,9 +10,7 @@
         android:layout_height="600dp"
         android:layout_centerInParent="true"
         android:layout_margin="50dp"
-        android:background="@color/color_default_q1"
         android:orientation="vertical">
-
 
         <LinearLayout
             android:id="@+id/lytTop"
@@ -43,219 +41,247 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/floppy"
-                android:visibility="visible" android:tint="@android:color/white"/>
+                android:tint="@android:color/white"
+                android:visibility="visible" />
         </LinearLayout>
 
-
-        <ScrollView
-            android:id="@+id/content_view"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent">
 
-            <RelativeLayout
-                android:id="@+id/lytTotoView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                android:padding="@dimen/item_general_margin">
+                <ScrollView
+                    android:id="@+id/content_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:id="@+id/lytTotoView"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+
+                        android:padding="@dimen/item_general_margin">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:orientation="vertical">
+
+                            <EditText
+                                android:id="@+id/edt_task_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:hint="@string/hint_task_title" />
+
+                            <TextView
+                                android:id="@+id/txt_task_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="left|start"
+                                android:layout_marginTop="@dimen/item_top_margin"
+                                android:text="@string/lbl_task_quadrant" />
+
+                            <Spinner
+                                android:id="@+id/spinner_quadrant_type"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/item_general_margin"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="left|start"
+                                android:layout_marginTop="@dimen/item_top_margin"
+                                android:text="@string/lbl_task_desc" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/item_top_margin"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <EditText
+                                    android:id="@+id/edt_task_desc"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_weight="1"
+                                    android:gravity="top|left|start"
+                                    android:hint="@string/hint_task_desc"
+                                    android:minLines="4" />
+
+                                <ImageView
+                                    android:id="@+id/img_icon"
+                                    android:layout_width="100dp"
+                                    android:layout_height="100dp"
+                                    android:src="@drawable/blue_clock" />
+
+                                <ImageView
+                                    android:id="@+id/img_arrow"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="100dp" />
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:id="@+id/lyt_status_type"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left|start"
+                                    android:layout_marginTop="@dimen/item_top_margin"
+                                    android:text="@string/lbl_task_starts_on" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/item_top_margin"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/start_date_picker"
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_weight="1"
+                                        android:clickable="true"
+                                        android:textSize="18sp" />
+
+                                    <ImageView
+                                        android:id="@+id/reset_start_date"
+                                        android:layout_width="40dp"
+                                        android:layout_height="40dp"
+                                        android:clickable="true"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/reset" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left|start"
+                                    android:layout_marginTop="@dimen/item_top_margin"
+                                    android:text="@string/lbl_task_due_on" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/item_top_margin"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/due_date_picker"
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_weight="1"
+                                        android:clickable="true"
+                                        android:textSize="18sp" />
+
+                                    <ImageView
+                                        android:id="@+id/reset_due_date"
+                                        android:layout_width="40dp"
+                                        android:layout_height="40dp"
+                                        android:clickable="true"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/reset" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="left|start"
+                                    android:layout_marginTop="@dimen/item_top_margin"
+                                    android:text="@string/lbl_task_repeat_type" />
+
+                                <Spinner
+                                    android:id="@+id/spinner_repeat_type"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="@dimen/item_top_margin" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </RelativeLayout>
+                </ScrollView>
 
                 <LinearLayout
+                    android:id="@+id/lytBottom"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
-                    <EditText
-                        android:id="@+id/edt_task_title"
-                        android:layout_width="match_parent"
+                    <ImageView
+                        android:id="@+id/imgDelete"
+                        android:layout_width="150dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:hint="@string/hint_task_title" />
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/left_round_corner_button"
+                        android:gravity="left|center_vertical"
+                        android:src="@drawable/undelete_trash"
+                        android:text="@string/btn_delete"
+                        android:textAllCaps="false"
+                        android:tint="@android:color/white" />
 
-                    <TextView
-                        android:id="@+id/txt_task_title"
-                        android:layout_width="wrap_content"
+                    <ImageView
+                        android:id="@+id/imgCancel"
+                        android:layout_width="150dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="left|start"
-                        android:layout_marginTop="@dimen/item_top_margin"
-                        android:text="@string/lbl_task_quadrant" />
-
-                    <Spinner
-                        android:id="@+id/spinner_quadrant_type"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/item_general_margin"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left|start"
-                        android:layout_marginTop="@dimen/item_top_margin"
-                        android:text="@string/lbl_task_desc" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/item_top_margin"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/edt_task_desc"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:layout_weight="1"
-                            android:gravity="top|left|start"
-                            android:hint="@string/hint_task_desc"
-                            android:minLines="4" />
-
-                        <ImageView
-                            android:id="@+id/img_icon"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:src="@drawable/blue_clock" />
-
-                        <ImageView
-                            android:id="@+id/img_arrow"
-                            android:layout_width="wrap_content"
-                            android:layout_height="100dp" />
-                    </LinearLayout>
-
-
-                    <LinearLayout
-                        android:id="@+id/lyt_status_type"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="visible">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="left|start"
-                            android:layout_marginTop="@dimen/item_top_margin"
-                            android:text="@string/lbl_task_starts_on" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/item_top_margin"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/start_date_picker"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:textSize="18sp" />
-
-                            <ImageView
-                                android:id="@+id/reset_start_date"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:clickable="true"
-                                android:scaleType="fitXY"
-                                android:src="@drawable/reset" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="left|start"
-                            android:layout_marginTop="@dimen/item_top_margin"
-                            android:text="@string/lbl_task_due_on" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/item_top_margin"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/due_date_picker"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:textSize="18sp" />
-
-                            <ImageView
-                                android:id="@+id/reset_due_date"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:clickable="true"
-                                android:scaleType="fitXY"
-                                android:src="@drawable/reset" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="left|start"
-                            android:layout_marginTop="@dimen/item_top_margin"
-                            android:text="@string/lbl_task_repeat_type" />
-
-                        <Spinner
-                            android:id="@+id/spinner_repeat_type"
-                            android:layout_width="match_parent"
-                            android:layout_height="40dp"
-                            android:layout_marginTop="@dimen/item_top_margin" />
-                    </LinearLayout>
+                        android:background="@drawable/right_round_corner_button"
+                        android:src="@drawable/cancel"
+                        android:text="@string/btn_cancel"
+                        android:textAllCaps="false"
+                        android:tint="@android:color/white" />
                 </LinearLayout>
-            </RelativeLayout>
-        </ScrollView>
+            </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/lytBottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="visible">
+            <LinearLayout
+                android:id="@+id/lyt_icon_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible">
 
-            <ImageView
-                android:id="@+id/imgDelete"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:background="@drawable/left_round_corner_button"
-                android:gravity="left|center_vertical"
-                android:src="@drawable/undelete_trash"
-                android:text="@string/btn_delete"
-                android:textAllCaps="false"
-                android:tint="@android:color/white" />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/icon_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/white" />
 
-            <ImageView
-                android:id="@+id/imgCancel"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/right_round_corner_button"
-                android:src="@drawable/cancel"
-                android:text="@string/btn_cancel"
-                android:textAllCaps="false"
-                android:tint="@android:color/white" />
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/imgListCancel"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/round_corner_button"
+                    android:src="@drawable/cancel"
+                    android:text="@string/btn_cancel"
+                    android:textAllCaps="false"
+                    android:tint="@android:color/white" />
+            </LinearLayout>
+        </RelativeLayout>
+
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/icon_list"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/lyt_main"
-        android:layout_alignEnd="@+id/lyt_main"
-        android:layout_alignRight="@+id/lyt_main"
-        android:layout_alignTop="@+id/lyt_main"
-        android:layout_marginBottom="43dp"
-        android:layout_marginTop="46dp"
-        android:background="@color/colorPrimary"
-        android:visibility="gone" />
 </RelativeLayout>
