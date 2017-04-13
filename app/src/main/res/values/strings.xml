@@ -60,7 +60,7 @@
     <string name="hint_q2">Add quadrant 2 title</string>
     <string name="hint_q3">Add quadrant 3 title</string>
     <string name="hint_q4">Add quadrant 4 title</string>
-
+    <string name="demo_text">Font Color</string>
 
     <!--edit task-->
     <string name="hint_task_title">Add task title</string>
@@ -80,6 +80,11 @@
     <string name="intent_action_notification">intent_actionn_notification</string>
     <!--action-->
     <string name="action_notify">Task pending need your attention</string>
+
+    <!--color picker-->
+    <string name="no_color">No Color </string>
+    <string name="label_color_auto">Auto</string>
+    <string name="label_color_custom">Custom</string>
 
     <string-array name="icon_name_array">
         <item>empty_orange128.png</item>

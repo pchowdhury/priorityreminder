@@ -24,6 +24,7 @@ import com.phoenix2k.priorityreminder.UpdateListener;
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
 import com.phoenix2k.priorityreminder.utils.KeyboardUtils;
+import com.phoenix2k.widget.ColorPickerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ import static android.view.View.GONE;
  * Created by Pushpan on 06/02/17.
  */
 
-public class AddProjectFragment extends Fragment {
+public class AddProjectFragment extends Fragment implements ColorPickerView.OnColorSecletionListener {
     public static final String TAG = "AddProjectFragment";
     public static final String VALUE_IS_NEW = "com.phoenix2k.priorityreminder.AddProjectFragment.VALUE_IS_NEW";
     public static final String IS_POP_OVER = "com.phoenix2k.priorityreminder.AddProjectFragment.IS_POP_OVER";
@@ -63,15 +64,24 @@ public class AddProjectFragment extends Fragment {
     View mBtnAdd;
     @BindView(R.id.btn_cancel)
     View mBtnCancel;
+    @BindView(R.id.colorPickerView)
+    ColorPickerView mColorPickerView;
+    @BindView(R.id.lytColorPicker)
+    View mLayoutColorPickerView;
 
     @BindViews({R.id.q1_edt_title, R.id.q2_edt_title, R.id.q3_edt_title, R.id.q4_edt_title})
     List<EditText> mQuadrantNameViews;
+
+    @BindViews({R.id.lyt_q1, R.id.lyt_q2, R.id.lyt_q3, R.id.lyt_q4})
+    List<View> mQuadrantTouchViews;
+
     ArrayList<TextWatcher> mTextWatcher = new ArrayList<>();
 
     private UpdateListener mUpdateListener;
     private Project mCurrentProject;
     private Project mEditBackup;
     private boolean mPopOver;
+    private TaskItem.QuadrantType mTouchQuadrantType;
 
     public static AddProjectFragment getInstance(boolean isCreateNew, boolean isPopOver) {
         AddProjectFragment fragment = new AddProjectFragment();
@@ -110,7 +120,29 @@ public class AddProjectFragment extends Fragment {
             mLytMain.setLayoutParams(params);
             mLytTop.setVisibility(GONE);
         }
-
+        for (View v : mQuadrantTouchViews) {
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (v.getId()) {
+                        case R.id.lyt_q1:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q1_OR_UPCOMING;
+                            break;
+                        case R.id.lyt_q2:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q2_OR_DUE;
+                            break;
+                        case R.id.lyt_q3:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q3_OR_IN_PROGRESS;
+                            break;
+                        case R.id.lyt_q4:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q4_OR_COMPLETED;
+                            break;
+                    }
+                    showColorPicker(true);
+                }
+            });
+        }
+        mColorPickerView.setOnColorSelectionListener(this);
     }
 
     public void switchNewProjectToState(Project project, boolean checked) {
@@ -324,5 +356,26 @@ public class AddProjectFragment extends Fragment {
 
     public boolean isPopOver() {
         return mPopOver;
+    }
+
+    void showColorPicker(boolean show) {
+        if (show) {
+            mColorPickerView.setToEdit(mCurrentProject.mColorQuadrants.get(mTouchQuadrantType));
+        }
+        mLayoutColorPickerView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mColorPickerView.requestFocus();
+        KeyboardUtils.hideKeyboard(getActivity());
+    }
+
+    @Override
+    public void onColorCancel() {
+        showColorPicker(false);
+    }
+
+    @Override
+    public void onColorSelection(int color) {
+        mCurrentProject.mColorQuadrants.put(mTouchQuadrantType, color);
+        mQuadrantTouchViews.get(mTouchQuadrantType.ordinal()).setBackgroundColor(color);
+        showColorPicker(false);
     }
 }

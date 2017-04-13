@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewContainer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@android:color/black"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/lytNoColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/spacer">
+
+        <TextView
+            android:id="@+id/txtNoColor"
+            android:layout_width="@dimen/hsvWidth"
+            android:layout_height="30dp"
+            android:background="@drawable/color_picker_no_color_selector"
+            android:gravity="center"
+            android:text="@string/no_color"
+            android:textColor="@drawable/color_formatter_tab_text_selector" />
+
+        <RadioGroup
+            android:id="@+id/radio_group_color_selection_type"
+            android:layout_width="@dimen/hsvWidth"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_type_auto"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:background="@drawable/segmented_radio_bg_left"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:text="@string/label_color_auto"
+                android:textColor="@android:color/white" />
+
+            <RadioButton
+                android:id="@+id/radio_type_custom"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:background="@drawable/segmented_radio_bg_right"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/label_color_custom"
+                android:textColor="@android:color/white" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/state"
+        android:layout_width="@dimen/hsvWidth"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lytNoColor"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/spacer"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:background="@android:color/white">
+
+            <View
+                android:id="@+id/white_color_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="#ffffffff" />
+
+            <View
+                android:id="@+id/black_color_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="#ff000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:background="@android:color/white">
+
+            <View
+                android:id="@+id/old_color_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="#faa" />
+
+            <View
+                android:id="@+id/new_color_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="#aaf" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.phoenix2k.widget.ShadeSelectorView
+        android:id="@+id/shadeSelectoView"
+        android:layout_width="@dimen/hsvWidth"
+        android:layout_height="@dimen/hsvHeight"
+        android:layout_below="@+id/state"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/spacer" />
+
+    <ImageView
+        android:id="@+id/viewHue"
+        android:layout_width="@dimen/hsvWidth"
+        android:layout_height="@dimen/hueHeight"
+        android:layout_below="@id/shadeSelectoView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/spacer"
+        android:layout_marginTop="@dimen/spacer"
+        android:scaleType="fitXY"
+        android:src="@drawable/color_picker_hue" />
+
+    <ImageView
+        android:id="@+id/cursor"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
+        android:layout_alignTop="@+id/viewHue"
+        android:layout_marginTop="-5dp"
+        android:scaleType="matrix"
+        android:src="@drawable/color_picker_cursor" />
+
+    <ImageView
+        android:id="@+id/target"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_alignTop="@+id/shadeSelectoView"
+        android:scaleType="matrix"
+        android:src="@drawable/color_picker_target" />
+
+    <LinearLayout
+        android:id="@+id/lyt_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/viewHue"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/imgSave"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/left_round_corner_button"
+            android:gravity="left|center_vertical"
+            android:src="@drawable/floppy"
+            android:text="@string/btn_delete"
+            android:textAllCaps="false"
+            android:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/imgCancel"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/right_round_corner_button"
+            android:src="@drawable/cancel"
+            android:text="@string/btn_cancel"
+            android:textAllCaps="false"
+            android:tint="@android:color/white" />
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/lytDisable"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/lyt_button"
+        android:layout_alignEnd="@+id/lytNoColor"
+        android:layout_alignLeft="@+id/lytNoColor"
+        android:layout_alignRight="@+id/lytNoColor"
+        android:layout_alignStart="@+id/lytNoColor"
+
+        android:layout_below="@+id/lytNoColor"
+        android:background="#80ffffff"
+        android:visibility="visible"></View>
+
+</RelativeLayout>

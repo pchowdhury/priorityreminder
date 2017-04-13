@@ -15,4 +15,15 @@
 
     <dimen name="sync_dialog_width">300dp</dimen>
     <dimen name="sync_dialog_height">150dp</dimen>
+
+    <!-- Color picker parameters -->
+    <dimen name="hsvHeight">220dp</dimen>
+    <dimen name="hsvWidth">220dp</dimen>
+    <dimen name="hueHeight">30dp</dimen>
+    <dimen name="spacer">8dp</dimen>
+
+    <!-- Color formatter parameters -->
+    <dimen name="tab_corner_radius">5dp</dimen>
 </resources>
+
+

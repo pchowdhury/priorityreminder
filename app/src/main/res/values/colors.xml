@@ -13,4 +13,6 @@
     <color name="color_icon_selecter">#33EFE6</color>
     <color name="color_transparent">#00000000</color>
     <color name="color_more_translucent_white">#60ffffff</color>
+    <color name="color_formatter_tab_border">#FFFFFF</color>
+    <color name="color_more_gray">#FF888888</color>
 </resources>
