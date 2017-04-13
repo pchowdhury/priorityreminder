@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.phoenix2k.priorityreminder.fragment.AddProjectFragment;
 import com.phoenix2k.priorityreminder.model.PREntity;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -29,6 +30,8 @@ import butterknife.ButterKnife;
  */
 
 public class AddProjectActivity extends AppCompatActivity implements UpdateListener {
+    @BindView(R.id.action_bar_app_version)
+    public TextView mProjectVersionTitleText;
     public TextView mProjectTitleText;
 
     @Override
@@ -74,7 +77,6 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
             });
             mProjectTitleText = (TextView) customActionBarView.findViewById(R.id.project_name);
             mProjectTitleText.setText(isNewProject()?getString(R.string.add_project_title):DataStore.getInstance().getCurrentProject().mTitle);
-            TextView projectVersionTitleText = (TextView) customActionBarView.findViewById(R.id.action_bar_app_version);
             PackageInfo pInfo;
             String version = " v";
             try {
@@ -83,7 +85,7 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            projectVersionTitleText.setText(getString(R.string.app_name) + version);
+            mProjectVersionTitleText.setText(getString(R.string.app_name) + version);
             supportActionBar.setCustomView(customActionBarView);
             ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
                     ActionBar.LayoutParams.MATCH_PARENT);

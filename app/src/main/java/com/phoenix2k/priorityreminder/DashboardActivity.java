@@ -57,6 +57,8 @@ public class DashboardActivity extends AppCompatActivity
     public static final int REQUEST_ADD_TASK = 101;
     public static final int REQUEST_SYNC = 102;
 
+    @BindView(R.id.action_bar_app_version)
+    public TextView mProjectVersionTitleText;
     @BindView(R.id.main_progress)
     public View mMainProress;
     @BindView(R.id.drawer_layout)
@@ -192,7 +194,6 @@ public class DashboardActivity extends AppCompatActivity
                 }
             });
             mProjectTitleText = (TextView) customActionBarView.findViewById(R.id.project_name);
-            TextView projectVersionTitleText = (TextView) customActionBarView.findViewById(R.id.action_bar_app_version);
             PackageInfo pInfo;
             String version = " v";
             try {
@@ -201,7 +202,7 @@ public class DashboardActivity extends AppCompatActivity
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            projectVersionTitleText.setText(getString(R.string.app_name) + version);
+            mProjectVersionTitleText.setText(getString(R.string.app_name) + version);
             supportActionBar.setCustomView(customActionBarView);
             ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
                     ActionBar.LayoutParams.MATCH_PARENT);

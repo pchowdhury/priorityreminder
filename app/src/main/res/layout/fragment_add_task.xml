@@ -281,7 +281,5 @@
                     android:tint="@android:color/white" />
             </LinearLayout>
         </RelativeLayout>
-
     </LinearLayout>
-
 </RelativeLayout>
