@@ -82,10 +82,6 @@ public class AddTaskFragment extends Fragment {
     Spinner mSpinnerRepeatType;
     @BindView(R.id.imgSave)
     View mImgSave;
-    @BindView(R.id.progress)
-    View mProgressView;
-    @BindView(R.id.progress_text)
-    TextView mProgressTextView;
     @BindView(R.id.imgDelete)
     View mImgDelete;
     @BindView(R.id.start_date_picker)
@@ -373,7 +369,6 @@ public class AddTaskFragment extends Fragment {
     public void onClickDelete(View v) {
         onDeleteTask();
     }
-
 
     @OnClick(R.id.start_date_picker)
     public void onClickStartDatePicker(View v) {

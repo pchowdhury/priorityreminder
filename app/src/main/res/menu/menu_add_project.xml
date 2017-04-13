@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_delete"
-        android:icon="@drawable/undelete_trash"
+        android:id="@+id/action_save"
+        android:icon="@drawable/floppy"
         android:orderInCategory="101"
-        android:title="@string/action_delete"
+        android:title="@string/action_save"
         android:actionViewClass="android.widget.ImageButton"
         app:showAsAction="ifRoom" />
 </menu>

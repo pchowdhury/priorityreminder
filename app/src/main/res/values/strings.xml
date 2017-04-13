@@ -31,6 +31,7 @@
     <string name="lbl_project_title">Add Title</string>
     <string name="btn_add_project"> + Add Project</string>
     <string name="btn_add">+ Add</string>
+    <string name="btn_delete">Delete</string>
     <string name="btn_update">Update</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_yes">Yes</string>

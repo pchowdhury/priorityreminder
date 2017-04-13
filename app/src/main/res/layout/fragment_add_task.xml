@@ -13,11 +13,12 @@
         android:background="@color/color_default_q1"
         android:orientation="vertical">
 
+
         <LinearLayout
             android:id="@+id/lytTop"
             android:layout_width="match_parent"
             android:layout_height="46dp"
-            android:background="@drawable/gradient_1"
+            android:background="@color/colorPrimary"
             android:gravity="center_vertical">
 
             <TextView
@@ -38,11 +39,11 @@
                 android:textStyle="bold" />
 
             <ImageView
-                android:id="@+id/imgDelete"
+                android:id="@+id/imgSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/undelete_trash"
-                android:visibility="visible" />
+                android:src="@drawable/floppy"
+                android:visibility="visible" android:tint="@android:color/white"/>
         </LinearLayout>
 
 
@@ -208,50 +209,40 @@
                             android:layout_marginTop="@dimen/item_top_margin" />
                     </LinearLayout>
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/progress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <ProgressBar
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:id="@+id/progress_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin" />
-                </LinearLayout>
             </RelativeLayout>
         </ScrollView>
 
         <LinearLayout
             android:id="@+id/lytBottom"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
-            android:background="@drawable/gradient_1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
             android:visibility="visible">
 
             <ImageView
-                android:id="@+id/imgSave"
-                android:layout_width="0dp"
+                android:id="@+id/imgDelete"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/floppy" />
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/left_round_corner_button"
+                android:gravity="left|center_vertical"
+                android:src="@drawable/undelete_trash"
+                android:text="@string/btn_delete"
+                android:textAllCaps="false"
+                android:tint="@android:color/white" />
 
             <ImageView
                 android:id="@+id/imgCancel"
-                android:layout_width="0dp"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/undelete" />
+                android:background="@drawable/right_round_corner_button"
+                android:src="@drawable/cancel"
+                android:text="@string/btn_cancel"
+                android:textAllCaps="false"
+                android:tint="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
 

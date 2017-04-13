@@ -99,11 +99,8 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_delete_task, menu);
+        getMenuInflater().inflate(R.menu.menu_add_task, menu);
         applyMenuThemeElements(menu, Color.WHITE);
-        if (isNewTask()) {
-            menu.getItem(0).setVisible(false);
-        }
         return true;
     }
 
@@ -115,18 +112,18 @@ public class AddTaskActivity extends AppCompatActivity implements UpdateListener
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete) {
-            onDeleteTask();
+        if (id == R.id.action_save) {
+            onSaveTask();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void onDeleteTask() {
+    private void onSaveTask() {
         AddTaskFragment fragment = (AddTaskFragment) getSupportFragmentManager().findFragmentByTag(AddTaskFragment.TAG);
         if (fragment != null) {
-            fragment.onDeleteTask();
+            fragment.onSaveOrUpdate();
         }
     }
 

@@ -98,9 +98,6 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_add_project, menu);
         applyMenuThemeElements(menu, Color.WHITE);
-        if (isNewProject()) {
-            menu.getItem(0).setVisible(false);
-        }
         return true;
     }
 
@@ -116,8 +113,8 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete) {
-            onDeleteProject();
+        if (id == R.id.action_save) {
+            onSaveProject();
             return true;
         }
 
@@ -136,13 +133,12 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
 
     @Override
     public void onNewItemAdded(PREntity item) {
-        setResult(RESULT_OK);
-        finish();
+        onFinishWithSuccess();
     }
 
     @Override
     public void onDeleteItem(PREntity item) {
-
+        onFinishWithSuccess();
     }
 
     @Override
@@ -152,18 +148,28 @@ public class AddProjectActivity extends AppCompatActivity implements UpdateListe
 
     @Override
     public void onItemUpdated(PREntity item) {
-
+        onFinishWithSuccess();
     }
 
     @Override
     public void onCancelEdit(PREntity item) {
-        setResult(RESULT_CANCELED);
+        onFinishWithCancel();
+    }
+
+    public void onSaveProject() {
+        AddProjectFragment fragment = (AddProjectFragment) getSupportFragmentManager().findFragmentByTag(AddProjectFragment.TAG);
+        if(fragment!=null){
+            fragment.onSaveOrUpdate();
+        }
+    }
+
+    void onFinishWithSuccess(){
+        setResult(RESULT_OK);
         finish();
     }
 
-    public void onDeleteProject() {
-        onDeleteItem(DataStore.getInstance().deleteProject());
-        setResult(RESULT_OK);
+    void onFinishWithCancel(){
+        setResult(RESULT_CANCELED);
         finish();
     }
 }

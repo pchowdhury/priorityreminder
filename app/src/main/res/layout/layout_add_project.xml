@@ -9,235 +9,236 @@
         android:id="@+id/lytMain"
         android:layout_width="500dp"
         android:layout_height="600dp"
-        android:layout_centerInParent="true"
-        android:layout_margin="50dp">
+        android:background="@android:color/white"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="131dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
 
         <LinearLayout
-            android:id="@+id/lytTop"
-            android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:background="@drawable/gradient_1"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/txtTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:lines="1"
-                android:padding="5dp"
-                android:scrollHorizontally="true"
-                android:shadowColor="@android:color/black"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="2"
-                android:text="@string/add_project_title"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/imgDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/undelete_trash"
-                android:visibility="visible" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/lyt_add_details"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/lytTop"
-            android:background="@android:color/white"
-            android:orientation="vertical"
-            android:padding="10dp"
-            android:visibility="visible">
-
-
-            <EditText
-                android:id="@+id/edt_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:hint="@string/hint_add_project" />
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/lyt_status"
+                android:id="@+id/lytTop"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="46dp"
+                android:background="@color/colorPrimary"
+                android:gravity="center_vertical">
 
                 <TextView
+                    android:id="@+id/txtTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left|start"
                     android:layout_weight="1"
-                    android:text="@string/lbl_status" />
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:padding="5dp"
+                    android:scrollHorizontally="true"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="2"
+                    android:text="@string/add_project_title"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
-                <Switch
-                    android:id="@+id/type_switch"
+                <ImageView
+                    android:id="@+id/btn_add"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|end"
-                    android:layout_marginTop="5dp"
-                    android:checked="false" />
+                    android:src="@drawable/floppy"
+                    android:visibility="visible" android:tint="@android:color/white"/>
             </LinearLayout>
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|start"
-                android:text="@string/lbl_theme" />
-
-
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:layout_weight="1">
 
-                <LinearLayout
-                    android:id="@+id/lyt_quadrant"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="5dp"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:id="@+id/lyt_q1"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@color/color_default_q1" />
-
-                        <View
-                            android:id="@+id/lyt_q2"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@color/color_default_q2" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:id="@+id/lyt_q3"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@color/color_default_q3" />
-
-                        <View
-                            android:id="@+id/lyt_q4"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@color/color_default_q4" />
-
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content">
 
-                    <EditText
-                        android:id="@+id/q1_edt_title"
+                    <LinearLayout
+                        android:id="@+id/lyt_add_details"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:hint="@string/hint_q1"
-                        android:text="@string/lbl_title_quadrant1" />
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="visible">
 
-                    <EditText
-                        android:id="@+id/q2_edt_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:hint="@string/hint_q2"
-                        android:text="@string/lbl_title_quadrant2" />
+                        <EditText
+                            android:id="@+id/edt_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:hint="@string/hint_add_project" />
 
-                    <EditText
-                        android:id="@+id/q3_edt_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:hint="@string/hint_q3"
-                        android:text="@string/lbl_title_quadrant3" />
+                        <LinearLayout
+                            android:id="@+id/lyt_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                    <EditText
-                        android:id="@+id/q4_edt_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:hint="@string/hint_q4"
-                        android:text="@string/lbl_title_quadrant4" />
-                </LinearLayout>
-            </LinearLayout>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="left|start"
+                                android:layout_weight="1"
+                                android:text="@string/lbl_status" />
+
+                            <Switch
+                                android:id="@+id/type_switch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="right|end"
+                                android:layout_marginTop="5dp"
+                                android:checked="false" />
+                        </LinearLayout>
 
 
-            <RelativeLayout
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left|start"
+                            android:text="@string/lbl_theme" />
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:id="@+id/lyt_quadrant"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginTop="5dp"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal">
+
+                                    <View
+                                        android:id="@+id/lyt_q1"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:background="@color/color_default_q1" />
+
+                                    <View
+                                        android:id="@+id/lyt_q2"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:background="@color/color_default_q2" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal">
+
+                                    <View
+                                        android:id="@+id/lyt_q3"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:background="@color/color_default_q3" />
+
+                                    <View
+                                        android:id="@+id/lyt_q4"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:background="@color/color_default_q4" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <EditText
+                                    android:id="@+id/q1_edt_title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:hint="@string/hint_q1"
+                                    android:text="@string/lbl_title_quadrant1" />
+
+                                <EditText
+                                    android:id="@+id/q2_edt_title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:hint="@string/hint_q2"
+                                    android:text="@string/lbl_title_quadrant2" />
+
+                                <EditText
+                                    android:id="@+id/q3_edt_title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:hint="@string/hint_q3"
+                                    android:text="@string/lbl_title_quadrant3" />
+
+                                <EditText
+                                    android:id="@+id/q4_edt_title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:hint="@string/hint_q4"
+                                    android:text="@string/lbl_title_quadrant4" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </ScrollView>
+
+            <LinearLayout
+                android:id="@+id/lyt_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="visible">
 
-                <LinearLayout
-                    android:id="@+id/lyt_button"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/imgDelete"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/left_round_corner_button"
+                    android:gravity="left|center_vertical"
+                    android:src="@drawable/undelete_trash"
+                    android:text="@string/btn_delete"
+                    android:textAllCaps="false"
+                    android:tint="@android:color/white" />
 
-                    <Button
-                        android:id="@+id/btn_add"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/btn_add"
-                        android:textAllCaps="false" />
-
-                    <Button
-                        android:id="@+id/btn_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/btn_cancel"
-                        android:textAllCaps="false" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/progress"
-                    android:layout_width="wrap_content"
+                <ImageView
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <ProgressBar
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:id="@+id/progress_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                        android:layout_marginStart="@dimen/activity_horizontal_margin" />
-                </LinearLayout>
-            </RelativeLayout>
+                    android:background="@drawable/right_round_corner_button"
+                    android:src="@drawable/cancel"
+                    android:text="@string/btn_cancel"
+                    android:textAllCaps="false"
+                    android:tint="@android:color/white" />
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

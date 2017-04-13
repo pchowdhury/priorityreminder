@@ -5,12 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -54,16 +55,14 @@ public class AddProjectFragment extends Fragment {
     View mLytAddDetails;
     @BindView(R.id.edt_title)
     EditText mEditTitle;
-    @BindView(R.id.progress)
-    View mProgressView;
-    @BindView(R.id.progress_text)
-    TextView mProgressTextView;
     @BindView(R.id.lyt_button)
     View mLytButton;
     @BindView(R.id.type_switch)
     Switch mStatusSwitch;
     @BindView(R.id.btn_add)
-    Button mBtnAdd;
+    View mBtnAdd;
+    @BindView(R.id.btn_cancel)
+    View mBtnCancel;
 
     @BindViews({R.id.q1_edt_title, R.id.q2_edt_title, R.id.q3_edt_title, R.id.q4_edt_title})
     List<EditText> mQuadrantNameViews;
@@ -226,6 +225,7 @@ public class AddProjectFragment extends Fragment {
     public void openToEdit(boolean isCreateNew) {
         if (isCreateNew) {
             mImgDelete.setVisibility(GONE);
+            ViewCompat.setBackground(mBtnCancel, ContextCompat.getDrawable(getContext(), R.drawable.round_corner_button));
             mTitleText.setText(getString(R.string.add_project_title));
             DataStore.getInstance().setNewProject(Project.newProject(getContext()));
             setCurrentProject(DataStore.getInstance().getNewProject());
@@ -236,7 +236,6 @@ public class AddProjectFragment extends Fragment {
             mEditBackup = new Project();
             DataStore.getInstance().getCurrentProject().copyTo(mEditBackup);
         }
-        mBtnAdd.setText(getString(isCreateNew ? R.string.btn_add : R.string.btn_update));
         validateAddButton();
         loadView();
     }

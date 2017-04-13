@@ -20,7 +20,6 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -29,13 +28,13 @@
             android:theme="@style/Theme.SyncDialog" />
         <activity
             android:name=".DashboardActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/PRAppTheme" />
         <activity
             android:name=".AddProjectActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/PRAppTheme" />
         <activity
             android:name=".AddTaskActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/PRAppTheme" />
         <receiver
             android:name="com.phoenix2k.priorityreminder.receiver.AlarmReceiver"
             android:enabled="true" >
