@@ -7,6 +7,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -84,6 +86,8 @@ public class AddTaskFragment extends Fragment {
     View mImgSave;
     @BindView(R.id.imgDelete)
     View mImgDelete;
+    @BindView(R.id.imgCancel)
+    View mImgCancel;
     @BindView(R.id.start_date_picker)
     TextView mTextStartDate;
     @BindView(R.id.due_date_picker)
@@ -151,6 +155,7 @@ public class AddTaskFragment extends Fragment {
                 taskItem = TaskItem.newTaskItem();
                 taskItem.mProjectId = project.mId;
                 mImgDelete.setVisibility(GONE);
+                ViewCompat.setBackground(mImgCancel, ContextCompat.getDrawable(getContext(), R.drawable.round_corner_button));
             }
             setCurrentProject(DataStore.getInstance().getCurrentProject());
             DataStore.getInstance().setCurrentTaskItem(taskItem);
