@@ -120,28 +120,6 @@ public class AddProjectFragment extends Fragment implements ColorPickerView.OnCo
             mLytMain.setLayoutParams(params);
             mLytTop.setVisibility(GONE);
         }
-        for (View v : mQuadrantTouchViews) {
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switch (v.getId()) {
-                        case R.id.lyt_q1:
-                            mTouchQuadrantType = TaskItem.QuadrantType.Q1_OR_UPCOMING;
-                            break;
-                        case R.id.lyt_q2:
-                            mTouchQuadrantType = TaskItem.QuadrantType.Q2_OR_DUE;
-                            break;
-                        case R.id.lyt_q3:
-                            mTouchQuadrantType = TaskItem.QuadrantType.Q3_OR_IN_PROGRESS;
-                            break;
-                        case R.id.lyt_q4:
-                            mTouchQuadrantType = TaskItem.QuadrantType.Q4_OR_COMPLETED;
-                            break;
-                    }
-                    showColorPicker(true);
-                }
-            });
-        }
         mColorPickerView.setOnColorSelectionListener(this);
     }
 
@@ -269,6 +247,30 @@ public class AddProjectFragment extends Fragment implements ColorPickerView.OnCo
             mEditBackup = new Project();
             DataStore.getInstance().getCurrentProject().copyTo(mEditBackup);
             mStatusSwitch.setChecked(DataStore.getInstance().getCurrentProject().mProjectType == Project.ProjectType.State);
+        }
+        for (int i = 0; i < mQuadrantTouchViews.size(); i++) {
+            View v = mQuadrantTouchViews.get(i);
+            v.setBackgroundColor(mCurrentProject.mColorQuadrants.get(TaskItem.QuadrantType.values()[i]));
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (v.getId()) {
+                        case R.id.lyt_q1:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q1_OR_UPCOMING;
+                            break;
+                        case R.id.lyt_q2:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q2_OR_DUE;
+                            break;
+                        case R.id.lyt_q3:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q3_OR_IN_PROGRESS;
+                            break;
+                        case R.id.lyt_q4:
+                            mTouchQuadrantType = TaskItem.QuadrantType.Q4_OR_COMPLETED;
+                            break;
+                    }
+                    showColorPicker(true);
+                }
+            });
         }
         mStatusSwitch.setOnCheckedChangeListener(mSwitchChangedListener);
         validateAddButton();

@@ -473,6 +473,12 @@ public class DataStore {
         setTasks(SQLDataStore.getInstance().getTaskItems(null, null, null, false));
     }
 
+    public void validateProjectIndex() {
+        if (mCurrentProjectIndex >= mProjects.size()) {
+            mCurrentProjectIndex = mProjects.size() - 1;
+        }
+    }
+
     public static void sortedProjectByIndex(ArrayList<Project> items) {
         Collections.sort(items, getInstance().mSortCompartor.get(SortType.Index.ordinal()));
     }

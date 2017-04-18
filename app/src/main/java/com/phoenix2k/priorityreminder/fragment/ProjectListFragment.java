@@ -86,6 +86,8 @@ public class ProjectListFragment extends BasicFragment {
         mListView.postDelayed(new Runnable() {
             @Override
             public void run() {
+                //correct index
+                DataStore.getInstance().validateProjectIndex();
                 selectProject(DataStore.getInstance().getCurrentProjectIndex(), true);
             }
         }, 100);
