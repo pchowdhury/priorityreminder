@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.phoenix2k.priorityreminder.model.Project;
 import com.phoenix2k.priorityreminder.model.TaskItem;
+import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -177,6 +178,23 @@ public class DbHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    protected boolean bulkUpdateOfflineToOnlineTime(String table, String col, long time) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues set = new ContentValues();
+            set.put(col, time);
+            db.update(table, set, col + " = ?", new String[]{IDGenerator.NO_TIMESTAMP_INDICATE_OFFLINE_CHANGE + ""});
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            LogUtils.printException(e);
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+        return true;
+    }
+
     protected boolean bulkDeleteItems(String table, String idName, List<String> ids) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
@@ -185,7 +203,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 for (int i = 0; i < ids.size(); i++) {
                     db.delete(table, idName + " = ?", new String[]{ids.get(i)});
                 }
-            }else{
+            } else {
                 db.delete(table, null, null);
             }
             db.setTransactionSuccessful();

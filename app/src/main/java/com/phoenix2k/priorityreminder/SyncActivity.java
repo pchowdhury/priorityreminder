@@ -17,12 +17,15 @@ import com.phoenix2k.priorityreminder.task.FindAppFolderTask;
 import com.phoenix2k.priorityreminder.task.LoadAllTasks;
 import com.phoenix2k.priorityreminder.task.LoadProjectsTask;
 import com.phoenix2k.priorityreminder.task.SearchFileTask;
+import com.phoenix2k.priorityreminder.utils.IDGenerator;
 import com.phoenix2k.priorityreminder.utils.LogUtils;
 import com.phoenix2k.priorityreminder.utils.StaticDataProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -182,6 +185,12 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
 
     public void mergeWithRemote(ArrayList<Project> remoteProjects, ArrayList<TaskItem> remoteTasks) {
 
+        boolean success = SQLDataStore.getInstance().updateOfflineItems();
+        if(!success){
+            LogUtils.logD(TAG, "Sync failed due while updating offline data");
+            onSyncFailed();
+            return;
+        }
         if (remoteProjects == null) {
             remoteProjects = new ArrayList<>();
         }
@@ -345,8 +354,48 @@ public class SyncActivity extends BasicCommunicationActivity implements SyncMana
         }
     }
 
-    private void onSetupValidationComplete() {
+
+    /**
+     * Wait till the IDGenerator is initialized
+     */
+    private void validateInitialization() {
+        IDGenerator.init();
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (IDGenerator.isInitialized()) {
+                    timer.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finishInitialization();
+                        }
+                    });
+                } else {
+                    if (IDGenerator.hasError()) {
+                        timer.cancel();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                onDisplayInfo("Sync failed. Check internet settings and try again.");
+                                onSyncFailed();
+                                IDGenerator.restart();
+                            }
+                        });
+                    }
+                }
+            }
+        }, 0, 200);
+    }
+
+    private void finishInitialization() {
         new LoadProjectsTask(this, getUserCredentials(), this).execute();
+    }
+
+
+    private void onSetupValidationComplete() {
+        validateInitialization();
     }
 
 

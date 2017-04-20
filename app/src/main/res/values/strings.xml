@@ -18,7 +18,7 @@
     <string name="progress_syncing">Syncing projects....</string>
 
 
-    <string name="dialog_lbl_fatal_error_recoverable">Failed to initialize. Please check your internet connection and retry.</string>
+    <string name="dialog_lbl_fatal_error_recoverable">Failed to initialize. Please check your internet connection and retry or continue in offine mode</string>
     <string name="dialog_title_fatal_error_recoverable">Error</string>
 
     <string name="dialog_lbl_logout_confirmation">Do you really want to logout?</string>
@@ -38,6 +38,7 @@
     <string name="btn_no">No</string>
 
     <string name="btn_retry">Retry</string>
+    <string name="btn_continue">Continue</string>
     <string name="btn_exit">Exit</string>
 
     <string name="lbl_status">Project with status</string>

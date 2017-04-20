@@ -215,6 +215,7 @@ public class DashboardActivity extends AppCompatActivity
      * Wait till the IDGenerator is initialized
      */
     private void validateInitialization() {
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         IDGenerator.init();
 //        finishInitialization();
         showProgress(true);
@@ -248,7 +249,6 @@ public class DashboardActivity extends AppCompatActivity
 
     private void showFatalErrorDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
         builder.setTitle(R.string.dialog_title_fatal_error_recoverable).setMessage(getResources().getString(R.string.dialog_lbl_fatal_error_recoverable));
         builder.setPositiveButton(R.string.btn_retry, new DialogInterface.OnClickListener() {
             @Override
@@ -265,10 +265,21 @@ public class DashboardActivity extends AppCompatActivity
                 finish();
             }
         });
+        builder.setNeutralButton(R.string.btn_continue, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                continueOfflineMode();
+            }
+        });
 
         AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+    }
+
+    private void continueOfflineMode() {
+        finishInitialization(false);
     }
 
     private void showLogoutConfirmationDialog() {
@@ -333,6 +344,7 @@ public class DashboardActivity extends AppCompatActivity
             }, 200);
         }
         showProgress(false);
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
 

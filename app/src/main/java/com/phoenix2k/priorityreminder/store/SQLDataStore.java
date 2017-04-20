@@ -59,7 +59,7 @@ public class SQLDataStore {
     }
 
     public ArrayList<TaskItem> getTaskItems(String projectId, TaskItem.QuadrantType quarter, DataStore.SortType sortType, boolean includeTrashedItem) {
-        String trashedquery = includeTrashedItem ? "":" WHERE " + Project.Column.TRASHED.name() + " = 0";
+        String trashedquery = includeTrashedItem ? "" : " WHERE " + Project.Column.TRASHED.name() + " = 0";
         StringBuffer query = new StringBuffer("SELECT * FROM " + TaskItem.TAG + trashedquery);
         String orderBy = null;
         if (sortType != null) {
@@ -126,7 +126,7 @@ public class SQLDataStore {
     }
 
     public ArrayList<Project> getProjects(boolean includeTrashedItem) {
-        String trashedquery = includeTrashedItem ? "":" WHERE " + Project.Column.TRASHED.name() + " = 0";
+        String trashedquery = includeTrashedItem ? "" : " WHERE " + Project.Column.TRASHED.name() + " = 0";
         ArrayList<Project> projects = readProjects(mDbHelper.getQueryResults("SELECT * from " + Project.TAG + trashedquery));
         return projects;
     }
@@ -294,5 +294,15 @@ public class SQLDataStore {
 
     public static void deInit() {
         mInstance = null;
+    }
+
+    public boolean updateOfflineItems() {
+        long now = IDGenerator.getCurrentTimeStamp();
+        if (now > 0) {
+            boolean success = mDbHelper.bulkUpdateOfflineToOnlineTime(Project.TAG, Project.Column.UPDATED_ON.name(), now);
+            success = success && mDbHelper.bulkUpdateOfflineToOnlineTime(TaskItem.TAG, TaskItem.Column.UPDATED_ON.name(), now);
+            return success;
+        }
+        return false;
     }
 }

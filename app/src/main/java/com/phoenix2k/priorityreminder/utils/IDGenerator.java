@@ -15,6 +15,7 @@ import java.util.UUID;
  */
 
 public class IDGenerator {
+    public static final long NO_TIMESTAMP_INDICATE_OFFLINE_CHANGE = -2;
 
     private static IDGenerator mInstance;
     private long mCurrentMillis;
@@ -37,7 +38,7 @@ public class IDGenerator {
 //    }
 
     public static long getCurrentTimeStamp() {
-        return mInstance.mCurrentMillis;
+        return mInstance.mInitialized ? mInstance.mCurrentMillis : NO_TIMESTAMP_INDICATE_OFFLINE_CHANGE;
     }
 
     public static void init() {
